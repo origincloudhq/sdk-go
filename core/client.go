@@ -53,7 +53,7 @@ func WithCredentials(credentials Credentials) Option {
 }
 
 // WithRegion sends calls to a region's front door,
-// {service}.{region}.origincloudapis.com, for the services that have one.
+// {service}.{region}.origincloudapis.eu, for the services that have one.
 // It overrides ORIGINCLOUD_REGION; an empty region uses the regionless
 // endpoint.
 func WithRegion(region string) Option {
@@ -139,9 +139,9 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 func (c *Client) Service(shortcode string, regional bool) *Service {
 	base := c.endpoint
 	if base == nil {
-		host := shortcode + ".origincloudapis.com"
+		host := shortcode + ".origincloudapis.eu"
 		if regional && c.region != "" {
-			host = shortcode + "." + c.region + ".origincloudapis.com"
+			host = shortcode + "." + c.region + ".origincloudapis.eu"
 		}
 		base = &url.URL{Scheme: "https", Host: host}
 	}

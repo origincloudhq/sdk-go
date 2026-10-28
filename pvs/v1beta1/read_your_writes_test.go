@@ -66,7 +66,7 @@ func (f *laggingFrontDoor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if time.Now().After(deadline) {
 				w.WriteHeader(http.StatusServiceUnavailable)
 				_, _ = io.WriteString(w, `{"error":{"code":503,"status":"UNAVAILABLE","message":"the read model hasn't reached the token yet","details":[
-					{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_UNAVAILABLE","domain":"origincloudapis.com"},
+					{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_UNAVAILABLE","domain":"origincloudapis.eu"},
 					{"@type":"type.googleapis.com/google.rpc.RetryInfo","retryDelay":"0.020s"}]}}`)
 				return
 			}
@@ -75,7 +75,7 @@ func (f *laggingFrontDoor) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if f.readModel() < wanted {
 			w.WriteHeader(http.StatusNotFound)
 			_, _ = io.WriteString(w, `{"error":{"code":404,"status":"NOT_FOUND","message":"volume not found","details":[
-				{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"NOT_FOUND","domain":"origincloudapis.com"}]}}`)
+				{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"NOT_FOUND","domain":"origincloudapis.eu"}]}}`)
 			return
 		}
 		f.write(w, &pvsv1beta1.Volume{Name: volumeName(wanted), State: pvsv1beta1.Volume_AVAILABLE, SizeGib: 1})

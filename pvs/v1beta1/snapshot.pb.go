@@ -749,12 +749,12 @@ var File_origincloud_pvs_v1beta1_snapshot_proto protoreflect.FileDescriptor
 
 const file_origincloud_pvs_v1beta1_snapshot_proto_rawDesc = "" +
 	"\n" +
-	"&origincloud/pvs/v1beta1/snapshot.proto\x12\x17origincloud.pvs.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xc1\a\n" +
+	"&origincloud/pvs/v1beta1/snapshot.proto\x12\x17origincloud.pvs.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xbf\a\n" +
 	"\bSnapshot\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12M\n" +
-	"\rsource_volume\x18\x03 \x01(\tB(\xe2A\x02\x02\x05\xfaA \n" +
-	"\x1epvs.origincloudapis.com/VolumeR\fsourceVolume\x12,\n" +
+	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12L\n" +
+	"\rsource_volume\x18\x03 \x01(\tB'\xe2A\x02\x02\x05\xfaA\x1f\n" +
+	"\x1dpvs.origincloudapis.eu/VolumeR\fsourceVolume\x12,\n" +
 	"\x0fsource_size_gib\x18\x04 \x01(\x05B\x04\xe2A\x01\x03R\rsourceSizeGib\x12C\n" +
 	"\x05state\x18\x05 \x01(\x0e2'.origincloud.pvs.v1beta1.Snapshot.StateB\x04\xe2A\x01\x03R\x05state\x12'\n" +
 	"\fstate_reason\x18\x06 \x01(\tB\x04\xe2A\x01\x03R\vstateReason\x12b\n" +
@@ -780,43 +780,43 @@ const file_origincloud_pvs_v1beta1_snapshot_proto_rawDesc = "" +
 	"PROTECTING\x10\x02\x12\r\n" +
 	"\tPROTECTED\x10\x03\x12\x10\n" +
 	"\fUNPROTECTING\x10\x04\x12\x15\n" +
-	"\x11PROTECTION_FAILED\x10\x05:p\xeaAm\n" +
-	" pvs.origincloudapis.com/Snapshot\x124projects/{project}/zones/{zone}/snapshots/{snapshot}*\tsnapshots2\bsnapshot\"S\n" +
-	"\x12GetSnapshotRequest\x12=\n" +
-	"\x04name\x18\x01 \x01(\tB)\xe2A\x01\x02\xfaA\"\n" +
-	" pvs.origincloudapis.com/SnapshotR\x04name\"\xa1\x01\n" +
-	"\x14ListSnapshotsRequest\x12A\n" +
-	"\x06parent\x18\x01 \x01(\tB)\xe2A\x01\x02\xfaA\"\x12 pvs.origincloudapis.com/SnapshotR\x06parent\x12!\n" +
+	"\x11PROTECTION_FAILED\x10\x05:o\xeaAl\n" +
+	"\x1fpvs.origincloudapis.eu/Snapshot\x124projects/{project}/zones/{zone}/snapshots/{snapshot}*\tsnapshots2\bsnapshot\"R\n" +
+	"\x12GetSnapshotRequest\x12<\n" +
+	"\x04name\x18\x01 \x01(\tB(\xe2A\x01\x02\xfaA!\n" +
+	"\x1fpvs.origincloudapis.eu/SnapshotR\x04name\"\xa0\x01\n" +
+	"\x14ListSnapshotsRequest\x12@\n" +
+	"\x06parent\x18\x01 \x01(\tB(\xe2A\x01\x02\xfaA!\x12\x1fpvs.origincloudapis.eu/SnapshotR\x06parent\x12!\n" +
 	"\tpage_size\x18\x02 \x01(\x05B\x04\xe2A\x01\x01R\bpageSize\x12#\n" +
 	"\n" +
 	"page_token\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\tpageToken\"\x80\x01\n" +
 	"\x15ListSnapshotsResponse\x12?\n" +
 	"\tsnapshots\x18\x01 \x03(\v2!.origincloud.pvs.v1beta1.SnapshotR\tsnapshots\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xcc\x01\n" +
-	"\x15CreateSnapshotRequest\x12A\n" +
-	"\x06parent\x18\x01 \x01(\tB)\xe2A\x01\x02\xfaA\"\x12 pvs.origincloudapis.com/SnapshotR\x06parent\x12C\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xcb\x01\n" +
+	"\x15CreateSnapshotRequest\x12@\n" +
+	"\x06parent\x18\x01 \x01(\tB(\xe2A\x01\x02\xfaA!\x12\x1fpvs.origincloudapis.eu/SnapshotR\x06parent\x12C\n" +
 	"\bsnapshot\x18\x02 \x01(\v2!.origincloud.pvs.v1beta1.SnapshotB\x04\xe2A\x01\x02R\bsnapshot\x12+\n" +
 	"\n" +
 	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\x9f\x01\n" +
 	"\x15UpdateSnapshotRequest\x12C\n" +
 	"\bsnapshot\x18\x01 \x01(\v2!.origincloud.pvs.v1beta1.SnapshotB\x04\xe2A\x01\x02R\bsnapshot\x12A\n" +
 	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x04\xe2A\x01\x02R\n" +
-	"updateMask\"\x83\x01\n" +
-	"\x15DeleteSnapshotRequest\x12=\n" +
-	"\x04name\x18\x01 \x01(\tB)\xe2A\x01\x02\xfaA\"\n" +
-	" pvs.origincloudapis.com/SnapshotR\x04name\x12+\n" +
+	"updateMask\"\x82\x01\n" +
+	"\x15DeleteSnapshotRequest\x12<\n" +
+	"\x04name\x18\x01 \x01(\tB(\xe2A\x01\x02\xfaA!\n" +
+	"\x1fpvs.origincloudapis.eu/SnapshotR\x04name\x12+\n" +
 	"\n" +
-	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\x84\x01\n" +
-	"\x16ProtectSnapshotRequest\x12=\n" +
-	"\x04name\x18\x01 \x01(\tB)\xe2A\x01\x02\xfaA\"\n" +
-	" pvs.origincloudapis.com/SnapshotR\x04name\x12+\n" +
+	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\x83\x01\n" +
+	"\x16ProtectSnapshotRequest\x12<\n" +
+	"\x04name\x18\x01 \x01(\tB(\xe2A\x01\x02\xfaA!\n" +
+	"\x1fpvs.origincloudapis.eu/SnapshotR\x04name\x12+\n" +
 	"\n" +
-	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\x86\x01\n" +
-	"\x18UnprotectSnapshotRequest\x12=\n" +
-	"\x04name\x18\x01 \x01(\tB)\xe2A\x01\x02\xfaA\"\n" +
-	" pvs.origincloudapis.com/SnapshotR\x04name\x12+\n" +
+	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\x85\x01\n" +
+	"\x18UnprotectSnapshotRequest\x12<\n" +
+	"\x04name\x18\x01 \x01(\tB(\xe2A\x01\x02\xfaA!\n" +
+	"\x1fpvs.origincloudapis.eu/SnapshotR\x04name\x12+\n" +
 	"\n" +
-	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId2\x90\f\n" +
+	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId2\x8f\f\n" +
 	"\x0fSnapshotService\x12\x9c\x01\n" +
 	"\vGetSnapshot\x12+.origincloud.pvs.v1beta1.GetSnapshotRequest\x1a!.origincloud.pvs.v1beta1.Snapshot\"=\xdaA\x04name\x82\xd3\xe4\x93\x020\x12./v1beta1/{name=projects/*/zones/*/snapshots/*}\x12\xaf\x01\n" +
 	"\rListSnapshots\x12-.origincloud.pvs.v1beta1.ListSnapshotsRequest\x1a..origincloud.pvs.v1beta1.ListSnapshotsResponse\"?\xdaA\x06parent\x82\xd3\xe4\x93\x020\x12./v1beta1/{parent=projects/*/zones/*}/snapshots\x12\xf4\x01\n" +
@@ -828,7 +828,7 @@ const file_origincloud_pvs_v1beta1_snapshot_proto_rawDesc = "" +
 	"\x0fProtectSnapshot\x12/.origincloud.pvs.v1beta1.ProtectSnapshotRequest\x1a\x1d.google.longrunning.Operation\"\x88\x01\xcaA=\n" +
 	"\bSnapshot\x121origincloud.longrunning.v1beta1.OperationMetadata\xdaA\x04name\x82\xd3\xe4\x93\x02;:\x01*\"6/v1beta1/{name=projects/*/zones/*/snapshots/*}:protect\x12\xf2\x01\n" +
 	"\x11UnprotectSnapshot\x121.origincloud.pvs.v1beta1.UnprotectSnapshotRequest\x1a\x1d.google.longrunning.Operation\"\x8a\x01\xcaA=\n" +
-	"\bSnapshot\x121origincloud.longrunning.v1beta1.OperationMetadata\xdaA\x04name\x82\xd3\xe4\x93\x02=:\x01*\"8/v1beta1/{name=projects/*/zones/*/snapshots/*}:unprotect\x1a\x1a\xcaA\x17pvs.origincloudapis.comb\x06proto3"
+	"\bSnapshot\x121origincloud.longrunning.v1beta1.OperationMetadata\xdaA\x04name\x82\xd3\xe4\x93\x02=:\x01*\"8/v1beta1/{name=projects/*/zones/*/snapshots/*}:unprotect\x1a\x19\xcaA\x16pvs.origincloudapis.eub\x06proto3"
 
 var (
 	file_origincloud_pvs_v1beta1_snapshot_proto_rawDescOnce sync.Once

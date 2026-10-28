@@ -78,7 +78,7 @@ func main() {
 
 ## Behaviour
 
-- **Endpoints.** Every service answers at `{service}.origincloudapis.com`,
+- **Endpoints.** Every service answers at `{service}.origincloudapis.eu`,
   which serves every resource wherever it lives. `core.WithRegion`, or
   `ORIGINCLOUD_REGION`, picks a region's front door instead.
 - **Operations.** A create, update or delete returns a `core.Operation`; its

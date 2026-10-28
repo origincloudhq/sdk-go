@@ -779,15 +779,15 @@ var File_origincloud_pvs_v1beta1_volume_proto protoreflect.FileDescriptor
 
 const file_origincloud_pvs_v1beta1_volume_proto_rawDesc = "" +
 	"\n" +
-	"$origincloud/pvs/v1beta1/volume.proto\x12\x17origincloud.pvs.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x99\t\n" +
+	"$origincloud/pvs/v1beta1/volume.proto\x12\x17origincloud.pvs.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x96\t\n" +
 	"\x06Volume\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
 	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12\x1f\n" +
-	"\bsize_gib\x18\x03 \x01(\x05B\x04\xe2A\x01\x02R\asizeGib\x12S\n" +
-	"\rstorage_class\x18\x04 \x01(\tB.\xe2A\x02\x05\x01\xfaA&\n" +
-	"$pvs.origincloudapis.com/StorageClassR\fstorageClass\x12S\n" +
-	"\x0fsource_snapshot\x18\x05 \x01(\tB*\xe2A\x02\x05\x01\xfaA\"\n" +
-	" pvs.origincloudapis.com/SnapshotR\x0esourceSnapshot\x12A\n" +
+	"\bsize_gib\x18\x03 \x01(\x05B\x04\xe2A\x01\x02R\asizeGib\x12R\n" +
+	"\rstorage_class\x18\x04 \x01(\tB-\xe2A\x02\x05\x01\xfaA%\n" +
+	"#pvs.origincloudapis.eu/StorageClassR\fstorageClass\x12R\n" +
+	"\x0fsource_snapshot\x18\x05 \x01(\tB)\xe2A\x02\x05\x01\xfaA!\n" +
+	"\x1fpvs.origincloudapis.eu/SnapshotR\x0esourceSnapshot\x12A\n" +
 	"\x05state\x18\x06 \x01(\x0e2%.origincloud.pvs.v1beta1.Volume.StateB\x04\xe2A\x01\x03R\x05state\x12'\n" +
 	"\fstate_reason\x18\a \x01(\tB\x04\xe2A\x01\x03R\vstateReason\x12$\n" +
 	"\n" +
@@ -818,26 +818,26 @@ const file_origincloud_pvs_v1beta1_volume_proto_rawDesc = "" +
 	"\x18RESIZE_STATE_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10RESIZE_COMPLETED\x10\x01\x12\f\n" +
 	"\bRESIZING\x10\x02\x12\x11\n" +
-	"\rRESIZE_FAILED\x10\x03:f\xeaAc\n" +
-	"\x1epvs.origincloudapis.com/Volume\x120projects/{project}/zones/{zone}/volumes/{volume}*\avolumes2\x06volume\"O\n" +
-	"\x10GetVolumeRequest\x12;\n" +
-	"\x04name\x18\x01 \x01(\tB'\xe2A\x01\x02\xfaA \n" +
-	"\x1epvs.origincloudapis.com/VolumeR\x04name\"\x9d\x01\n" +
-	"\x12ListVolumesRequest\x12?\n" +
-	"\x06parent\x18\x01 \x01(\tB'\xe2A\x01\x02\xfaA \x12\x1epvs.origincloudapis.com/VolumeR\x06parent\x12!\n" +
+	"\rRESIZE_FAILED\x10\x03:e\xeaAb\n" +
+	"\x1dpvs.origincloudapis.eu/Volume\x120projects/{project}/zones/{zone}/volumes/{volume}*\avolumes2\x06volume\"N\n" +
+	"\x10GetVolumeRequest\x12:\n" +
+	"\x04name\x18\x01 \x01(\tB&\xe2A\x01\x02\xfaA\x1f\n" +
+	"\x1dpvs.origincloudapis.eu/VolumeR\x04name\"\x9c\x01\n" +
+	"\x12ListVolumesRequest\x12>\n" +
+	"\x06parent\x18\x01 \x01(\tB&\xe2A\x01\x02\xfaA\x1f\x12\x1dpvs.origincloudapis.eu/VolumeR\x06parent\x12!\n" +
 	"\tpage_size\x18\x02 \x01(\x05B\x04\xe2A\x01\x01R\bpageSize\x12#\n" +
 	"\n" +
 	"page_token\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\tpageToken\"x\n" +
 	"\x13ListVolumesResponse\x129\n" +
 	"\avolumes\x18\x01 \x03(\v2\x1f.origincloud.pvs.v1beta1.VolumeR\avolumes\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xc2\x01\n" +
-	"\x13CreateVolumeRequest\x12?\n" +
-	"\x06parent\x18\x01 \x01(\tB'\xe2A\x01\x02\xfaA \x12\x1epvs.origincloudapis.com/VolumeR\x06parent\x12=\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xc1\x01\n" +
+	"\x13CreateVolumeRequest\x12>\n" +
+	"\x06parent\x18\x01 \x01(\tB&\xe2A\x01\x02\xfaA\x1f\x12\x1dpvs.origincloudapis.eu/VolumeR\x06parent\x12=\n" +
 	"\x06volume\x18\x02 \x01(\v2\x1f.origincloud.pvs.v1beta1.VolumeB\x04\xe2A\x01\x02R\x06volume\x12+\n" +
 	"\n" +
-	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\xe7\x01\n" +
-	"\x13ImportVolumeRequest\x12?\n" +
-	"\x06parent\x18\x01 \x01(\tB'\xe2A\x01\x02\xfaA \x12\x1epvs.origincloudapis.com/VolumeR\x06parent\x12=\n" +
+	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\xe6\x01\n" +
+	"\x13ImportVolumeRequest\x12>\n" +
+	"\x06parent\x18\x01 \x01(\tB&\xe2A\x01\x02\xfaA\x1f\x12\x1dpvs.origincloudapis.eu/VolumeR\x06parent\x12=\n" +
 	"\x06volume\x18\x02 \x01(\v2\x1f.origincloud.pvs.v1beta1.VolumeB\x04\xe2A\x01\x02R\x06volume\x12#\n" +
 	"\n" +
 	"source_url\x18\x03 \x01(\tB\x04\xe2A\x01\x02R\tsourceUrl\x12+\n" +
@@ -848,12 +848,12 @@ const file_origincloud_pvs_v1beta1_volume_proto_rawDesc = "" +
 	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x04\xe2A\x01\x02R\n" +
 	"updateMask\x12+\n" +
 	"\n" +
-	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\x7f\n" +
-	"\x13DeleteVolumeRequest\x12;\n" +
-	"\x04name\x18\x01 \x01(\tB'\xe2A\x01\x02\xfaA \n" +
-	"\x1epvs.origincloudapis.com/VolumeR\x04name\x12+\n" +
+	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"~\n" +
+	"\x13DeleteVolumeRequest\x12:\n" +
+	"\x04name\x18\x01 \x01(\tB&\xe2A\x01\x02\xfaA\x1f\n" +
+	"\x1dpvs.origincloudapis.eu/VolumeR\x04name\x12+\n" +
 	"\n" +
-	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId2\x93\n" +
+	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId2\x92\n" +
 	"\n" +
 	"\rVolumeService\x12\x94\x01\n" +
 	"\tGetVolume\x12).origincloud.pvs.v1beta1.GetVolumeRequest\x1a\x1f.origincloud.pvs.v1beta1.Volume\";\xdaA\x04name\x82\xd3\xe4\x93\x02.\x12,/v1beta1/{name=projects/*/zones/*/volumes/*}\x12\xa7\x01\n" +
@@ -865,7 +865,7 @@ const file_origincloud_pvs_v1beta1_volume_proto_rawDesc = "" +
 	"\fUpdateVolume\x12,.origincloud.pvs.v1beta1.UpdateVolumeRequest\x1a\x1d.google.longrunning.Operation\"\x96\x01\xcaA;\n" +
 	"\x06Volume\x121origincloud.longrunning.v1beta1.OperationMetadata\xdaA\x12volume,update_mask\x82\xd3\xe4\x93\x02=:\x06volume23/v1beta1/{volume.name=projects/*/zones/*/volumes/*}\x12\xe6\x01\n" +
 	"\fDeleteVolume\x12,.origincloud.pvs.v1beta1.DeleteVolumeRequest\x1a\x1d.google.longrunning.Operation\"\x88\x01\xcaAJ\n" +
-	"\x15google.protobuf.Empty\x121origincloud.longrunning.v1beta1.OperationMetadata\xdaA\x04name\x82\xd3\xe4\x93\x02.*,/v1beta1/{name=projects/*/zones/*/volumes/*}\x1a\x1a\xcaA\x17pvs.origincloudapis.comb\x06proto3"
+	"\x15google.protobuf.Empty\x121origincloud.longrunning.v1beta1.OperationMetadata\xdaA\x04name\x82\xd3\xe4\x93\x02.*,/v1beta1/{name=projects/*/zones/*/volumes/*}\x1a\x19\xcaA\x16pvs.origincloudapis.eub\x06proto3"
 
 var (
 	file_origincloud_pvs_v1beta1_volume_proto_rawDescOnce sync.Once

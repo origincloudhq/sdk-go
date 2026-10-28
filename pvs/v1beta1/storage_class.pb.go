@@ -325,7 +325,7 @@ var File_origincloud_pvs_v1beta1_storage_class_proto protoreflect.FileDescriptor
 
 const file_origincloud_pvs_v1beta1_storage_class_proto_rawDesc = "" +
 	"\n" +
-	"+origincloud/pvs/v1beta1/storage_class.proto\x12\x17origincloud.pvs.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\"\xf1\x03\n" +
+	"+origincloud/pvs/v1beta1/storage_class.proto\x12\x17origincloud.pvs.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\"\xf0\x03\n" +
 	"\fStorageClass\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12'\n" +
 	"\fdisplay_name\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\vdisplayName\x12G\n" +
@@ -337,17 +337,17 @@ const file_origincloud_pvs_v1beta1_storage_class_proto_rawDesc = "" +
 	"\x05Media\x12\x15\n" +
 	"\x11MEDIA_UNSPECIFIED\x10\x00\x12\a\n" +
 	"\x03SSD\x10\x01\x12\a\n" +
-	"\x03HDD\x10\x02:g\xeaAd\n" +
-	"$pvs.origincloudapis.com/StorageClass\x12\x1estorageClasses/{storage_class}*\x0estorageClasses2\fstorageClass\"[\n" +
-	"\x16GetStorageClassRequest\x12A\n" +
-	"\x04name\x18\x01 \x01(\tB-\xe2A\x01\x02\xfaA&\n" +
-	"$pvs.origincloudapis.com/StorageClassR\x04name\"\x1b\n" +
+	"\x03HDD\x10\x02:f\xeaAc\n" +
+	"#pvs.origincloudapis.eu/StorageClass\x12\x1estorageClasses/{storage_class}*\x0estorageClasses2\fstorageClass\"Z\n" +
+	"\x16GetStorageClassRequest\x12@\n" +
+	"\x04name\x18\x01 \x01(\tB,\xe2A\x01\x02\xfaA%\n" +
+	"#pvs.origincloudapis.eu/StorageClassR\x04name\"\x1b\n" +
 	"\x19ListStorageClassesRequest\"l\n" +
 	"\x1aListStorageClassesResponse\x12N\n" +
-	"\x0fstorage_classes\x18\x01 \x03(\v2%.origincloud.pvs.v1beta1.StorageClassR\x0estorageClasses2\xef\x02\n" +
+	"\x0fstorage_classes\x18\x01 \x03(\v2%.origincloud.pvs.v1beta1.StorageClassR\x0estorageClasses2\xee\x02\n" +
 	"\x13StorageClassService\x12\x9a\x01\n" +
 	"\x0fGetStorageClass\x12/.origincloud.pvs.v1beta1.GetStorageClassRequest\x1a%.origincloud.pvs.v1beta1.StorageClass\"/\xdaA\x04name\x82\xd3\xe4\x93\x02\"\x12 /v1beta1/{name=storageClasses/*}\x12\x9e\x01\n" +
-	"\x12ListStorageClasses\x122.origincloud.pvs.v1beta1.ListStorageClassesRequest\x1a3.origincloud.pvs.v1beta1.ListStorageClassesResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/v1beta1/storageClasses\x1a\x1a\xcaA\x17pvs.origincloudapis.comb\x06proto3"
+	"\x12ListStorageClasses\x122.origincloud.pvs.v1beta1.ListStorageClassesRequest\x1a3.origincloud.pvs.v1beta1.ListStorageClassesResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/v1beta1/storageClasses\x1a\x19\xcaA\x16pvs.origincloudapis.eub\x06proto3"
 
 var (
 	file_origincloud_pvs_v1beta1_storage_class_proto_rawDescOnce sync.Once

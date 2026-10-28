@@ -30,11 +30,11 @@ func testClient(t *testing.T, handler http.HandlerFunc, opts ...Option) *Client 
 }
 
 const unavailable = `{"error":{"code":503,"status":"UNAVAILABLE","message":"the read model is behind","details":[
-	{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_UNAVAILABLE","domain":"origincloudapis.com"},
+	{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_UNAVAILABLE","domain":"origincloudapis.eu"},
 	{"@type":"type.googleapis.com/google.rpc.RetryInfo","retryDelay":"0.010s"}]}}`
 
 const badRequest = `{"error":{"code":400,"status":"INVALID_ARGUMENT","message":"invalid input on field volume.sizeGib: must be at least 1","details":[
-	{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"BAD_REQUEST","domain":"origincloudapis.com"},
+	{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"BAD_REQUEST","domain":"origincloudapis.eu"},
 	{"@type":"type.googleapis.com/google.rpc.RequestInfo","requestId":"4bf92f3577b34da6"},
 	{"@type":"type.googleapis.com/google.rpc.BadRequest","fieldViolations":[{"field":"volume.sizeGib","description":"must be at least 1"}]}]}}`
 
@@ -209,9 +209,9 @@ func TestEndpoints(t *testing.T) {
 		regional bool
 		want     string
 	}{
-		{"", true, "https://pvs.origincloudapis.com"},
-		{"eu-central1", true, "https://pvs.eu-central1.origincloudapis.com"},
-		{"eu-central1", false, "https://pvs.origincloudapis.com"},
+		{"", true, "https://pvs.origincloudapis.eu"},
+		{"eu-central1", true, "https://pvs.eu-central1.origincloudapis.eu"},
+		{"eu-central1", false, "https://pvs.origincloudapis.eu"},
 	} {
 		client, err := NewClient(context.Background(), WithCredentials(AccessToken("t")), WithRegion(tc.region))
 		if err != nil {
@@ -224,11 +224,11 @@ func TestEndpoints(t *testing.T) {
 
 	t.Setenv(envRegion, "eu-west1")
 	client, _ := NewClient(context.Background(), WithCredentials(AccessToken("t")))
-	if got := client.Service("pvs", true).base.String(); got != "https://pvs.eu-west1.origincloudapis.com" {
+	if got := client.Service("pvs", true).base.String(); got != "https://pvs.eu-west1.origincloudapis.eu" {
 		t.Errorf("ORIGINCLOUD_REGION: %s", got)
 	}
 	client, _ = NewClient(context.Background(), WithCredentials(AccessToken("t")), WithRegion(""))
-	if got := client.Service("pvs", true).base.String(); got != "https://pvs.origincloudapis.com" {
+	if got := client.Service("pvs", true).base.String(); got != "https://pvs.origincloudapis.eu" {
 		t.Errorf("an empty WithRegion overrides the environment: %s", got)
 	}
 }

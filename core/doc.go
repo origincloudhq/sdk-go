@@ -22,9 +22,9 @@
 //
 // # Endpoints
 //
-// Every service answers at {service}.origincloudapis.com, which serves every
+// Every service answers at {service}.origincloudapis.eu, which serves every
 // resource wherever it lives. [WithRegion], or ORIGINCLOUD_REGION, picks a
-// region's front door instead, {service}.{region}.origincloudapis.com, for
+// region's front door instead, {service}.{region}.origincloudapis.eu, for
 // the services that have regional ones.
 //
 // # Retries

@@ -64,7 +64,7 @@ func TestWaitWaitsUntilTheOperationIsDone(t *testing.T) {
 }
 
 func TestAFailedOperationReturnsItsError(t *testing.T) {
-	info, _ := anypb.New(&errdetails.ErrorInfo{Reason: "INTERNAL_SERVER_ERROR", Domain: "origincloudapis.com"})
+	info, _ := anypb.New(&errdetails.ErrorInfo{Reason: "INTERNAL_SERVER_ERROR", Domain: "origincloudapis.eu"})
 	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
 		writeOperation(t, w, &longrunningpb.Operation{
 			Name: operationName, Done: true,
