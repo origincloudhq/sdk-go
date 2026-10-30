@@ -102,8 +102,9 @@ of the PVS API and may change in incompatible ways, like the API itself.
 
 ## Contributing
 
-Issues are welcome. This repository is published from Origin Cloud's own
-source, so a pull request here is not merged; see [CONTRIBUTING.md](CONTRIBUTING.md).
+Issues and pull requests are welcome. The service packages are generated from
+the API definitions, so a change to what a service offers starts as an issue;
+see [CONTRIBUTING.md](CONTRIBUTING.md) for how the SDK is built and checked.
 
 ## License
 

@@ -1,0 +1,54 @@
+# Checks every pull request and every push to main: the service packages are
+# what the pinned API definitions generate (scripts/generate.sh), the code is
+# formatted, tidy and vetted, and the tests pass with the race detector (the
+# live tests skip without a zone).
+#
+# The regeneration pull request is opened with the workflow token, which
+# starts no pull_request run, so regenerate.yml dispatches this workflow on
+# its branch instead.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: 'actions/checkout@v4'
+
+      - name: Go
+        uses: 'actions/setup-go@v5'
+        with:
+          go-version-file: go.mod
+
+      - name: Generated code
+        run: scripts/generate.sh
+
+      - name: Formatting and modules
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [[ -n "${unformatted}" ]]; then
+            echo "not gofmt-formatted:"; echo "${unformatted}"; exit 1
+          fi
+          go mod tidy -diff
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Tests
+        run: go test -race ./...
+
+      - name: Scripts
+        run: shellcheck scripts/*.sh

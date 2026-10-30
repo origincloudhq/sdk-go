@@ -15,16 +15,38 @@ vulnerability** on this repository's Security tab, which reaches us privately.
 
 ## Pull requests
 
-The code here is published from Origin Cloud's own source: the service
-packages are generated from the API definitions, and `core` is maintained next
-to the generator. A pull request in this repository is therefore never
-merged. If it describes a change we want, we make the change at the source,
-credit you, and close the pull request; the change then arrives here with the
-next published commit.
+Pull requests are reviewed and merged here. For anything larger than a small
+fix, open an issue first, so that we can agree on the change before you spend
+time on it. CI must pass: the checks below, run on every pull request.
 
-A pull request is a good way to show exactly what you mean. For anything larger
-than a comment fix, open an issue first, so that we can agree on the change
-before you spend time on it.
+## How the SDK is built
+
+The service packages (`<service>/<version>`) are generated from the API
+definitions in [origincloudhq/api](https://github.com/origincloudhq/api), at
+the commit `API_REVISION` names: protoc-gen-go writes the messages, and this
+repository's plugin, `internal/cmd/protoc-gen-go-origincloud`, the clients.
+`core` is written by hand. So a change to what a service offers starts in the
+API, which is why it is requested by opening an issue rather than by editing
+a generated package; a change to how every client behaves is a change to the
+plugin or `core`.
+
+The regeneration workflow (`.github/workflows/regenerate.yml`) moves the SDK
+to the newest API daily, and opens a pull request when that changes anything.
+
+## Checks
+
+Go and network access are all you need; buf runs through `go run`.
+
+```sh
+scripts/generate.sh --write   # generate the service packages again; without --write, check them
+scripts/update.sh             # move to the newest API, and generate
+go test -race ./...           # the live tests skip without a zone
+ORIGINCLOUD_LIVE_ZONE=projects/<project>/zones/<zone> \
+  go test -count=1 -v ./internal/livetest   # against the live API
+```
+
+CI also checks formatting (`gofmt`), `go mod tidy`, `go vet` and the scripts.
+Releases are described in [RELEASING.md](RELEASING.md).
 
 ## License
 
