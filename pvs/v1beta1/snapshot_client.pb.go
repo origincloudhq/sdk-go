@@ -208,8 +208,10 @@ func (c *SnapshotClient) ProtectSnapshot(ctx context.Context, req *ProtectSnapsh
 	return core.NewOperation[*Snapshot](c.service, out), nil
 }
 
-// UnprotectSnapshot unprotects a snapshot, so it can be deleted. Refused while an image is
-// built from it. The operation is done once it is `UNPROTECTED`.
+// UnprotectSnapshot unprotects a snapshot, so it can be deleted. Refused with
+// `FAILED_PRECONDITION` while an image is built from it or a volume not
+// `DELETED` was created from it; delete those first. The operation is
+// done once it is `UNPROTECTED`.
 //
 // It answers with an operation to wait on, whose result is the Snapshot.
 func (c *SnapshotClient) UnprotectSnapshot(ctx context.Context, req *UnprotectSnapshotRequest) (*core.Operation[*Snapshot], error) {
