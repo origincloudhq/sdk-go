@@ -55,7 +55,9 @@ func (c *VolumeClient) GetVolume(ctx context.Context, req *GetVolumeRequest) (*V
 }
 
 // ListVolumes lists the volumes in a zone, oldest first. Deleted volumes aren't
-// listed.
+// listed. For every zone's volumes, list the zones whose `services` name
+// `pvs` with the location service (`location.origincloudapis.eu`), then
+// each zone's volumes.
 func (c *VolumeClient) ListVolumes(ctx context.Context, req *ListVolumesRequest) (*ListVolumesResponse, error) {
 	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
