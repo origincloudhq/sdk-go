@@ -1,8 +1,9 @@
 # Releasing
 
 A release is an annotated tag on a commit on `main` whose CI passed, with
-the next version. The Go module proxy serves it from here as
-`go.origincloud.eu/sdk@<version>`:
+the next version. That commit sets `Version` in `core/client.go`, which the
+SDK sends in its User-Agent, to the same version. The Go module proxy serves
+it from here as `go.origincloud.eu/sdk@<version>`:
 
 ```sh
 git tag -a v0.3.0 -m v0.3.0 origin/main
