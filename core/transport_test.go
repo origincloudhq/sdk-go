@@ -233,6 +233,19 @@ func TestEndpoints(t *testing.T) {
 	}
 }
 
+func TestARegionThatIsNoRegionCodeIsRefused(t *testing.T) {
+	clearCredentialEnv(t)
+	for _, region := range []string{"eu/central1", "x@evil.com/", "eu central1", "eu-central1:443", "EU-CENTRAL1"} {
+		if _, err := NewClient(context.Background(), WithCredentials(AccessToken("t")), WithRegion(region)); err == nil {
+			t.Errorf("region %q was accepted", region)
+		}
+	}
+	t.Setenv(envRegion, "pvs.example.com/")
+	if _, err := NewClient(context.Background(), WithCredentials(AccessToken("t"))); err == nil {
+		t.Error("ORIGINCLOUD_REGION pvs.example.com/ was accepted")
+	}
+}
+
 func TestPathValue(t *testing.T) {
 	got, err := PathValue("name", "projects/p 1/zones/z/volumes/vol-1", "projects/*/zones/*/volumes/*")
 	if err != nil || got != "projects/p%201/zones/z/volumes/vol-1" {

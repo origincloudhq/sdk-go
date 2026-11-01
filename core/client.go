@@ -115,6 +115,11 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 	} else {
 		c.region = os.Getenv(envRegion)
 	}
+	// The region becomes part of a host name the token is sent to: only a
+	// plain region code, such as eu-central1, may get there.
+	if strings.TrimLeft(c.region, "abcdefghijklmnopqrstuvwxyz0123456789-") != "" {
+		return nil, fmt.Errorf("origincloud: the region must be a region code such as eu-central1, got %q", c.region)
+	}
 	if s.endpoint != "" {
 		endpoint, err := url.Parse(strings.TrimSuffix(s.endpoint, "/"))
 		if err != nil || endpoint.Scheme == "" || endpoint.Host == "" {
