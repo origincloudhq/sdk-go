@@ -55,7 +55,9 @@ func (c *SnapshotClient) GetSnapshot(ctx context.Context, req *GetSnapshotReques
 }
 
 // ListSnapshots lists the snapshots in a zone, oldest first. Deleted snapshots aren't
-// listed.
+// listed. For every zone's snapshots, list the zones whose `services` name
+// `pvs` with the location service (`location.origincloudapis.eu`), then
+// each zone's snapshots.
 func (c *SnapshotClient) ListSnapshots(ctx context.Context, req *ListSnapshotsRequest) (*ListSnapshotsResponse, error) {
 	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
@@ -208,8 +210,10 @@ func (c *SnapshotClient) ProtectSnapshot(ctx context.Context, req *ProtectSnapsh
 	return core.NewOperation[*Snapshot](c.service, out), nil
 }
 
-// UnprotectSnapshot unprotects a snapshot, so it can be deleted. Refused while an image is
-// built from it. The operation is done once it is `UNPROTECTED`.
+// UnprotectSnapshot unprotects a snapshot, so it can be deleted. Refused with
+// `FAILED_PRECONDITION` while an image is built from it or a volume not
+// `DELETED` was created from it; delete those first. The operation is
+// done once it is `UNPROTECTED`.
 //
 // It answers with an operation to wait on, whose result is the Snapshot.
 func (c *SnapshotClient) UnprotectSnapshot(ctx context.Context, req *UnprotectSnapshotRequest) (*core.Operation[*Snapshot], error) {
