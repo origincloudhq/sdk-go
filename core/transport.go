@@ -197,7 +197,9 @@ func PathValue(field, value, pattern string) (string, error) {
 	for i := 0; valid && i < len(want); i++ {
 		switch want[i] {
 		case "*":
-			valid = got[i] != ""
+			// A dot segment would move the request to another path, which
+			// the server would act on instead.
+			valid = got[i] != "" && got[i] != "." && got[i] != ".."
 		default:
 			valid = got[i] == want[i]
 		}

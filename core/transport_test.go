@@ -251,7 +251,7 @@ func TestPathValue(t *testing.T) {
 	if err != nil || got != "projects/p%201/zones/z/volumes/vol-1" {
 		t.Errorf("PathValue = %q, %v", got, err)
 	}
-	for _, bad := range []string{"", "projects/p/zones/z", "projects/p/zones//volumes/v", "projects/p/regions/z/volumes/v", "projects/p/zones/z/volumes/v/x"} {
+	for _, bad := range []string{"", "projects/p/zones/z", "projects/p/zones//volumes/v", "projects/p/regions/z/volumes/v", "projects/p/zones/z/volumes/v/x", "projects/p/zones/z/volumes/..", "projects/p/zones/z/volumes/.", "projects/../zones/z/volumes/v"} {
 		if _, err := PathValue("name", bad, "projects/*/zones/*/volumes/*"); err == nil {
 			t.Errorf("PathValue(%q) succeeded", bad)
 		}
