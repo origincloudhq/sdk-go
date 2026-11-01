@@ -53,7 +53,8 @@ func (c *OperationClient) GetOperation(ctx context.Context, req *GetOperationReq
 }
 
 // WaitOperation waits until an operation is done or `timeout` has passed, whichever
-// comes first, and returns it as it is then.
+// comes first, and returns it as it is then. It only reads, so a client
+// may repeat it after a transport error.
 func (c *OperationClient) WaitOperation(ctx context.Context, req *WaitOperationRequest) (*longrunningpb.Operation, error) {
 	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/operations/*")
 	if err != nil {
@@ -61,9 +62,10 @@ func (c *OperationClient) WaitOperation(ctx context.Context, req *WaitOperationR
 	}
 	out := new(longrunningpb.Operation)
 	if err := c.service.Call(ctx, core.Request{
-		Method: http.MethodPost,
-		Path:   "/v1beta1/" + p1 + ":wait",
-		Body:   req,
+		Method:     http.MethodPost,
+		Path:       "/v1beta1/" + p1 + ":wait",
+		Body:       req,
+		Idempotent: true,
 	}, out); err != nil {
 		return nil, err
 	}
