@@ -22,6 +22,7 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/types/descriptorpb"
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
@@ -161,7 +162,7 @@ func generateMethod(g *protogen.GeneratedFile, client string, m *protogen.Method
 	g.P("func (c *", client, ") ", m.GoName, "(ctx ", ctx, ", req *", input, ") (", result, ", error) {")
 
 	requestID := fieldNamed(m.Input, "request_id")
-	idempotent := verb == "GET" || requestID != nil
+	idempotent := verb == "GET" || requestID != nil || declaredIdempotent(m.Desc)
 	if requestID != nil {
 		g.P("if req.Get", requestID.GoName, "() == \"\" {")
 		g.P("req = ", g.QualifiedGoIdent(protoPackage.Ident("Clone")), "(req).(*", input, ")")
@@ -452,4 +453,12 @@ func lowerFirst(s string) string {
 		return s // an acronym
 	}
 	return string(unicode.ToLower(r)) + s[size:]
+}
+
+// declaredIdempotent reports whether the API declares the method safe to
+// repeat with `option idempotency_level`, as a read that isn't a GET
+// (WaitOperation) does.
+func declaredIdempotent(m protoreflect.MethodDescriptor) bool {
+	opts, _ := m.Options().(*descriptorpb.MethodOptions)
+	return opts.GetIdempotencyLevel() != descriptorpb.MethodOptions_IDEMPOTENCY_UNKNOWN
 }
