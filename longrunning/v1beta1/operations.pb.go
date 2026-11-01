@@ -220,10 +220,10 @@ const file_origincloud_longrunning_v1beta1_operations_proto_rawDesc = "" +
 	"\x04verb\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x04verb\x12A\n" +
 	"\vcreate_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime\x12;\n" +
-	"\bend_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\aendTime2\xf0\x02\n" +
+	"\bend_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\aendTime2\xf3\x02\n" +
 	"\x10OperationService\x12\xa3\x01\n" +
-	"\fGetOperation\x124.origincloud.longrunning.v1beta1.GetOperationRequest\x1a\x1d.google.longrunning.Operation\">\xdaA\x04name\x82\xd3\xe4\x93\x021\x12//v1beta1/{name=projects/*/zones/*/operations/*}\x12\xb5\x01\n" +
-	"\rWaitOperation\x125.origincloud.longrunning.v1beta1.WaitOperationRequest\x1a\x1d.google.longrunning.Operation\"N\xdaA\fname,timeout\x82\xd3\xe4\x93\x029:\x01*\"4/v1beta1/{name=projects/*/zones/*/operations/*}:waitb\x06proto3"
+	"\fGetOperation\x124.origincloud.longrunning.v1beta1.GetOperationRequest\x1a\x1d.google.longrunning.Operation\">\xdaA\x04name\x82\xd3\xe4\x93\x021\x12//v1beta1/{name=projects/*/zones/*/operations/*}\x12\xb8\x01\n" +
+	"\rWaitOperation\x125.origincloud.longrunning.v1beta1.WaitOperationRequest\x1a\x1d.google.longrunning.Operation\"Q\xdaA\fname,timeout\x82\xd3\xe4\x93\x029:\x01*\"4/v1beta1/{name=projects/*/zones/*/operations/*}:wait\x90\x02\x01b\x06proto3"
 
 var (
 	file_origincloud_longrunning_v1beta1_operations_proto_rawDescOnce sync.Once
