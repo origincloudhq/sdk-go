@@ -1,0 +1,106 @@
+# Releases the version core/client.go's `Version` names, once CI passed on
+# the push to main that set it and it has no tag yet (scripts/version.sh
+# unreleased): an annotated tag on that commit, which the Go module proxy
+# serves as go.origincloud.eu/sdk@<version>. The regeneration pull request
+# sets the version, so a merged regeneration is released; a version set by
+# hand in a pull request is released the same way (RELEASING.md).
+#
+# Once the proxy serves it, the release dispatches the Terraform provider's
+# regeneration, which moves the provider to it, with the regeneration App's
+# token (REGENERATE_APP_ID and REGENERATE_APP_PRIVATE_KEY); without the App,
+# the provider's daily run picks it up.
+name: Release
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      github.event.workflow_run.head_repository.full_name == github.repository
+    runs-on: ubuntu-latest
+    env:
+      HEAD: ${{ github.event.workflow_run.head_sha }}
+    steps:
+      - name: Checkout
+        uses: 'actions/checkout@v4'
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+          fetch-depth: 0
+
+      - name: Version
+        id: version
+        run: |
+          set -euo pipefail
+          version="$(scripts/version.sh current)"
+          echo "version=${version}" >> "$GITHUB_OUTPUT"
+          if scripts/version.sh unreleased; then
+            echo "release=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "v${version} is released already, or older than the newest tag: nothing to release"
+          fi
+
+      - name: Tag
+        if: steps.version.outputs.release == 'true'
+        env:
+          TAG: v${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git tag -a "${TAG}" -m "${TAG}" "${HEAD}"
+          git push --quiet origin "${TAG}"
+
+      - name: Go
+        if: steps.version.outputs.release == 'true'
+        uses: 'actions/setup-go@v5'
+        with:
+          go-version-file: go.mod
+
+      # The proxy fetches a new version on its first request; a few minutes
+      # can pass before it serves one.
+      # Asked from outside this module, which `go list` would take for the
+      # module asked about.
+      - name: Module proxy
+        if: steps.version.outputs.release == 'true'
+        working-directory: ${{ runner.temp }}
+        env:
+          TAG: v${{ steps.version.outputs.version }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 20); do
+            if GOPROXY=https://proxy.golang.org GOFLAGS=-mod=mod go list -m "go.origincloud.eu/sdk@${TAG}"; then
+              exit 0
+            fi
+            echo "attempt ${attempt}: the proxy doesn't serve ${TAG} yet"
+            sleep 30
+          done
+          echo "::error::the module proxy doesn't serve ${TAG}"
+          exit 1
+
+      - name: App token
+        id: app
+        if: steps.version.outputs.release == 'true' && vars.REGENERATE_APP_ID != ''
+        uses: 'actions/create-github-app-token@v2'
+        with:
+          app-id: ${{ vars.REGENERATE_APP_ID }}
+          private-key: ${{ secrets.REGENERATE_APP_PRIVATE_KEY }}
+          repositories: terraform-provider-origincloud
+
+      - name: Downstream
+        if: steps.app.outputs.token != ''
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+        run: gh workflow run regenerate.yml --repo origincloudhq/terraform-provider-origincloud --ref main
