@@ -13,8 +13,11 @@ go get go.origincloud.eu/sdk
 | Package | API |
 |---|---|
 | `go.origincloud.eu/sdk/core` | The client every service package uses |
+| `go.origincloud.eu/sdk/compute/v1beta1` | Instances, images, key pairs, volume attachments and the instance catalog |
+| `go.origincloud.eu/sdk/network/v1beta1` | VPCs, subnets, routing, gateways, floating IPs, network interfaces, security groups, ACLs and DNS policies |
 | `go.origincloud.eu/sdk/pvs/v1beta1` | Persistent volumes: volumes, snapshots, storage classes |
 | `go.origincloud.eu/sdk/location/v1beta1` | Regions and zones, and the services each zone offers |
+| `go.origincloud.eu/sdk/resourcemanager/v1beta1` | Organizations, projects and their quotas |
 | `go.origincloud.eu/sdk/longrunning/v1beta1` | Operations, for resuming one by name |
 
 ## Example
@@ -81,10 +84,13 @@ func main() {
 
 - **Endpoints.** Every service answers at `{service}.origincloudapis.eu`,
   which serves every resource wherever it lives. `core.WithRegion`, or
-  `ORIGINCLOUD_REGION`, picks a region's front door instead.
-- **Operations.** A create, update or delete returns a `core.Operation`; its
-  `Wait` returns the resource once the change is complete, or the error the
-  change failed with.
+  `ORIGINCLOUD_REGION`, picks a region's front door instead,
+  `{service}.{region}.origincloudapis.eu`; `location` and `resourcemanager`
+  are global and have none, so they always answer at their own host.
+- **Operations.** A change the API carries out after answering, such as
+  creating a volume or an instance, returns a `core.Operation`; its `Wait`
+  returns the resource once the change is complete, or the error the change
+  failed with.
 - **Retries.** A call answered as retryable is sent again with a growing delay,
   when sending it again is safe: a read, or a mutation with a request id. The
   client fills in an empty request id, so a retried create never creates twice.
