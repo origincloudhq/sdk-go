@@ -26,9 +26,9 @@ import (
 	"google.golang.org/protobuf/types/pluginpb"
 )
 
-// The services that answer only at their regionless host
-// (docs: "Global services have only the regionless name").
-var globalServices = map[string]bool{"iam": true, "admin": true, "location": true}
+// The services that answer only at their regionless host: the API's global
+// services, which have no regional name.
+var globalServices = map[string]bool{"iam": true, "resourcemanager": true, "location": true}
 
 const (
 	corePackage    = protogen.GoImportPath("go.origincloud.eu/sdk/core")
