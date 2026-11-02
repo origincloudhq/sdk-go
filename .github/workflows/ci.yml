@@ -51,4 +51,6 @@ jobs:
         run: go test -race ./...
 
       - name: Scripts
-        run: shellcheck scripts/*.sh
+        run: |
+          shellcheck scripts/*.sh
+          scripts/version.test.sh

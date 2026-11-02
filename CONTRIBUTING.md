@@ -31,7 +31,10 @@ a generated package; a change to how every client behaves is a change to the
 plugin or `core`.
 
 The regeneration workflow (`.github/workflows/regenerate.yml`) moves the SDK
-to the newest API daily, and opens a pull request when that changes anything.
+to the newest API when it changes, and daily, and opens a pull request when
+that changes anything, with the next version. Once its CI passes, it is
+merged and released without anyone's hands, unless someone added commits to
+it, which then wait for review ([RELEASING.md](RELEASING.md)).
 
 ## Checks
 
@@ -45,7 +48,8 @@ ORIGINCLOUD_LIVE_ZONE=projects/<project>/zones/<zone> \
   go test -count=1 -v ./internal/livetest   # against the live API
 ```
 
-CI also checks formatting (`gofmt`), `go mod tidy`, `go vet` and the scripts.
+CI also checks formatting (`gofmt`), `go mod tidy`, `go vet` and the scripts,
+and runs `scripts/version.test.sh`.
 Releases are described in [RELEASING.md](RELEASING.md).
 
 ## License
