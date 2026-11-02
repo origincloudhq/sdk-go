@@ -34,7 +34,8 @@ The regeneration workflow (`.github/workflows/regenerate.yml`) moves the SDK
 to the newest API when it changes, and daily, and opens a pull request when
 that changes anything, with the next version. Once its CI passes, it is
 merged and released without anyone's hands, unless someone added commits to
-it, which then wait for review ([RELEASING.md](RELEASING.md)).
+it, or it adds a service, which needs a test of its client and a row in
+README.md's table first: these wait for review ([RELEASING.md](RELEASING.md)).
 
 ## Checks
 
