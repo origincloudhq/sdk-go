@@ -3,7 +3,9 @@
 # the API change was reviewed where the API is defined, and CI checks the
 # generated code. A pull request someone added commits to, such as a
 # generator change a new method needs, waits for review and is merged by
-# hand.
+# hand, and so does one that adds a service, a directory under SERVICES that
+# main doesn't have: a new service needs work of someone's before it is
+# merged (CONTRIBUTING.md).
 #
 # It merges with the regeneration App's token (REGENERATE_APP_ID and
 # REGENERATE_APP_PRIVATE_KEY), because a merge with the workflow token would
@@ -32,6 +34,10 @@ jobs:
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
+    env:
+      # Where each service has a directory of its own: <service>/, at the
+      # top (pvs/, location/).
+      SERVICES: ""
     steps:
       - name: App token
         id: app
@@ -66,6 +72,24 @@ jobs:
           others="$(git log --format='%ae%n%ce' "origin/main..${HEAD}" | grep -cvxF "${bot}" || true)"
           if [[ "${others}" -gt 0 ]]; then
             echo "pull request #${pr} has commits of someone else's: it needs review"
+            exit 0
+          fi
+          new=()
+          while read -r path; do
+            service="${path#"${SERVICES}"}"
+            service="${service%%/*}"
+            if [[ "${path}" == "${SERVICES}"*/* ]] && ! git cat-file -e "origin/main:${SERVICES}${service}" 2>/dev/null; then
+              new+=("${service}")
+            fi
+          done < <(git diff --name-only --diff-filter=A "origin/main...${HEAD}")
+          if [[ "${#new[@]}" -gt 0 ]]; then
+            services="$(printf '%s\n' "${new[@]}" | sort -u | paste -sd ' ' -)"
+            echo "pull request #${pr} adds ${services}: it needs review"
+            # Once: the comment isn't repeated by later runs.
+            note="This regeneration adds a service (${services}), which needs work of someone's before it is merged (CONTRIBUTING.md), so it isn't merged on its own."
+            if ! gh pr view "${pr}" --json comments --jq '.comments[].body' | grep -qxF "${note}"; then
+              gh pr comment "${pr}" --body "${note}"
+            fi
             exit 0
           fi
           gh pr merge "${pr}" --merge --match-head-commit "${HEAD}"
