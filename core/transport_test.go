@@ -38,6 +38,10 @@ const badRequest = `{"error":{"code":400,"status":"INVALID_ARGUMENT","message":"
 	{"@type":"type.googleapis.com/google.rpc.RequestInfo","requestId":"4bf92f3577b34da6"},
 	{"@type":"type.googleapis.com/google.rpc.BadRequest","fieldViolations":[{"field":"volume.sizeGib","description":"must be at least 1"}]}]}}`
 
+const conflict = `{"error":{"code":409,"status":"FAILED_PRECONDITION","message":"the service account organizations/o/serviceAccounts/s was created by an earlier request with this request_id; its client secret was returned only to that request. To get a working secret, delete that account and create a new one","details":[
+	{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"CONFLICT","domain":"origincloudapis.eu","metadata":{"serviceAccount":"organizations/o/serviceAccounts/s"}},
+	{"@type":"type.googleapis.com/google.rpc.RequestInfo","requestId":"7d3c1a2b9e8f4051"}]}}`
+
 func TestARequestCarriesItsCredentialsAndAgent(t *testing.T) {
 	var got *http.Request
 	var body string
@@ -143,8 +147,53 @@ func TestAnErrorThatIsntRetryableIsNotRetried(t *testing.T) {
 	if len(apiErr.FieldViolations) != 1 || apiErr.FieldViolations[0].Field != "volume.sizeGib" {
 		t.Errorf("field violations = %+v", apiErr.FieldViolations)
 	}
+	if apiErr.Metadata == nil || len(apiErr.Metadata) != 0 {
+		t.Errorf("metadata = %#v, want empty", apiErr.Metadata)
+	}
 	if got := apiErr.Error(); got != "origincloud: BAD_REQUEST: invalid input on field volume.sizeGib: must be at least 1 (request 4bf92f3577b34da6)" {
 		t.Errorf("Error() = %q", got)
+	}
+}
+
+// A 409 is the answer to the request, not a passing failure: it isn't
+// sent again, and its ErrorInfo metadata names the resource it is about.
+func TestAConflictIsNotRetriedAndCarriesItsMetadata(t *testing.T) {
+	var calls atomic.Int32
+	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
+		calls.Add(1)
+		w.WriteHeader(http.StatusConflict)
+		_, _ = io.WriteString(w, conflict)
+	})
+
+	err := client.Service("iam", false).Call(context.Background(), Request{
+		Method: http.MethodPost, Path: "/v1beta1/organizations/o/serviceAccounts", Query: url.Values{"requestId": {"r"}}, Idempotent: true,
+	}, &structpb.Struct{})
+	var apiErr *Error
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("err = %v, want an *Error", err)
+	}
+	if calls.Load() != 1 {
+		t.Errorf("%d calls, want 1", calls.Load())
+	}
+	if apiErr.HTTPStatus != 409 || apiErr.Status != "FAILED_PRECONDITION" || apiErr.Reason != "CONFLICT" ||
+		apiErr.RequestID != "7d3c1a2b9e8f4051" || apiErr.Retryable() {
+		t.Errorf("error = %+v", apiErr)
+	}
+	if len(apiErr.Metadata) != 1 || apiErr.Metadata["serviceAccount"] != "organizations/o/serviceAccounts/s" {
+		t.Errorf("metadata = %#v", apiErr.Metadata)
+	}
+}
+
+func TestAnErrorWithoutAStatusHasEmptyMetadata(t *testing.T) {
+	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusForbidden)
+		_, _ = io.WriteString(w, "<html>forbidden</html>")
+	})
+
+	err := client.Service("pvs", true).Call(context.Background(), Request{Method: http.MethodGet, Path: "/x"}, &structpb.Struct{})
+	var apiErr *Error
+	if !errors.As(err, &apiErr) || apiErr.Metadata == nil || len(apiErr.Metadata) != 0 {
+		t.Fatalf("err = %#v, want an *Error with empty metadata", err)
 	}
 }
 

@@ -101,7 +101,10 @@ func main() {
 - **Pages.** Each list method has an `All...` counterpart that iterates over
   every page.
 - **Errors.** A refused call returns a `*core.Error`; branch on its `Reason`,
-  the platform's error code.
+  the platform's error code. Its `Metadata` carries what the API adds to the
+  reason, such as `serviceAccount`, the account a repeated create refused with
+  `CONFLICT` is about. Only an error the API answers as retryable is retried:
+  a `CONFLICT` never is.
 
 ## Versions
 

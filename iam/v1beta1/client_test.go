@@ -3,6 +3,7 @@ package iamv1beta1_test
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -140,5 +141,67 @@ func TestCreateServiceAccountAnswersWithItsClientSecret(t *testing.T) {
 	if got := rec.calls[0]; got.method != "POST" || got.url.Path != "/v1beta1/organizations/o/serviceAccounts" ||
 		!sameJSON(got.body, `{"displayName":"CI"}`) || !uuid.MatchString(got.url.Query().Get("requestId")) || len(got.url.Query()) != 1 {
 		t.Errorf("create: %s %s %s", got.method, got.url, got.body)
+	}
+}
+
+// lostAnswer records the requests it was sent and loses the answer to the
+// first, as a connection that breaks off after the server acted on it
+// does, then answers every later one with status and body.
+type lostAnswer struct {
+	status int
+	body   string
+	calls  []call
+}
+
+func (l *lostAnswer) RoundTrip(req *http.Request) (*http.Response, error) {
+	var body []byte
+	if req.Body != nil {
+		body, _ = io.ReadAll(req.Body)
+	}
+	l.calls = append(l.calls, call{req.Method, string(body), req.URL})
+	if len(l.calls) == 1 {
+		return nil, io.ErrUnexpectedEOF
+	}
+	return &http.Response{
+		StatusCode: l.status,
+		Header:     http.Header{"Content-Type": []string{"application/json"}},
+		Body:       io.NopCloser(strings.NewReader(l.body)),
+		Request:    req,
+	}, nil
+}
+
+// A create whose answer was lost is sent again with the same request id.
+// The server already created the account then, and the client secret went
+// out with the lost answer: the repeat is refused with CONFLICT, naming
+// the account, and not sent a third time.
+func TestARepeatedCreateServiceAccountIsAConflictNamingTheAccount(t *testing.T) {
+	transport := &lostAnswer{status: http.StatusConflict, body: `{"error":{"code":409,"status":"FAILED_PRECONDITION",` +
+		`"message":"the service account organizations/o/serviceAccounts/s was created by an earlier request with this request_id; ` +
+		`its client secret was returned only to that request. To get a working secret, delete that account and create a new one",` +
+		`"details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"CONFLICT","domain":"origincloudapis.eu",` +
+		`"metadata":{"serviceAccount":"organizations/o/serviceAccounts/s"}},` +
+		`{"@type":"type.googleapis.com/google.rpc.RequestInfo","requestId":"7d3c1a2b9e8f4051"}]}}`}
+	client, err := core.NewClient(context.Background(), core.WithCredentials(core.AccessToken("t")), core.WithHTTPClient(&http.Client{Transport: transport}))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	account, err := iamv1beta1.NewServiceAccountClient(client).CreateServiceAccount(context.Background(), &iamv1beta1.CreateServiceAccountRequest{
+		Parent: "organizations/o", ServiceAccount: &iamv1beta1.ServiceAccount{DisplayName: "CI"},
+	})
+	var apiErr *core.Error
+	if !errors.As(err, &apiErr) {
+		t.Fatalf("CreateServiceAccount = %v, %v; want a *core.Error", account, err)
+	}
+	if apiErr.HTTPStatus != http.StatusConflict || apiErr.Reason != "CONFLICT" ||
+		apiErr.Metadata["serviceAccount"] != "organizations/o/serviceAccounts/s" {
+		t.Errorf("error = %+v", apiErr)
+	}
+	if len(transport.calls) != 2 {
+		t.Fatalf("sent %d calls, want 2", len(transport.calls))
+	}
+	first, repeat := transport.calls[0].url.Query().Get("requestId"), transport.calls[1].url.Query().Get("requestId")
+	if !uuid.MatchString(first) || repeat != first {
+		t.Errorf("request ids %q then %q, want the same one twice", first, repeat)
 	}
 }
