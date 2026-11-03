@@ -18,7 +18,7 @@ go get go.origincloud.eu/sdk
 | `go.origincloud.eu/sdk/pvs/v1beta1` | Persistent volumes: volumes, snapshots, storage classes |
 | `go.origincloud.eu/sdk/location/v1beta1` | Regions and zones, and the services each zone offers |
 | `go.origincloud.eu/sdk/resourcemanager/v1beta1` | Organizations, projects and their quotas |
-| `go.origincloud.eu/sdk/iam/v1beta1` | Role bindings, service accounts, users, roles, permissions and the audit log |
+| `go.origincloud.eu/sdk/iam/v1beta1` | Users, service accounts, roles, role bindings, permissions and the audit log |
 | `go.origincloud.eu/sdk/longrunning/v1beta1` | Operations, for resuming one by name |
 
 ## Example
