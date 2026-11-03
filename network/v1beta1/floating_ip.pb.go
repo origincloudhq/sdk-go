@@ -43,9 +43,9 @@ type FloatingIp struct {
 	// The interface's private IPv4 address the public one translates to, as
 	// the floating IP's association sets it; empty while it has none.
 	PrivateAddress string `protobuf:"bytes,5,opt,name=private_address,json=privateAddress,proto3" json:"private_address,omitempty"`
-	// Whether the platform assigned the address at launch, from a subnet
-	// with `auto_assign_public_ip`. Such an address is released when its
-	// instance is terminated.
+	// Whether the platform assigned the address at launch, to an interface
+	// the launch created in a subnet with `auto_assign_public_ip`. Such an
+	// address is released when its instance is terminated.
 	AutoAssigned bool `protobuf:"varint,6,opt,name=auto_assigned,json=autoAssigned,proto3" json:"auto_assigned,omitempty"`
 	// When the floating IP was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`

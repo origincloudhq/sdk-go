@@ -137,8 +137,8 @@ func (c *SubnetClient) CreateSubnet(ctx context.Context, req *CreateSubnetReques
 }
 
 // UpdateSubnet changes a subnet's public address assignment or tags.
-// `auto_assign_public_ip` applies to instances launched afterwards. The
-// operation is done once the change is recorded.
+// `auto_assign_public_ip` applies to launches afterwards that create
+// their interface. The operation is done once the change is recorded.
 //
 // It answers with an operation to wait on, whose result is the Subnet.
 func (c *SubnetClient) UpdateSubnet(ctx context.Context, req *UpdateSubnetRequest) (*core.Operation[*Subnet], error) {
