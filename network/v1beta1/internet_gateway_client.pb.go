@@ -17,11 +17,9 @@ import (
 //
 // Internet gateways: a VPC's way to and from the internet, for its
 // instances' floating IPs and IPv6 addresses and for its NAT gateways. A VPC
-// has at most one, and a subnet reaches it through a route that targets it.
-// Internet access is decided per VPC and address family: while any route
-// table the VPC's subnets use has a family's default route to the gateway,
-// traffic of that family leaves the VPC and reaches its floating IPs and
-// IPv6 addresses.
+// has at most one, and a subnet reaches it through a route that targets it:
+// a subnet reaches, and is reached from, the internet for an address family
+// only if its own route table has that family's default route.
 type InternetGatewayClient struct {
 	service *core.Service
 }

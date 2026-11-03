@@ -40,10 +40,11 @@ type Subnet struct {
 	Vpc string `protobuf:"bytes,3,opt,name=vpc,proto3" json:"vpc,omitempty"`
 	// The route table that decides where the subnet's traffic goes, as the
 	// subnet's route table association (a `RouteTableAssociation`) sets it.
-	// Empty while it has none: the subnet then has no route out of its VPC
-	// and counts as a subnet whose route table has no default route. Internet
-	// access is decided per VPC and address family, from the route tables of
-	// all its subnets (a `Route` with that family's default destination).
+	// A subnet reaches, and is reached from, the internet for an address
+	// family only if its own route table has that family's default route (a
+	// `Route` with that family's default destination). Empty while it has
+	// none: a subnet with no route table has no route out of its VPC and isn't
+	// reachable from the internet, even when the VPC has an internet gateway.
 	RouteTable string `protobuf:"bytes,4,opt,name=route_table,json=routeTable,proto3" json:"route_table,omitempty"`
 	// The ACL that filters traffic in and out of the subnet, as the subnet's
 	// ACL association (an `AclAssociation`) sets it. Empty while it has
