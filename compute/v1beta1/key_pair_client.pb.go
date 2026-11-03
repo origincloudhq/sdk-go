@@ -106,7 +106,8 @@ func (c *KeyPairClient) AllKeyPairs(ctx context.Context, req *ListKeyPairsReques
 // `ssh-ed25519` key and returns its private half in `private_key`, in
 // this response only. A repeat of a generating request with the same
 // `request_id` can't return the private key again, and is refused with
-// `FAILED_PRECONDITION`: delete the key pair and create another.
+// `CONFLICT`, its `ErrorInfo` metadata naming the key pair under
+// `keyPair`: delete it and create another.
 func (c *KeyPairClient) CreateKeyPair(ctx context.Context, req *CreateKeyPairRequest) (*KeyPair, error) {
 	if req.GetRequestId() == "" {
 		req = proto.Clone(req).(*CreateKeyPairRequest)

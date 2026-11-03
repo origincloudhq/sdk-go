@@ -295,8 +295,11 @@ type CreateKeyPairRequest struct {
 	// The key pair to create: the public key to import, or none to generate
 	// one, and optionally its tags.
 	KeyPair *KeyPair `protobuf:"bytes,2,opt,name=key_pair,json=keyPair,proto3" json:"key_pair,omitempty"`
-	// A UUID; a repeat with the same id returns the first request's key pair
-	// instead of creating a second one.
+	// A UUID; a repeat with the same id creates no second key pair. A repeat
+	// importing a key returns the first request's key pair; a repeat
+	// generating one is refused with `CONFLICT`, as the private key went to
+	// the first request only, and the error's `ErrorInfo` metadata names the
+	// key pair under `keyPair`.
 	RequestId     string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
