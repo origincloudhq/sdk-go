@@ -18,6 +18,7 @@ go get go.origincloud.eu/sdk
 | `go.origincloud.eu/sdk/pvs/v1beta1` | Persistent volumes: volumes, snapshots, storage classes |
 | `go.origincloud.eu/sdk/location/v1beta1` | Regions and zones, and the services each zone offers |
 | `go.origincloud.eu/sdk/resourcemanager/v1beta1` | Organizations, projects and their quotas |
+| `go.origincloud.eu/sdk/iam/v1beta1` | Role bindings, service accounts, users, roles, permissions and the audit log |
 | `go.origincloud.eu/sdk/longrunning/v1beta1` | Operations, for resuming one by name |
 
 ## Example
@@ -85,8 +86,8 @@ func main() {
 - **Endpoints.** Every service answers at `{service}.origincloudapis.eu`,
   which serves every resource wherever it lives. `core.WithRegion`, or
   `ORIGINCLOUD_REGION`, picks a region's front door instead,
-  `{service}.{region}.origincloudapis.eu`; `location` and `resourcemanager`
-  are global and have none, so they always answer at their own host.
+  `{service}.{region}.origincloudapis.eu`; `location`, `resourcemanager` and
+  `iam` are global and have none, so they always answer at their own host.
 - **Operations.** A change the API carries out after answering, such as
   creating a volume or an instance, returns a `core.Operation`; its `Wait`
   returns the resource once the change is complete, or the error the change
