@@ -16,12 +16,10 @@ import (
 // RouteTableAssociationClient calls RouteTableAssociationService.
 //
 // Route table associations: which route table a subnet uses. A subnet has at
-// most one; with none it has no route out of its VPC and counts as a subnet
-// whose route table has no default route. Internet access is decided per VPC
-// and address family, so a subnet without a default route still reaches, and
-// is reached from, the internet through a floating IP or an IPv6 address
-// while another subnet of its VPC routes out; network ACL and security group
-// rules are what keep its traffic in. An
+// most one. A subnet reaches, and is reached from, the internet for an
+// address family only if its own route table has that family's default
+// route; a subnet with no route table has no route out of its VPC and isn't
+// reachable from the internet (see the subnet's `route_table`). An
 // association's id is the id of the route table it names, so a client that
 // knows the subnet and the table names the association without listing. To
 // move a subnet to another table, delete its association and create
@@ -142,8 +140,7 @@ func (c *RouteTableAssociationClient) CreateRouteTableAssociation(ctx context.Co
 }
 
 // DeleteRouteTableAssociation removes a subnet's route table association. The subnet then has no
-// route out of its VPC and counts as a subnet whose route table has no
-// default route. The
+// route out of its VPC and isn't reachable from the internet. The
 // operation is done once the change is recorded; the network applies it
 // within seconds.
 //
