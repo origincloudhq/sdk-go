@@ -184,6 +184,20 @@ func TestAConflictIsNotRetriedAndCarriesItsMetadata(t *testing.T) {
 	}
 }
 
+func TestMetadataThatIsntTextIsLeftOut(t *testing.T) {
+	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusConflict)
+		_, _ = io.WriteString(w, strings.Replace(conflict, `"metadata":{`, `"metadata":{"count":2,`, 1))
+	})
+
+	err := client.Service("iam", false).Call(context.Background(), Request{Method: http.MethodGet, Path: "/x"}, &structpb.Struct{})
+	var apiErr *Error
+	if !errors.As(err, &apiErr) || apiErr.Reason != "CONFLICT" || len(apiErr.Metadata) != 1 ||
+		apiErr.Metadata["serviceAccount"] != "organizations/o/serviceAccounts/s" {
+		t.Fatalf("err = %#v", err)
+	}
+}
+
 func TestAnErrorWithoutAStatusHasEmptyMetadata(t *testing.T) {
 	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusForbidden)

@@ -119,11 +119,13 @@ func errorFromResponse(httpStatus int, body []byte) *Error {
 	e := &Error{HTTPStatus: httpStatus, Status: parsed.Error.Status, Message: parsed.Error.Message, Metadata: map[string]string{}}
 	for _, raw := range parsed.Error.Details {
 		var detail struct {
-			Type            string            `json:"@type"`
-			Reason          string            `json:"reason"`
-			Metadata        map[string]string `json:"metadata"`
-			RequestID       string            `json:"requestId"`
-			RetryDelay      string            `json:"retryDelay"`
+			Type   string `json:"@type"`
+			Reason string `json:"reason"`
+			// any, so that a value that isn't a string, which the API
+			// never sends, costs that value and not the whole detail.
+			Metadata        map[string]any `json:"metadata"`
+			RequestID       string         `json:"requestId"`
+			RetryDelay      string         `json:"retryDelay"`
 			FieldViolations []struct {
 				Field       string `json:"field"`
 				Description string `json:"description"`
@@ -135,7 +137,11 @@ func errorFromResponse(httpStatus int, body []byte) *Error {
 		switch detail.Type {
 		case typeErrorInfo:
 			e.Reason = detail.Reason
-			maps.Copy(e.Metadata, detail.Metadata)
+			for k, v := range detail.Metadata {
+				if s, ok := v.(string); ok {
+					e.Metadata[k] = s
+				}
+			}
 		case typeRequestInfo:
 			e.RequestID = detail.RequestID
 		case typeRetryInfo:
