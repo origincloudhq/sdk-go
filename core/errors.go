@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"net/http"
 	"strings"
 	"time"
@@ -24,6 +25,10 @@ type Error struct {
 	// Reason is the platform's error code, such as "NOT_FOUND" or
 	// "CONFLICT": what to branch on.
 	Reason string
+	// Metadata is what the API adds to the Reason, such as the name of
+	// the resource a CONFLICT is about; each Reason documents its keys.
+	// Empty, not nil, when the error carries none.
+	Metadata map[string]string
 	// Message says what went wrong, for a person.
 	Message string
 	// RequestID identifies the request to Origin Cloud's support.
@@ -104,20 +109,23 @@ type statusBody struct {
 func errorFromResponse(httpStatus int, body []byte) *Error {
 	var parsed statusBody
 	if json.Unmarshal(body, &parsed) != nil || parsed.Error == nil {
-		e := &Error{HTTPStatus: httpStatus, Message: http.StatusText(httpStatus)}
+		e := &Error{HTTPStatus: httpStatus, Message: http.StatusText(httpStatus), Metadata: map[string]string{}}
 		switch httpStatus {
 		case http.StatusBadGateway, http.StatusServiceUnavailable, http.StatusGatewayTimeout:
 			e.Status, e.retryable = "UNAVAILABLE", true
 		}
 		return e
 	}
-	e := &Error{HTTPStatus: httpStatus, Status: parsed.Error.Status, Message: parsed.Error.Message}
+	e := &Error{HTTPStatus: httpStatus, Status: parsed.Error.Status, Message: parsed.Error.Message, Metadata: map[string]string{}}
 	for _, raw := range parsed.Error.Details {
 		var detail struct {
-			Type            string `json:"@type"`
-			Reason          string `json:"reason"`
-			RequestID       string `json:"requestId"`
-			RetryDelay      string `json:"retryDelay"`
+			Type   string `json:"@type"`
+			Reason string `json:"reason"`
+			// any, so that a value that isn't a string, which the API
+			// never sends, costs that value and not the whole detail.
+			Metadata        map[string]any `json:"metadata"`
+			RequestID       string         `json:"requestId"`
+			RetryDelay      string         `json:"retryDelay"`
 			FieldViolations []struct {
 				Field       string `json:"field"`
 				Description string `json:"description"`
@@ -129,6 +137,11 @@ func errorFromResponse(httpStatus int, body []byte) *Error {
 		switch detail.Type {
 		case typeErrorInfo:
 			e.Reason = detail.Reason
+			for k, v := range detail.Metadata {
+				if s, ok := v.(string); ok {
+					e.Metadata[k] = s
+				}
+			}
 		case typeRequestInfo:
 			e.RequestID = detail.RequestID
 		case typeRetryInfo:
@@ -148,7 +161,7 @@ func errorFromResponse(httpStatus int, body []byte) *Error {
 
 // errorFromStatus is the error a failed operation carries.
 func errorFromStatus(s *status.Status) *Error {
-	e := &Error{Status: code.Code(s.GetCode()).String(), Message: s.GetMessage()}
+	e := &Error{Status: code.Code(s.GetCode()).String(), Message: s.GetMessage(), Metadata: map[string]string{}}
 	for _, detail := range s.GetDetails() {
 		message, err := detail.UnmarshalNew()
 		if err != nil {
@@ -157,6 +170,7 @@ func errorFromStatus(s *status.Status) *Error {
 		switch d := message.(type) {
 		case *errdetails.ErrorInfo:
 			e.Reason = d.GetReason()
+			maps.Copy(e.Metadata, d.GetMetadata())
 		case *errdetails.RequestInfo:
 			e.RequestID = d.GetRequestId()
 		case *errdetails.BadRequest:

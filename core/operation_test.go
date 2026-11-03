@@ -64,7 +64,10 @@ func TestWaitWaitsUntilTheOperationIsDone(t *testing.T) {
 }
 
 func TestAFailedOperationReturnsItsError(t *testing.T) {
-	info, _ := anypb.New(&errdetails.ErrorInfo{Reason: "INTERNAL_SERVER_ERROR", Domain: "origincloudapis.eu"})
+	info, _ := anypb.New(&errdetails.ErrorInfo{
+		Reason: "INTERNAL_SERVER_ERROR", Domain: "origincloudapis.eu",
+		Metadata: map[string]string{"volume": "projects/p/zones/z/volumes/vol-1"},
+	})
 	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
 		writeOperation(t, w, &longrunningpb.Operation{
 			Name: operationName, Done: true,
@@ -80,7 +83,8 @@ func TestAFailedOperationReturnsItsError(t *testing.T) {
 	if !errors.As(err, &apiErr) {
 		t.Fatalf("err = %v, want an *Error", err)
 	}
-	if apiErr.Status != "INTERNAL" || apiErr.Reason != "INTERNAL_SERVER_ERROR" || apiErr.Message != "the storage couldn't be created" {
+	if apiErr.Status != "INTERNAL" || apiErr.Reason != "INTERNAL_SERVER_ERROR" || apiErr.Message != "the storage couldn't be created" ||
+		apiErr.Metadata["volume"] != "projects/p/zones/z/volumes/vol-1" || len(apiErr.Metadata) != 1 {
 		t.Fatalf("error = %+v", apiErr)
 	}
 }

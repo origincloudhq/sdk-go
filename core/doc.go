@@ -44,5 +44,12 @@
 //
 // # Errors
 //
-// A call the API refuses returns an [*Error]: branch on its Reason.
+// A call the API refuses returns an [*Error]: branch on its Reason. Its
+// Metadata carries what the API adds to the Reason, such as the name of the
+// resource a CONFLICT is about:
+//
+//	var apiErr *core.Error
+//	if errors.As(err, &apiErr) && apiErr.Reason == "CONFLICT" {
+//		log.Printf("refused: %s already exists", apiErr.Metadata["serviceAccount"])
+//	}
 package core
