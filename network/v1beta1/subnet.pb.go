@@ -50,8 +50,12 @@ type Subnet struct {
 	// none: nothing is filtered at the subnet's edge, and its interfaces'
 	// security groups still apply.
 	Acl string `protobuf:"bytes,5,opt,name=acl,proto3" json:"acl,omitempty"`
-	// Whether an instance launched into the subnet gets a floating IP of
-	// its own, released when the instance is terminated.
+	// Whether a launch that creates its network interface in the subnet,
+	// as the GraphQL API's `launchInstance` does, gives that interface a
+	// floating IP of its own, released when the instance is terminated.
+	// `CreateInstance` takes existing interfaces, so an instance it launches
+	// gets none: create a floating IP and a floating IP association for its
+	// interface instead.
 	AutoAssignPublicIp bool `protobuf:"varint,6,opt,name=auto_assign_public_ip,json=autoAssignPublicIp,proto3" json:"auto_assign_public_ip,omitempty"`
 	// The subnet's IPv4 range.
 	Ipv4CidrBlock string `protobuf:"bytes,7,opt,name=ipv4_cidr_block,json=ipv4CidrBlock,proto3" json:"ipv4_cidr_block,omitempty"`
