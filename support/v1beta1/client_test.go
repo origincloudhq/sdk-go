@@ -93,11 +93,10 @@ func TestEachCaseCallIsSentAsItsHTTPRuleSays(t *testing.T) {
 	client := newClient(t, rec)
 	cases, messages := supportv1beta1.NewCaseClient(client), supportv1beta1.NewCaseMessageClient(client)
 	ctx := context.Background()
-	project := "projects/p"
 
 	if _, err := cases.CreateCase(ctx, &supportv1beta1.CreateCaseRequest{
 		Parent: "organizations/o",
-		Case:   &supportv1beta1.Case{Subject: "Volume stuck", Description: "It stays ATTACHING.", ContactEmail: "ada@example.com", Project: &project},
+		Case:   &supportv1beta1.Case{Subject: "Volume stuck", Description: "It stays ATTACHING.", ContactEmail: "ada@example.com", Project: "projects/p"},
 	}); err != nil {
 		t.Fatal(err)
 	}

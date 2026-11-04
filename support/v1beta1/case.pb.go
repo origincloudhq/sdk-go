@@ -99,9 +99,8 @@ type Case struct {
 	// The case's URN, the identifier access policies and the audit log use.
 	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// The project the case is about, `projects/{project}`, one of the
-	// organization's. Unset means the case is about the organization as a
-	// whole.
-	Project *string `protobuf:"bytes,3,opt,name=project,proto3,oneof" json:"project,omitempty"`
+	// organization's. Empty for a case about the organization as a whole.
+	Project string `protobuf:"bytes,3,opt,name=project,proto3" json:"project,omitempty"`
 	// A one-line summary. Not empty.
 	Subject string `protobuf:"bytes,4,opt,name=subject,proto3" json:"subject,omitempty"`
 	// What the case is about, in full. Not empty.
@@ -169,8 +168,8 @@ func (x *Case) GetUrn() string {
 }
 
 func (x *Case) GetProject() string {
-	if x != nil && x.Project != nil {
-		return *x.Project
+	if x != nil {
+		return x.Project
 	}
 	return ""
 }
@@ -556,12 +555,12 @@ var File_origincloud_support_v1beta1_case_proto protoreflect.FileDescriptor
 
 const file_origincloud_support_v1beta1_case_proto_rawDesc = "" +
 	"\n" +
-	"&origincloud/support/v1beta1/case.proto\x12\x1borigincloud.support.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xad\x05\n" +
+	"&origincloud/support/v1beta1/case.proto\x12\x1borigincloud.support.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9c\x05\n" +
 	"\x04Case\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12S\n" +
+	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12N\n" +
 	"\aproject\x18\x03 \x01(\tB4\xe2A\x02\x01\x05\xfaA,\n" +
-	"*resourcemanager.origincloudapis.eu/ProjectH\x00R\aproject\x88\x01\x01\x12\x1f\n" +
+	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12\x1f\n" +
 	"\asubject\x18\x04 \x01(\tB\x05\xe2A\x02\x02\x05R\asubject\x12'\n" +
 	"\vdescription\x18\x05 \x01(\tB\x05\xe2A\x02\x02\x05R\vdescription\x12*\n" +
 	"\rcontact_email\x18\x06 \x01(\tB\x05\xe2A\x02\x02\x05R\fcontactEmail\x12C\n" +
@@ -579,9 +578,7 @@ const file_origincloud_support_v1beta1_case_proto_rawDesc = "" +
 	"\bRESOLVED\x10\x03\x12\n" +
 	"\n" +
 	"\x06CLOSED\x10\x04:\\\xeaAY\n" +
-	"\x1fsupport.origincloudapis.eu/Case\x12)organizations/{organization}/cases/{case}*\x05cases2\x04caseB\n" +
-	"\n" +
-	"\b_project\"N\n" +
+	"\x1fsupport.origincloudapis.eu/Case\x12)organizations/{organization}/cases/{case}*\x05cases2\x04case\"N\n" +
 	"\x0eGetCaseRequest\x12<\n" +
 	"\x04name\x18\x01 \x01(\tB(\xe2A\x01\x02\xfaA!\n" +
 	"\x1fsupport.origincloudapis.eu/CaseR\x04name\"\x9c\x01\n" +
@@ -666,7 +663,6 @@ func file_origincloud_support_v1beta1_case_proto_init() {
 	if File_origincloud_support_v1beta1_case_proto != nil {
 		return
 	}
-	file_origincloud_support_v1beta1_case_proto_msgTypes[0].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
