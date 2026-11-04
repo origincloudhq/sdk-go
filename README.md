@@ -19,6 +19,9 @@ go get go.origincloud.eu/sdk
 | `go.origincloud.eu/sdk/location/v1beta1` | Regions and zones, and the services each zone offers |
 | `go.origincloud.eu/sdk/resourcemanager/v1beta1` | Organizations, projects and their quotas |
 | `go.origincloud.eu/sdk/iam/v1beta1` | Users, service accounts, roles, role bindings, permissions and the audit log |
+| `go.origincloud.eu/sdk/billing/v1beta1` | Billing accounts and the projects they pay for, payment methods, cost and usage, spend limits and the price list |
+| `go.origincloud.eu/sdk/support/v1beta1` | Support cases and their messages |
+| `go.origincloud.eu/sdk/observability/v1beta1` | The metrics of a project's compute instances, volumes and network interfaces |
 | `go.origincloud.eu/sdk/longrunning/v1beta1` | Operations, for resuming one by name |
 
 ## Example
