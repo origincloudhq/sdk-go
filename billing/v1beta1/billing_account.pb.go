@@ -397,8 +397,6 @@ type ProjectBillingInfo struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The billing info's resource name, `projects/{project}/billingInfo`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The project, `projects/{project}`.
-	Project string `protobuf:"bytes,2,opt,name=project,proto3" json:"project,omitempty"`
 	// The billing account that pays for the project's usage, one of its
 	// organization's.
 	BillingAccount string `protobuf:"bytes,3,opt,name=billing_account,json=billingAccount,proto3" json:"billing_account,omitempty"`
@@ -439,13 +437,6 @@ func (*ProjectBillingInfo) Descriptor() ([]byte, []int) {
 func (x *ProjectBillingInfo) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *ProjectBillingInfo) GetProject() string {
-	if x != nil {
-		return x.Project
 	}
 	return ""
 }
@@ -1442,11 +1433,9 @@ const file_origincloud_billing_v1beta1_billing_account_proto_rawDesc = "" +
 	"\x11STATE_UNSPECIFIED\x10\x00\x12\v\n" +
 	"\aMISSING\x10\x01\x12\f\n" +
 	"\bVERIFIED\x10\x02\x12\x10\n" +
-	"\fNOT_REQUIRED\x10\x03\"\xd7\x02\n" +
+	"\fNOT_REQUIRED\x10\x03\"\x88\x02\n" +
 	"\x12ProjectBillingInfo\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12M\n" +
-	"\aproject\x18\x02 \x01(\tB3\xe2A\x01\x03\xfaA,\n" +
-	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12[\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12[\n" +
 	"\x0fbilling_account\x18\x03 \x01(\tB2\xe2A\x01\x02\xfaA+\n" +
 	")billing.origincloudapis.eu/BillingAccountR\x0ebillingAccount:{\xeaAx\n" +
 	"-billing.origincloudapis.eu/ProjectBillingInfo\x12\x1eprojects/{project}/billingInfo*\x13projectBillingInfos2\x12projectBillingInfo\"\x9e\x02\n" +
