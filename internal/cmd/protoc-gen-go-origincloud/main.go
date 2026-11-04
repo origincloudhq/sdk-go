@@ -28,7 +28,7 @@ import (
 
 // The services that answer only at their regionless host: the API's global
 // services, which have no regional name.
-var globalServices = map[string]bool{"iam": true, "resourcemanager": true, "location": true}
+var globalServices = map[string]bool{"iam": true, "resourcemanager": true, "location": true, "billing": true, "support": true}
 
 const (
 	corePackage    = protogen.GoImportPath("go.origincloud.eu/sdk/core")
