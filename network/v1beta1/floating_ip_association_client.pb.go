@@ -138,8 +138,10 @@ func (c *FloatingIpAssociationClient) CreateFloatingIpAssociation(ctx context.Co
 }
 
 // DeleteFloatingIpAssociation removes a floating IP's association: the address reaches nothing, and
-// stays allocated. The operation is done once the change is recorded; the
-// network applies it within seconds.
+// stays allocated. Refused for an address the platform assigned at
+// launch (`auto_assigned`), which is released with its network interface.
+// The operation is done once the change is recorded; the network applies
+// it within seconds.
 //
 // It answers with an operation to wait on, which has no result.
 func (c *FloatingIpAssociationClient) DeleteFloatingIpAssociation(ctx context.Context, req *DeleteFloatingIpAssociationRequest) (*core.Operation[*emptypb.Empty], error) {
