@@ -105,9 +105,9 @@ func (c *ServiceAccountClient) AllServiceAccounts(ctx context.Context, req *List
 	}
 }
 
-// CreateServiceAccount creates a service account and its client secret. The response is the
-// only place the secret is ever shown: store it now. Needs
-// `iam.service_account.create` on the organization.
+// CreateServiceAccount creates a service account and, for an `EXTERNAL` one, its client
+// secret. The response is the only place the secret is ever shown: store
+// it now. Needs `iam.service_account.create` on the organization.
 func (c *ServiceAccountClient) CreateServiceAccount(ctx context.Context, req *CreateServiceAccountRequest) (*ServiceAccount, error) {
 	if req.GetRequestId() == "" {
 		req = proto.Clone(req).(*CreateServiceAccountRequest)
