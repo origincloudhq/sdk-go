@@ -29,7 +29,7 @@ type RecordSetClient struct {
 
 // NewRecordSetClient returns a client of RecordSetService that sends its calls through client.
 func NewRecordSetClient(client *core.Client) *RecordSetClient {
-	return &RecordSetClient{service: client.Service("dns", true)}
+	return &RecordSetClient{service: client.Service("dns", false)}
 }
 
 // Service returns the endpoint the client sends its calls to, which

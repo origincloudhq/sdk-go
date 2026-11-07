@@ -28,7 +28,7 @@ type VpcAttachmentClient struct {
 
 // NewVpcAttachmentClient returns a client of VpcAttachmentService that sends its calls through client.
 func NewVpcAttachmentClient(client *core.Client) *VpcAttachmentClient {
-	return &VpcAttachmentClient{service: client.Service("dns", true)}
+	return &VpcAttachmentClient{service: client.Service("dns", false)}
 }
 
 // Service returns the endpoint the client sends its calls to, which

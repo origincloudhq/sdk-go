@@ -43,7 +43,7 @@ type HostedZoneClient struct {
 
 // NewHostedZoneClient returns a client of HostedZoneService that sends its calls through client.
 func NewHostedZoneClient(client *core.Client) *HostedZoneClient {
-	return &HostedZoneClient{service: client.Service("dns", true)}
+	return &HostedZoneClient{service: client.Service("dns", false)}
 }
 
 // Service returns the endpoint the client sends its calls to, which

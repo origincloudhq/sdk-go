@@ -44,7 +44,7 @@ func TestADeclaredIdempotencyLevelMakesAMethodRepeatable(t *testing.T) {
 
 func TestTheGlobalServicesHaveNoRegionalHost(t *testing.T) {
 	for shortcode, global := range map[string]bool{
-		"iam": true, "resourcemanager": true, "location": true, "billing": true, "support": true,
+		"iam": true, "resourcemanager": true, "location": true, "billing": true, "support": true, "dns": true,
 		"pvs": false, "compute": false, "network": false, "observability": false,
 	} {
 		if globalServices[shortcode] != global {
