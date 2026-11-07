@@ -45,7 +45,7 @@ type PriceList struct {
 	// `network_nat_gateway`, `network_vpc_egress`, `network_vpc_ingress`,
 	// `network_vpc_internal`, `storage_volume`, `storage_snapshot`,
 	// `observability_custom_metric`, `observability_api_request`,
-	// `observability_ingested_sample`.
+	// `observability_ingested_sample`, `dns_hosted_zone`, `dns_query`.
 	Families      []*PriceFamily `protobuf:"bytes,4,rep,name=families,proto3" json:"families,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -181,7 +181,7 @@ type Price struct {
 	// `storage_class` for a volume. Empty for a product that has none.
 	Dimensions map[string]string `protobuf:"bytes,2,rep,name=dimensions,proto3" json:"dimensions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// What is counted: `seconds`, `gib_hours`, `gb` (decimal, 10^9 bytes),
-	// `metric_months`, `requests` or `samples`.
+	// `metric_months`, `requests`, `samples` or `queries`.
 	UnitType string `protobuf:"bytes,3,opt,name=unit_type,proto3" json:"unit_type,omitempty"`
 	// How many of the unit the amount pays for: `3600` seconds is an
 	// hourly rate, `1000` requests a rate per thousand.

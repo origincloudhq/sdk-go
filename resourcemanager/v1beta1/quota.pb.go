@@ -39,6 +39,10 @@ type OrganizationQuota struct {
 	MaxVpcs int64 `protobuf:"varint,5,opt,name=max_vpcs,json=maxVpcs,proto3" json:"max_vpcs,omitempty"`
 	// The most floating IPs.
 	MaxPublicIps int64 `protobuf:"varint,6,opt,name=max_public_ips,json=maxPublicIps,proto3" json:"max_public_ips,omitempty"`
+	// The most DNS hosted zones, including those not yet verified.
+	MaxHostedZones int64 `protobuf:"varint,8,opt,name=max_hosted_zones,json=maxHostedZones,proto3" json:"max_hosted_zones,omitempty"`
+	// The most DNS record sets, summed over every hosted zone.
+	MaxRecordSets int64 `protobuf:"varint,9,opt,name=max_record_sets,json=maxRecordSets,proto3" json:"max_record_sets,omitempty"`
 	// How much of each limit the organization's projects use together.
 	Usage         *QuotaUsage `protobuf:"bytes,7,opt,name=usage,proto3" json:"usage,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -117,6 +121,20 @@ func (x *OrganizationQuota) GetMaxPublicIps() int64 {
 	return 0
 }
 
+func (x *OrganizationQuota) GetMaxHostedZones() int64 {
+	if x != nil {
+		return x.MaxHostedZones
+	}
+	return 0
+}
+
+func (x *OrganizationQuota) GetMaxRecordSets() int64 {
+	if x != nil {
+		return x.MaxRecordSets
+	}
+	return 0
+}
+
 func (x *OrganizationQuota) GetUsage() *QuotaUsage {
 	if x != nil {
 		return x.Usage
@@ -146,6 +164,12 @@ type ProjectQuota struct {
 	MaxVpcs *int64 `protobuf:"varint,5,opt,name=max_vpcs,json=maxVpcs,proto3,oneof" json:"max_vpcs,omitempty"`
 	// The most floating IPs; unset means no budget.
 	MaxPublicIps *int64 `protobuf:"varint,6,opt,name=max_public_ips,json=maxPublicIps,proto3,oneof" json:"max_public_ips,omitempty"`
+	// The most DNS hosted zones, including those not yet verified; unset
+	// means no budget.
+	MaxHostedZones *int64 `protobuf:"varint,8,opt,name=max_hosted_zones,json=maxHostedZones,proto3,oneof" json:"max_hosted_zones,omitempty"`
+	// The most DNS record sets, summed over the project's hosted zones; unset
+	// means no budget.
+	MaxRecordSets *int64 `protobuf:"varint,9,opt,name=max_record_sets,json=maxRecordSets,proto3,oneof" json:"max_record_sets,omitempty"`
 	// How much of each budget the project uses.
 	Usage         *QuotaUsage `protobuf:"bytes,7,opt,name=usage,proto3" json:"usage,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -224,6 +248,20 @@ func (x *ProjectQuota) GetMaxPublicIps() int64 {
 	return 0
 }
 
+func (x *ProjectQuota) GetMaxHostedZones() int64 {
+	if x != nil && x.MaxHostedZones != nil {
+		return *x.MaxHostedZones
+	}
+	return 0
+}
+
+func (x *ProjectQuota) GetMaxRecordSets() int64 {
+	if x != nil && x.MaxRecordSets != nil {
+		return *x.MaxRecordSets
+	}
+	return 0
+}
+
 func (x *ProjectQuota) GetUsage() *QuotaUsage {
 	if x != nil {
 		return x.Usage
@@ -245,7 +283,13 @@ type QuotaUsage struct {
 	// VPCs.
 	Vpcs int64 `protobuf:"varint,4,opt,name=vpcs,proto3" json:"vpcs,omitempty"`
 	// Floating IPs.
-	PublicIps     int64 `protobuf:"varint,5,opt,name=public_ips,json=publicIps,proto3" json:"public_ips,omitempty"`
+	PublicIps int64 `protobuf:"varint,5,opt,name=public_ips,json=publicIps,proto3" json:"public_ips,omitempty"`
+	// DNS hosted zones, including those not yet verified; unset while they
+	// can't be counted, the other figures answered all the same.
+	HostedZones *int64 `protobuf:"varint,6,opt,name=hosted_zones,json=hostedZones,proto3,oneof" json:"hosted_zones,omitempty"`
+	// DNS record sets; unset while they can't be counted, the other figures
+	// answered all the same.
+	RecordSets    *int64 `protobuf:"varint,7,opt,name=record_sets,json=recordSets,proto3,oneof" json:"record_sets,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -315,34 +359,54 @@ func (x *QuotaUsage) GetPublicIps() int64 {
 	return 0
 }
 
+func (x *QuotaUsage) GetHostedZones() int64 {
+	if x != nil && x.HostedZones != nil {
+		return *x.HostedZones
+	}
+	return 0
+}
+
+func (x *QuotaUsage) GetRecordSets() int64 {
+	if x != nil && x.RecordSets != nil {
+		return *x.RecordSets
+	}
+	return 0
+}
+
 var File_origincloud_resourcemanager_v1beta1_quota_proto protoreflect.FileDescriptor
 
 const file_origincloud_resourcemanager_v1beta1_quota_proto_rawDesc = "" +
 	"\n" +
-	"/origincloud/resourcemanager/v1beta1/quota.proto\x12#origincloud.resourcemanager.v1beta1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\"\xc7\x03\n" +
+	"/origincloud/resourcemanager/v1beta1/quota.proto\x12#origincloud.resourcemanager.v1beta1\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\"\xa5\x04\n" +
 	"\x11OrganizationQuota\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12)\n" +
 	"\rmax_instances\x18\x02 \x01(\x03B\x04\xe2A\x01\x03R\fmaxInstances\x12\x1f\n" +
 	"\bmax_vcpu\x18\x03 \x01(\x03B\x04\xe2A\x01\x03R\amaxVcpu\x12*\n" +
 	"\x0emax_volume_gib\x18\x04 \x01(\x03B\x04\xe2A\x01\x03R\fmaxVolumeGib\x12\x1f\n" +
 	"\bmax_vpcs\x18\x05 \x01(\x03B\x04\xe2A\x01\x03R\amaxVpcs\x12*\n" +
-	"\x0emax_public_ips\x18\x06 \x01(\x03B\x04\xe2A\x01\x03R\fmaxPublicIps\x12K\n" +
+	"\x0emax_public_ips\x18\x06 \x01(\x03B\x04\xe2A\x01\x03R\fmaxPublicIps\x12.\n" +
+	"\x10max_hosted_zones\x18\b \x01(\x03B\x04\xe2A\x01\x03R\x0emaxHostedZones\x12,\n" +
+	"\x0fmax_record_sets\x18\t \x01(\x03B\x04\xe2A\x01\x03R\rmaxRecordSets\x12K\n" +
 	"\x05usage\x18\a \x01(\v2/.origincloud.resourcemanager.v1beta1.QuotaUsageB\x04\xe2A\x01\x03R\x05usage:\x85\x01\xeaA\x81\x01\n" +
-	"4resourcemanager.origincloudapis.eu/OrganizationQuota\x12\"organizations/{organization}/quota*\x12organizationQuotas2\x11organizationQuota\"\x92\x04\n" +
+	"4resourcemanager.origincloudapis.eu/OrganizationQuota\x12\"organizations/{organization}/quota*\x12organizationQuotas2\x11organizationQuota\"\xa3\x05\n" +
 	"\fProjectQuota\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12.\n" +
 	"\rmax_instances\x18\x02 \x01(\x03B\x04\xe2A\x01\x01H\x00R\fmaxInstances\x88\x01\x01\x12$\n" +
 	"\bmax_vcpu\x18\x03 \x01(\x03B\x04\xe2A\x01\x01H\x01R\amaxVcpu\x88\x01\x01\x12/\n" +
 	"\x0emax_volume_gib\x18\x04 \x01(\x03B\x04\xe2A\x01\x01H\x02R\fmaxVolumeGib\x88\x01\x01\x12$\n" +
 	"\bmax_vpcs\x18\x05 \x01(\x03B\x04\xe2A\x01\x01H\x03R\amaxVpcs\x88\x01\x01\x12/\n" +
-	"\x0emax_public_ips\x18\x06 \x01(\x03B\x04\xe2A\x01\x01H\x04R\fmaxPublicIps\x88\x01\x01\x12K\n" +
+	"\x0emax_public_ips\x18\x06 \x01(\x03B\x04\xe2A\x01\x01H\x04R\fmaxPublicIps\x88\x01\x01\x123\n" +
+	"\x10max_hosted_zones\x18\b \x01(\x03B\x04\xe2A\x01\x01H\x05R\x0emaxHostedZones\x88\x01\x01\x121\n" +
+	"\x0fmax_record_sets\x18\t \x01(\x03B\x04\xe2A\x01\x01H\x06R\rmaxRecordSets\x88\x01\x01\x12K\n" +
 	"\x05usage\x18\a \x01(\v2/.origincloud.resourcemanager.v1beta1.QuotaUsageB\x04\xe2A\x01\x03R\x05usage:k\xeaAh\n" +
 	"/resourcemanager.origincloudapis.eu/ProjectQuota\x12\x18projects/{project}/quota*\rprojectQuotas2\fprojectQuotaB\x10\n" +
 	"\x0e_max_instancesB\v\n" +
 	"\t_max_vcpuB\x11\n" +
 	"\x0f_max_volume_gibB\v\n" +
 	"\t_max_vpcsB\x11\n" +
-	"\x0f_max_public_ips\"\xae\x01\n" +
+	"\x0f_max_public_ipsB\x13\n" +
+	"\x11_max_hosted_zonesB\x12\n" +
+	"\x10_max_record_sets\"\xa9\x02\n" +
 	"\n" +
 	"QuotaUsage\x12\"\n" +
 	"\tinstances\x18\x01 \x01(\x03B\x04\xe2A\x01\x03R\tinstances\x12\x18\n" +
@@ -351,7 +415,12 @@ const file_origincloud_resourcemanager_v1beta1_quota_proto_rawDesc = "" +
 	"volume_gib\x18\x03 \x01(\x03B\x04\xe2A\x01\x03R\tvolumeGib\x12\x18\n" +
 	"\x04vpcs\x18\x04 \x01(\x03B\x04\xe2A\x01\x03R\x04vpcs\x12#\n" +
 	"\n" +
-	"public_ips\x18\x05 \x01(\x03B\x04\xe2A\x01\x03R\tpublicIpsb\x06proto3"
+	"public_ips\x18\x05 \x01(\x03B\x04\xe2A\x01\x03R\tpublicIps\x12,\n" +
+	"\fhosted_zones\x18\x06 \x01(\x03B\x04\xe2A\x01\x03H\x00R\vhostedZones\x88\x01\x01\x12*\n" +
+	"\vrecord_sets\x18\a \x01(\x03B\x04\xe2A\x01\x03H\x01R\n" +
+	"recordSets\x88\x01\x01B\x0f\n" +
+	"\r_hosted_zonesB\x0e\n" +
+	"\f_record_setsb\x06proto3"
 
 var (
 	file_origincloud_resourcemanager_v1beta1_quota_proto_rawDescOnce sync.Once
@@ -387,6 +456,7 @@ func file_origincloud_resourcemanager_v1beta1_quota_proto_init() {
 		return
 	}
 	file_origincloud_resourcemanager_v1beta1_quota_proto_msgTypes[1].OneofWrappers = []any{}
+	file_origincloud_resourcemanager_v1beta1_quota_proto_msgTypes[2].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
