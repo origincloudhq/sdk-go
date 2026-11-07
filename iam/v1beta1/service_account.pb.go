@@ -24,6 +24,63 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// How the service account authenticates. Set when it is created; it
+// never changes.
+type ServiceAccount_Type int32
+
+const (
+	// Not set. A create that leaves it unset creates an `EXTERNAL` service
+	// account.
+	ServiceAccount_TYPE_UNSPECIFIED ServiceAccount_Type = 0
+	// Authenticates with an OAuth 2.0 client id and secret, for software
+	// outside Origin Cloud such as a CI pipeline.
+	ServiceAccount_EXTERNAL ServiceAccount_Type = 1
+	// Has no client id or secret and can't be given one: no credential of
+	// its own authenticates as it, wherever it was copied to.
+	ServiceAccount_WORKLOAD ServiceAccount_Type = 2
+)
+
+// Enum value maps for ServiceAccount_Type.
+var (
+	ServiceAccount_Type_name = map[int32]string{
+		0: "TYPE_UNSPECIFIED",
+		1: "EXTERNAL",
+		2: "WORKLOAD",
+	}
+	ServiceAccount_Type_value = map[string]int32{
+		"TYPE_UNSPECIFIED": 0,
+		"EXTERNAL":         1,
+		"WORKLOAD":         2,
+	}
+)
+
+func (x ServiceAccount_Type) Enum() *ServiceAccount_Type {
+	p := new(ServiceAccount_Type)
+	*p = x
+	return p
+}
+
+func (x ServiceAccount_Type) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ServiceAccount_Type) Descriptor() protoreflect.EnumDescriptor {
+	return file_origincloud_iam_v1beta1_service_account_proto_enumTypes[0].Descriptor()
+}
+
+func (ServiceAccount_Type) Type() protoreflect.EnumType {
+	return &file_origincloud_iam_v1beta1_service_account_proto_enumTypes[0]
+}
+
+func (x ServiceAccount_Type) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ServiceAccount_Type.Descriptor instead.
+func (ServiceAccount_Type) EnumDescriptor() ([]byte, []int) {
+	return file_origincloud_iam_v1beta1_service_account_proto_rawDescGZIP(), []int{0, 0}
+}
+
 // Where the service account is in its lifecycle.
 type ServiceAccount_State int32
 
@@ -61,11 +118,11 @@ func (x ServiceAccount_State) String() string {
 }
 
 func (ServiceAccount_State) Descriptor() protoreflect.EnumDescriptor {
-	return file_origincloud_iam_v1beta1_service_account_proto_enumTypes[0].Descriptor()
+	return file_origincloud_iam_v1beta1_service_account_proto_enumTypes[1].Descriptor()
 }
 
 func (ServiceAccount_State) Type() protoreflect.EnumType {
-	return &file_origincloud_iam_v1beta1_service_account_proto_enumTypes[0]
+	return &file_origincloud_iam_v1beta1_service_account_proto_enumTypes[1]
 }
 
 func (x ServiceAccount_State) Number() protoreflect.EnumNumber {
@@ -74,7 +131,7 @@ func (x ServiceAccount_State) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ServiceAccount_State.Descriptor instead.
 func (ServiceAccount_State) EnumDescriptor() ([]byte, []int) {
-	return file_origincloud_iam_v1beta1_service_account_proto_rawDescGZIP(), []int{0, 0}
+	return file_origincloud_iam_v1beta1_service_account_proto_rawDescGZIP(), []int{0, 1}
 }
 
 // A credential of an organization for software.
@@ -87,11 +144,12 @@ type ServiceAccount struct {
 	// The member a role binding names it by,
 	// `serviceAccount:{service_account}`.
 	Member string `protobuf:"bytes,3,opt,name=member,proto3" json:"member,omitempty"`
-	// The OAuth 2.0 client id it authenticates with.
+	// The OAuth 2.0 client id it authenticates with; empty for a `WORKLOAD`
+	// service account.
 	ClientId string `protobuf:"bytes,4,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
 	// The OAuth 2.0 client secret it authenticates with. Set only in the
-	// response that created the service account, and empty everywhere else:
-	// it can't be read again.
+	// response that created an `EXTERNAL` service account, and empty
+	// everywhere else: it can't be read again.
 	ClientSecret string `protobuf:"bytes,5,opt,name=client_secret,json=clientSecret,proto3" json:"client_secret,omitempty"`
 	// Where the service account is in its lifecycle.
 	State ServiceAccount_State `protobuf:"varint,6,opt,name=state,proto3,enum=origincloud.iam.v1beta1.ServiceAccount_State" json:"state,omitempty"`
@@ -101,7 +159,10 @@ type ServiceAccount struct {
 	// When the service account was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
 	// When the service account was deleted; unset while it is active.
-	DeleteTime    *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=delete_time,json=deleteTime,proto3" json:"delete_time,omitempty"`
+	DeleteTime *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=delete_time,json=deleteTime,proto3" json:"delete_time,omitempty"`
+	// How the service account authenticates; `EXTERNAL` when the create
+	// leaves it unset.
+	Type          ServiceAccount_Type `protobuf:"varint,10,opt,name=type,proto3,enum=origincloud.iam.v1beta1.ServiceAccount_Type" json:"type,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -197,6 +258,13 @@ func (x *ServiceAccount) GetDeleteTime() *timestamppb.Timestamp {
 		return x.DeleteTime
 	}
 	return nil
+}
+
+func (x *ServiceAccount) GetType() ServiceAccount_Type {
+	if x != nil {
+		return x.Type
+	}
+	return ServiceAccount_TYPE_UNSPECIFIED
 }
 
 // The request for GetServiceAccount.
@@ -381,7 +449,7 @@ type CreateServiceAccountRequest struct {
 	// The organization to create the service account in,
 	// `organizations/{organization}`.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
-	// The service account to create: its `display_name`.
+	// The service account to create: its `display_name` and `type`.
 	ServiceAccount *ServiceAccount `protobuf:"bytes,2,opt,name=service_account,json=serviceAccount,proto3" json:"service_account,omitempty"`
 	// A UUID. A repeat of the request with the same `request_id` within a
 	// day creates nothing and is refused with `CONFLICT`: the secret went to
@@ -495,7 +563,7 @@ var File_origincloud_iam_v1beta1_service_account_proto protoreflect.FileDescript
 
 const file_origincloud_iam_v1beta1_service_account_proto_rawDesc = "" +
 	"\n" +
-	"-origincloud/iam/v1beta1/service_account.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf9\x04\n" +
+	"-origincloud/iam/v1beta1/service_account.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfc\x05\n" +
 	"\x0eServiceAccount\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12(\n" +
 	"\fdisplay_name\x18\x02 \x01(\tB\x05\xe2A\x02\x02\x05R\vdisplayName\x12\x1c\n" +
@@ -507,7 +575,13 @@ const file_origincloud_iam_v1beta1_service_account_proto_rawDesc = "" +
 	"\vcreate_time\x18\b \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime\x12A\n" +
 	"\vdelete_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"deleteTime\"7\n" +
+	"deleteTime\x12G\n" +
+	"\x04type\x18\n" +
+	" \x01(\x0e2,.origincloud.iam.v1beta1.ServiceAccount.TypeB\x05\xe2A\x02\x01\x05R\x04type\"8\n" +
+	"\x04Type\x12\x14\n" +
+	"\x10TYPE_UNSPECIFIED\x10\x00\x12\f\n" +
+	"\bEXTERNAL\x10\x01\x12\f\n" +
+	"\bWORKLOAD\x10\x02\"7\n" +
 	"\x05State\x12\x15\n" +
 	"\x11STATE_UNSPECIFIED\x10\x00\x12\n" +
 	"\n" +
@@ -552,38 +626,40 @@ func file_origincloud_iam_v1beta1_service_account_proto_rawDescGZIP() []byte {
 	return file_origincloud_iam_v1beta1_service_account_proto_rawDescData
 }
 
-var file_origincloud_iam_v1beta1_service_account_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_origincloud_iam_v1beta1_service_account_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
 var file_origincloud_iam_v1beta1_service_account_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_origincloud_iam_v1beta1_service_account_proto_goTypes = []any{
-	(ServiceAccount_State)(0),           // 0: origincloud.iam.v1beta1.ServiceAccount.State
-	(*ServiceAccount)(nil),              // 1: origincloud.iam.v1beta1.ServiceAccount
-	(*GetServiceAccountRequest)(nil),    // 2: origincloud.iam.v1beta1.GetServiceAccountRequest
-	(*ListServiceAccountsRequest)(nil),  // 3: origincloud.iam.v1beta1.ListServiceAccountsRequest
-	(*ListServiceAccountsResponse)(nil), // 4: origincloud.iam.v1beta1.ListServiceAccountsResponse
-	(*CreateServiceAccountRequest)(nil), // 5: origincloud.iam.v1beta1.CreateServiceAccountRequest
-	(*DeleteServiceAccountRequest)(nil), // 6: origincloud.iam.v1beta1.DeleteServiceAccountRequest
-	(*timestamppb.Timestamp)(nil),       // 7: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),               // 8: google.protobuf.Empty
+	(ServiceAccount_Type)(0),            // 0: origincloud.iam.v1beta1.ServiceAccount.Type
+	(ServiceAccount_State)(0),           // 1: origincloud.iam.v1beta1.ServiceAccount.State
+	(*ServiceAccount)(nil),              // 2: origincloud.iam.v1beta1.ServiceAccount
+	(*GetServiceAccountRequest)(nil),    // 3: origincloud.iam.v1beta1.GetServiceAccountRequest
+	(*ListServiceAccountsRequest)(nil),  // 4: origincloud.iam.v1beta1.ListServiceAccountsRequest
+	(*ListServiceAccountsResponse)(nil), // 5: origincloud.iam.v1beta1.ListServiceAccountsResponse
+	(*CreateServiceAccountRequest)(nil), // 6: origincloud.iam.v1beta1.CreateServiceAccountRequest
+	(*DeleteServiceAccountRequest)(nil), // 7: origincloud.iam.v1beta1.DeleteServiceAccountRequest
+	(*timestamppb.Timestamp)(nil),       // 8: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),               // 9: google.protobuf.Empty
 }
 var file_origincloud_iam_v1beta1_service_account_proto_depIdxs = []int32{
-	0, // 0: origincloud.iam.v1beta1.ServiceAccount.state:type_name -> origincloud.iam.v1beta1.ServiceAccount.State
-	7, // 1: origincloud.iam.v1beta1.ServiceAccount.create_time:type_name -> google.protobuf.Timestamp
-	7, // 2: origincloud.iam.v1beta1.ServiceAccount.delete_time:type_name -> google.protobuf.Timestamp
-	1, // 3: origincloud.iam.v1beta1.ListServiceAccountsResponse.service_accounts:type_name -> origincloud.iam.v1beta1.ServiceAccount
-	1, // 4: origincloud.iam.v1beta1.CreateServiceAccountRequest.service_account:type_name -> origincloud.iam.v1beta1.ServiceAccount
-	2, // 5: origincloud.iam.v1beta1.ServiceAccountService.GetServiceAccount:input_type -> origincloud.iam.v1beta1.GetServiceAccountRequest
-	3, // 6: origincloud.iam.v1beta1.ServiceAccountService.ListServiceAccounts:input_type -> origincloud.iam.v1beta1.ListServiceAccountsRequest
-	5, // 7: origincloud.iam.v1beta1.ServiceAccountService.CreateServiceAccount:input_type -> origincloud.iam.v1beta1.CreateServiceAccountRequest
-	6, // 8: origincloud.iam.v1beta1.ServiceAccountService.DeleteServiceAccount:input_type -> origincloud.iam.v1beta1.DeleteServiceAccountRequest
-	1, // 9: origincloud.iam.v1beta1.ServiceAccountService.GetServiceAccount:output_type -> origincloud.iam.v1beta1.ServiceAccount
-	4, // 10: origincloud.iam.v1beta1.ServiceAccountService.ListServiceAccounts:output_type -> origincloud.iam.v1beta1.ListServiceAccountsResponse
-	1, // 11: origincloud.iam.v1beta1.ServiceAccountService.CreateServiceAccount:output_type -> origincloud.iam.v1beta1.ServiceAccount
-	8, // 12: origincloud.iam.v1beta1.ServiceAccountService.DeleteServiceAccount:output_type -> google.protobuf.Empty
-	9, // [9:13] is the sub-list for method output_type
-	5, // [5:9] is the sub-list for method input_type
-	5, // [5:5] is the sub-list for extension type_name
-	5, // [5:5] is the sub-list for extension extendee
-	0, // [0:5] is the sub-list for field type_name
+	1,  // 0: origincloud.iam.v1beta1.ServiceAccount.state:type_name -> origincloud.iam.v1beta1.ServiceAccount.State
+	8,  // 1: origincloud.iam.v1beta1.ServiceAccount.create_time:type_name -> google.protobuf.Timestamp
+	8,  // 2: origincloud.iam.v1beta1.ServiceAccount.delete_time:type_name -> google.protobuf.Timestamp
+	0,  // 3: origincloud.iam.v1beta1.ServiceAccount.type:type_name -> origincloud.iam.v1beta1.ServiceAccount.Type
+	2,  // 4: origincloud.iam.v1beta1.ListServiceAccountsResponse.service_accounts:type_name -> origincloud.iam.v1beta1.ServiceAccount
+	2,  // 5: origincloud.iam.v1beta1.CreateServiceAccountRequest.service_account:type_name -> origincloud.iam.v1beta1.ServiceAccount
+	3,  // 6: origincloud.iam.v1beta1.ServiceAccountService.GetServiceAccount:input_type -> origincloud.iam.v1beta1.GetServiceAccountRequest
+	4,  // 7: origincloud.iam.v1beta1.ServiceAccountService.ListServiceAccounts:input_type -> origincloud.iam.v1beta1.ListServiceAccountsRequest
+	6,  // 8: origincloud.iam.v1beta1.ServiceAccountService.CreateServiceAccount:input_type -> origincloud.iam.v1beta1.CreateServiceAccountRequest
+	7,  // 9: origincloud.iam.v1beta1.ServiceAccountService.DeleteServiceAccount:input_type -> origincloud.iam.v1beta1.DeleteServiceAccountRequest
+	2,  // 10: origincloud.iam.v1beta1.ServiceAccountService.GetServiceAccount:output_type -> origincloud.iam.v1beta1.ServiceAccount
+	5,  // 11: origincloud.iam.v1beta1.ServiceAccountService.ListServiceAccounts:output_type -> origincloud.iam.v1beta1.ListServiceAccountsResponse
+	2,  // 12: origincloud.iam.v1beta1.ServiceAccountService.CreateServiceAccount:output_type -> origincloud.iam.v1beta1.ServiceAccount
+	9,  // 13: origincloud.iam.v1beta1.ServiceAccountService.DeleteServiceAccount:output_type -> google.protobuf.Empty
+	10, // [10:14] is the sub-list for method output_type
+	6,  // [6:10] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_origincloud_iam_v1beta1_service_account_proto_init() }
@@ -596,7 +672,7 @@ func file_origincloud_iam_v1beta1_service_account_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_origincloud_iam_v1beta1_service_account_proto_rawDesc), len(file_origincloud_iam_v1beta1_service_account_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      2,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
