@@ -419,8 +419,10 @@ type Instance struct {
 	// The service account the instance runs as,
 	// `organizations/{organization}/serviceAccounts/{service_account}`: a
 	// `WORKLOAD` service account of the instance's organization that isn't
-	// deleted. Launching with one needs `iam.service_account.act_as` on the
-	// organization as well. Empty for an instance that runs as none.
+	// deleted. Launching with one, or updating the instance to one, needs
+	// `iam.service_account.act_as` on the organization as well; an update
+	// that leaves it empty removes it, and a terminated instance's can't
+	// change. Empty for an instance that runs as none.
 	ServiceAccount string `protobuf:"bytes,17,opt,name=service_account,json=serviceAccount,proto3" json:"service_account,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -1075,7 +1077,9 @@ type UpdateInstanceRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The instance, by its name, with the fields to change.
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	// The fields to change: `instance_type`, `tags`, or both. `*` is both.
+	// The fields to change: any of `instance_type`, `tags` and
+	// `service_account`. `*` is all three, so an empty `service_account`
+	// under it removes the instance's.
 	UpdateMask *fieldmaskpb.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	// A UUID; a repeat with the same id returns the first request's
 	// operation instead of changing the instance again.
@@ -1307,7 +1311,7 @@ var File_origincloud_compute_v1beta1_instance_proto protoreflect.FileDescriptor
 
 const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"\n" +
-	"*origincloud/compute/v1beta1/instance.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xc2\v\n" +
+	"*origincloud/compute/v1beta1/instance.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xc1\v\n" +
 	"\bInstance\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
 	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12U\n" +
@@ -1333,8 +1337,8 @@ const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"createTime\x12\x1e\n" +
 	"\acreator\x18\x0e \x01(\tB\x04\xe2A\x01\x03R\acreator\x12I\n" +
 	"\x04tags\x18\x0f \x03(\v2/.origincloud.compute.v1beta1.Instance.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x12f\n" +
-	"\x13interface_addresses\x18\x10 \x03(\v2/.origincloud.compute.v1beta1.InterfaceAddressesB\x04\xe2A\x01\x03R\x12interfaceAddresses\x12X\n" +
-	"\x0fservice_account\x18\x11 \x01(\tB/\xe2A\x02\x01\x05\xfaA'\n" +
+	"\x13interface_addresses\x18\x10 \x03(\v2/.origincloud.compute.v1beta1.InterfaceAddressesB\x04\xe2A\x01\x03R\x12interfaceAddresses\x12W\n" +
+	"\x0fservice_account\x18\x11 \x01(\tB.\xe2A\x01\x01\xfaA'\n" +
 	"%iam.origincloudapis.eu/ServiceAccountR\x0eserviceAccount\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
