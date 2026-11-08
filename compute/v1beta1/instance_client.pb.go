@@ -139,7 +139,8 @@ func (c *InstanceClient) CreateInstance(ctx context.Context, req *CreateInstance
 	return core.NewOperation[*Instance](c.service, out), nil
 }
 
-// UpdateInstance changes an instance's type or tags. A new `instance_type` needs the
+// UpdateInstance changes an instance's type, tags or service account. A new
+// `instance_type` needs the
 // instance `STOPPED`, and is refused with `FAILED_PRECONDITION`
 // otherwise; it takes effect at the next start. A larger type is checked
 // against the same vCPU quota a launch is. The operation is done once the
