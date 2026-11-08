@@ -120,7 +120,7 @@ type RecordSet struct {
 	Type RecordSet_Type `protobuf:"varint,4,opt,name=type,proto3,enum=origincloud.dns.v1beta1.RecordSet_Type" json:"type,omitempty"`
 	// How long resolvers may keep the answer, from 30 seconds to 7 days, in
 	// whole seconds. 300 seconds when left out.
-	Ttl *durationpb.Duration `protobuf:"bytes,5,opt,name=ttl,proto3" json:"ttl,omitempty"`
+	Ttl *durationpb.Duration `protobuf:"bytes,5,opt,name=ttl,proto3,oneof" json:"ttl,omitempty"`
 	// What the record set answers with: exactly one of these.
 	//
 	// Types that are valid to be assigned to Data:
@@ -948,13 +948,13 @@ var File_origincloud_dns_v1beta1_record_set_proto protoreflect.FileDescriptor
 
 const file_origincloud_dns_v1beta1_record_set_proto_rawDesc = "" +
 	"\n" +
-	"(origincloud/dns/v1beta1/record_set.proto\x12\x17origincloud.dns.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd6\x05\n" +
+	"(origincloud/dns/v1beta1/record_set.proto\x12\x17origincloud.dns.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe3\x05\n" +
 	"\tRecordSet\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
 	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12 \n" +
 	"\bdns_name\x18\x03 \x01(\tB\x05\xe2A\x02\x02\x05R\adnsName\x12B\n" +
-	"\x04type\x18\x04 \x01(\x0e2'.origincloud.dns.v1beta1.RecordSet.TypeB\x05\xe2A\x02\x02\x05R\x04type\x121\n" +
-	"\x03ttl\x18\x05 \x01(\v2\x19.google.protobuf.DurationB\x04\xe2A\x01\x01R\x03ttl\x12F\n" +
+	"\x04type\x18\x04 \x01(\x0e2'.origincloud.dns.v1beta1.RecordSet.TypeB\x05\xe2A\x02\x02\x05R\x04type\x126\n" +
+	"\x03ttl\x18\x05 \x01(\v2\x19.google.protobuf.DurationB\x04\xe2A\x01\x01H\x01R\x03ttl\x88\x01\x01\x12F\n" +
 	"\x05basic\x18\x06 \x01(\v2(.origincloud.dns.v1beta1.BasicRecordDataB\x04\xe2A\x01\x02H\x00R\x05basic\x12F\n" +
 	"\x05alias\x18\a \x01(\v2(.origincloud.dns.v1beta1.AliasRecordDataB\x04\xe2A\x01\x02H\x00R\x05alias\x12A\n" +
 	"\vcreate_time\x18\b \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
@@ -972,7 +972,8 @@ const file_origincloud_dns_v1beta1_record_set_proto_rawDesc = "" +
 	"\x03CAA\x10\a:\x82\x01\xeaA\x7f\n" +
 	" dns.origincloudapis.eu/RecordSet\x12Dprojects/{project}/hostedZones/{hosted_zone}/recordSets/{record_set}*\n" +
 	"recordSets2\trecordSetB\x06\n" +
-	"\x04data\"0\n" +
+	"\x04dataB\x06\n" +
+	"\x04_ttl\"0\n" +
 	"\x0fBasicRecordData\x12\x1d\n" +
 	"\x06values\x18\x01 \x03(\tB\x05\xe2A\x02\x02\x06R\x06values\"b\n" +
 	"\x0fAliasRecordData\x12O\n" +
