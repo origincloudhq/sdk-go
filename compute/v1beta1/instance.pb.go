@@ -416,8 +416,14 @@ type Instance struct {
 	// Each network interface's private addresses, in the order of
 	// `network_interfaces`; an interface not attached yet has none.
 	InterfaceAddresses []*InterfaceAddresses `protobuf:"bytes,16,rep,name=interface_addresses,json=interfaceAddresses,proto3" json:"interface_addresses,omitempty"`
-	unknownFields      protoimpl.UnknownFields
-	sizeCache          protoimpl.SizeCache
+	// The service account the instance runs as,
+	// `organizations/{organization}/serviceAccounts/{service_account}`: a
+	// `WORKLOAD` service account of the instance's organization that isn't
+	// deleted. Launching with one needs `iam.service_account.act_as` on the
+	// organization as well. Empty for an instance that runs as none.
+	ServiceAccount string `protobuf:"bytes,17,opt,name=service_account,json=serviceAccount,proto3" json:"service_account,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *Instance) Reset() {
@@ -560,6 +566,13 @@ func (x *Instance) GetInterfaceAddresses() []*InterfaceAddresses {
 		return x.InterfaceAddresses
 	}
 	return nil
+}
+
+func (x *Instance) GetServiceAccount() string {
+	if x != nil {
+		return x.ServiceAccount
+	}
+	return ""
 }
 
 // An instance's boot volume.
@@ -1294,8 +1307,7 @@ var File_origincloud_compute_v1beta1_instance_proto protoreflect.FileDescriptor
 
 const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"\n" +
-	"*origincloud/compute/v1beta1/instance.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xe8\n" +
-	"\n" +
+	"*origincloud/compute/v1beta1/instance.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xc2\v\n" +
 	"\bInstance\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
 	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12U\n" +
@@ -1321,7 +1333,9 @@ const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"createTime\x12\x1e\n" +
 	"\acreator\x18\x0e \x01(\tB\x04\xe2A\x01\x03R\acreator\x12I\n" +
 	"\x04tags\x18\x0f \x03(\v2/.origincloud.compute.v1beta1.Instance.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x12f\n" +
-	"\x13interface_addresses\x18\x10 \x03(\v2/.origincloud.compute.v1beta1.InterfaceAddressesB\x04\xe2A\x01\x03R\x12interfaceAddresses\x1a7\n" +
+	"\x13interface_addresses\x18\x10 \x03(\v2/.origincloud.compute.v1beta1.InterfaceAddressesB\x04\xe2A\x01\x03R\x12interfaceAddresses\x12X\n" +
+	"\x0fservice_account\x18\x11 \x01(\tB/\xe2A\x02\x01\x05\xfaA'\n" +
+	"%iam.origincloudapis.eu/ServiceAccountR\x0eserviceAccount\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x94\x01\n" +
