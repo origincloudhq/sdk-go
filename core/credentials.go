@@ -32,6 +32,7 @@ const (
 	envClientSecret = "ORIGINCLOUD_CLIENT_SECRET"
 
 	envMetadataDisabled = "ORIGINCLOUD_METADATA_DISABLED"
+	envMetadataEndpoint = "ORIGINCLOUD_METADATA_ENDPOINT"
 
 	// The OAuth client the CLI logs in as, which its refresh token
 	// belongs to.
@@ -47,6 +48,22 @@ const (
 	// How long a metadata session is asked to live: the most the
 	// metadata service grants.
 	metadataSessionTTL = 6 * time.Hour
+
+	// How long before its expiry the metadata service's access token is
+	// replaced; it lives five minutes.
+	metadataExpiryMargin = 60 * time.Second
+
+	// How long opening a metadata session may take, so that a program on
+	// no instance learns it has no credentials quickly, and how long
+	// asking for the credential may.
+	metadataSessionTimeout    = 2 * time.Second
+	metadataCredentialTimeout = 5 * time.Second
+
+	// How often a request the metadata service answers 503 is sent in
+	// all, and how long to wait before sending it again the first time;
+	// the wait doubles.
+	metadataAttempts   = 3
+	metadataRetryDelay = 100 * time.Millisecond
 )
 
 // Credentials supply the access token each call is sent with.
@@ -83,7 +100,11 @@ func DefaultCredentials(ctx context.Context) (Credentials, error) {
 	if strings.EqualFold(os.Getenv(envMetadataDisabled), "true") {
 		return nil, ErrNoCredentials
 	}
-	return InstanceMetadata(), nil
+	metadata := InstanceMetadata()
+	if endpoint := os.Getenv(envMetadataEndpoint); endpoint != "" {
+		metadata.Endpoint = strings.TrimSuffix(endpoint, "/")
+	}
+	return metadata, nil
 }
 
 // AccessToken returns credentials that always send token. It is not
@@ -204,6 +225,8 @@ type InstanceMetadataCredentials struct {
 	// HTTPClient sends the requests to the metadata service; when nil, a
 	// client that never goes through a proxy, which the service refuses,
 	// and gives up on a service that doesn't connect within a second.
+	// Whichever client sends them, opening a session may take 2 seconds
+	// and asking for the credential 5.
 	HTTPClient *http.Client
 
 	cache   tokenCache
@@ -212,7 +235,6 @@ type InstanceMetadataCredentials struct {
 
 // The client the metadata service is asked with by default.
 var metadataHTTPClient = &http.Client{
-	Timeout: 5 * time.Second,
 	Transport: &http.Transport{
 		// Never through a proxy, whatever HTTP_PROXY says: the service
 		// refuses a request that came through one.
@@ -225,7 +247,7 @@ var metadataHTTPClient = &http.Client{
 // new one when it is about to expire. It returns [ErrNoCredentials] when no
 // metadata service answers: the program runs on no instance.
 func (c *InstanceMetadataCredentials) Token(ctx context.Context) (string, error) {
-	return c.cache.get(func() (string, time.Time, error) {
+	return c.cache.getWithin(metadataExpiryMargin, func() (string, time.Time, error) {
 		status, body, err := c.requestCredential(ctx)
 		if err == nil && status == http.StatusUnauthorized {
 			// The session expired, or the host no longer knows it: open
@@ -267,13 +289,13 @@ func (c *InstanceMetadataCredentials) requestCredential(ctx context.Context) (in
 	if err != nil {
 		return 0, nil, err
 	}
-	return c.ask(ctx, http.MethodGet, "/latest/meta-data/service-account/token", "X-Origincloud-Metadata-Token", session)
+	return c.ask(ctx, metadataCredentialTimeout, http.MethodGet, "/latest/meta-data/service-account/token", "X-Origincloud-Metadata-Token", session)
 }
 
 func (c *InstanceMetadataCredentials) openSession(ctx context.Context) (string, time.Time, error) {
 	expiry := time.Now().Add(metadataSessionTTL)
 	ttl := strconv.Itoa(int(metadataSessionTTL / time.Second))
-	status, body, err := c.ask(ctx, http.MethodPut, "/latest/api/token", "X-Origincloud-Metadata-Token-TTL-Seconds", ttl)
+	status, body, err := c.ask(ctx, metadataSessionTimeout, http.MethodPut, "/latest/api/token", "X-Origincloud-Metadata-Token-TTL-Seconds", ttl)
 	if err != nil {
 		return "", time.Time{}, err
 	}
@@ -294,10 +316,27 @@ func (c *InstanceMetadataCredentials) openSession(ctx context.Context) (string, 
 	return session, expiry, nil
 }
 
-// ask sends the metadata service a request with one header, and returns
-// the answer's status and body. A service that doesn't answer is
+// ask sends the metadata service a request with one header, giving it
+// timeout, and returns the answer's status and body. A 503 is sent again,
+// up to metadataAttempts in all. A service that doesn't answer is
 // [ErrNoCredentials].
-func (c *InstanceMetadataCredentials) ask(ctx context.Context, method, path, header, value string) (int, []byte, error) {
+func (c *InstanceMetadataCredentials) ask(ctx context.Context, timeout time.Duration, method, path, header, value string) (int, []byte, error) {
+	delay := metadataRetryDelay
+	for attempt := 1; ; attempt++ {
+		status, body, err := c.askOnce(ctx, timeout, method, path, header, value)
+		if err != nil || status != http.StatusServiceUnavailable || attempt == metadataAttempts {
+			return status, body, err
+		}
+		select {
+		case <-ctx.Done():
+			return 0, nil, fmt.Errorf("origincloud: asking the metadata service: %w", ctx.Err())
+		case <-time.After(delay):
+		}
+		delay *= 2
+	}
+}
+
+func (c *InstanceMetadataCredentials) askOnce(ctx context.Context, timeout time.Duration, method, path, header, value string) (int, []byte, error) {
 	client := c.HTTPClient
 	if client == nil {
 		client = metadataHTTPClient
@@ -306,7 +345,9 @@ func (c *InstanceMetadataCredentials) ask(ctx context.Context, method, path, hea
 	if endpoint == "" {
 		endpoint = MetadataEndpoint
 	}
-	req, err := http.NewRequestWithContext(ctx, method, strings.TrimSuffix(endpoint, "/")+path, nil)
+	limited, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+	req, err := http.NewRequestWithContext(limited, method, strings.TrimSuffix(endpoint, "/")+path, nil)
 	if err != nil {
 		return 0, nil, fmt.Errorf("origincloud: asking the metadata service: %w", err)
 	}
@@ -358,9 +399,14 @@ type tokenCache struct {
 }
 
 func (c *tokenCache) get(renew func() (string, time.Time, error)) (string, error) {
+	return c.getWithin(expiryMargin, renew)
+}
+
+// getWithin is get, replacing the token margin before its expiry.
+func (c *tokenCache) getWithin(margin time.Duration, renew func() (string, time.Time, error)) (string, error) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	if c.token != "" && time.Now().Add(expiryMargin).Before(c.expiry) {
+	if c.token != "" && time.Now().Add(margin).Before(c.expiry) {
 		return c.token, nil
 	}
 	token, expiry, err := renew()

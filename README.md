@@ -85,7 +85,8 @@ func main() {
 4. The instance's metadata service, on an Origin Cloud instance that runs as a
    service account: the account's access tokens, fetched as they expire, with
    no secret on the instance. `ORIGINCLOUD_METADATA_DISABLED=true` leaves this
-   step out.
+   step out; `ORIGINCLOUD_METADATA_ENDPOINT` asks another address than
+   `http://169.254.169.254`.
 
 `core.WithCredentials` sets them explicitly instead.
 

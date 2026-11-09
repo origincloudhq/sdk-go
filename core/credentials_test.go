@@ -21,7 +21,7 @@ import (
 // environment and a data directory of its own.
 func clearCredentialEnv(t *testing.T) string {
 	t.Helper()
-	for _, name := range []string{envAccessToken, envClientID, envClientSecret, envMetadataDisabled, envRegion} {
+	for _, name := range []string{envAccessToken, envClientID, envClientSecret, envMetadataDisabled, envMetadataEndpoint, envRegion} {
 		t.Setenv(name, "")
 	}
 	dir := t.TempDir()
@@ -114,8 +114,29 @@ func TestWithNothingElseTheMetadataServiceComesLast(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, ok := credentials.(*InstanceMetadataCredentials); !ok {
+	metadata, ok := credentials.(*InstanceMetadataCredentials)
+	if !ok {
 		t.Fatalf("credentials = %T, want the metadata service's", credentials)
+	}
+	if metadata.Endpoint != "" {
+		t.Fatalf("endpoint = %q, want the default", metadata.Endpoint)
+	}
+}
+
+func TestTheMetadataEndpointCanBeMovedInTheEnvironment(t *testing.T) {
+	clearCredentialEnv(t)
+	server := newMetadataServer(t)
+	t.Setenv(envMetadataEndpoint, server.URL+"/")
+
+	credentials, err := DefaultCredentials(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if endpoint := credentials.(*InstanceMetadataCredentials).Endpoint; endpoint != server.URL {
+		t.Fatalf("endpoint = %q, want %q", endpoint, server.URL)
+	}
+	if token, err := credentials.Token(context.Background()); err != nil || token != "access-1" {
+		t.Fatalf("Token() = %q, %v; want access-1", token, err)
 	}
 }
 
@@ -236,9 +257,9 @@ func TestACLISessionPastItsRefreshExpiryAsksToLogIn(t *testing.T) {
 }
 
 // metadataServer is a fake metadata service. It opens sessions numbered
-// from 1 and hands out access tokens numbered from 1, expiring in five
-// minutes; credential answers with the status the credential request
-// gets, or 0 to hand out a token.
+// from 1 and hands out access tokens numbered from 1, expiring after
+// expiresIn; session and credential answer with the status the session
+// and the credential request get, or 0 to answer them.
 type metadataServer struct {
 	*httptest.Server
 
@@ -247,12 +268,18 @@ type metadataServer struct {
 	ttls       []string
 	sessions   int
 	tokens     int
+	expiresIn  time.Duration
+	session    func() int
 	credential func(session string) int
 }
 
 func newMetadataServer(t *testing.T) *metadataServer {
 	t.Helper()
-	m := &metadataServer{credential: func(string) int { return 0 }}
+	m := &metadataServer{
+		expiresIn:  5 * time.Minute,
+		session:    func() int { return 0 },
+		credential: func(string) int { return 0 },
+	}
 	m.Server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		m.mu.Lock()
 		defer m.mu.Unlock()
@@ -260,6 +287,10 @@ func newMetadataServer(t *testing.T) *metadataServer {
 		switch {
 		case r.Method == http.MethodPut && r.URL.Path == "/latest/api/token":
 			m.ttls = append(m.ttls, r.Header.Get("X-Origincloud-Metadata-Token-TTL-Seconds"))
+			if status := m.session(); status != 0 {
+				w.WriteHeader(status)
+				return
+			}
 			m.sessions++
 			_, _ = w.Write([]byte("session-" + string(rune('0'+m.sessions))))
 		case r.Method == http.MethodGet && r.URL.Path == "/latest/meta-data/service-account/token":
@@ -271,7 +302,7 @@ func newMetadataServer(t *testing.T) *metadataServer {
 			_ = json.NewEncoder(w).Encode(map[string]string{
 				"access_token": "access-" + string(rune('0'+m.tokens)),
 				"token_type":   "Bearer",
-				"expires_at":   time.Now().Add(5 * time.Minute).UTC().Format(time.RFC3339),
+				"expires_at":   time.Now().Add(m.expiresIn).UTC().Format(time.RFC3339),
 			})
 		default:
 			w.WriteHeader(http.StatusNotFound)
@@ -389,5 +420,97 @@ func TestNoMetadataServiceIsNoCredentials(t *testing.T) {
 func TestTheMetadataServiceIsNeverAskedThroughAProxy(t *testing.T) {
 	if transport := metadataHTTPClient.Transport.(*http.Transport); transport.Proxy != nil {
 		t.Fatal("the metadata client goes through the environment's proxy")
+	}
+}
+
+func TestTheMetadataServicesTokenIsReplacedAMinuteBeforeItExpires(t *testing.T) {
+	server := newMetadataServer(t)
+	server.expiresIn = 50 * time.Second
+	credentials := &InstanceMetadataCredentials{Endpoint: server.URL}
+
+	for _, want := range []string{"access-1", "access-2"} {
+		if token, err := credentials.Token(context.Background()); err != nil || token != want {
+			t.Fatalf("Token() = %q, %v; want %s", token, err, want)
+		}
+	}
+	if server.sessions != 1 {
+		t.Fatalf("%d sessions opened, want the first reused", server.sessions)
+	}
+}
+
+func TestAMetadataServiceThatCantSignIsAskedThreeTimes(t *testing.T) {
+	for _, request := range []string{"session", "credential"} {
+		t.Run(request, func(t *testing.T) {
+			server := newMetadataServer(t)
+			var unavailable atomic.Int32
+			answer := func() int {
+				if unavailable.Add(-1) >= 0 {
+					return http.StatusServiceUnavailable
+				}
+				return 0
+			}
+			if request == "session" {
+				server.session = answer
+			} else {
+				server.credential = func(string) int { return answer() }
+			}
+
+			// Unavailable twice, then signing: the third attempt succeeds,
+			// after waiting 100 ms and 200 ms.
+			unavailable.Store(2)
+			start := time.Now()
+			credentials := &InstanceMetadataCredentials{Endpoint: server.URL}
+			if token, err := credentials.Token(context.Background()); err != nil || token != "access-1" {
+				t.Fatalf("Token() = %q, %v; want access-1", token, err)
+			}
+			if took := time.Since(start); took < 300*time.Millisecond {
+				t.Fatalf("three attempts took %v, want the waits between them", took)
+			}
+
+			// Unavailable three times: the third answer is the error.
+			unavailable.Store(3)
+			_, err := (&InstanceMetadataCredentials{Endpoint: server.URL}).Token(context.Background())
+			want := map[string]string{
+				"session":    "origincloud: the metadata service refused a session (HTTP 503)",
+				"credential": "origincloud: the metadata service answered HTTP 503",
+			}[request]
+			if err == nil || err.Error() != want {
+				t.Fatalf("err = %v, want %q", err, want)
+			}
+			if left := unavailable.Load(); left != 0 {
+				t.Fatalf("%d attempts left unmade", left)
+			}
+		})
+	}
+}
+
+func TestWaitingForTheMetadataServiceEndsWithTheCallersContext(t *testing.T) {
+	server := newMetadataServer(t)
+	server.session = func() int { return http.StatusServiceUnavailable }
+	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	defer cancel()
+
+	_, err := (&InstanceMetadataCredentials{Endpoint: server.URL}).Token(ctx)
+	if !errors.Is(err, context.DeadlineExceeded) {
+		t.Fatalf("err = %v, want the caller's deadline", err)
+	}
+}
+
+func TestAMetadataSessionThatTakesTooLongIsNoCredentials(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		select {
+		case <-r.Context().Done():
+		case <-time.After(10 * time.Second):
+		}
+	}))
+	t.Cleanup(server.Close)
+
+	start := time.Now()
+	_, err := (&InstanceMetadataCredentials{Endpoint: server.URL}).Token(context.Background())
+	if !errors.Is(err, ErrNoCredentials) {
+		t.Fatalf("err = %v, want ErrNoCredentials", err)
+	}
+	if took := time.Since(start); took < metadataSessionTimeout || took > metadataSessionTimeout+time.Second {
+		t.Fatalf("giving up took %v, want %v", took, metadataSessionTimeout)
 	}
 }
