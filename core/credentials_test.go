@@ -514,3 +514,18 @@ func TestAMetadataSessionThatTakesTooLongIsNoCredentials(t *testing.T) {
 		t.Fatalf("giving up took %v, want %v", took, metadataSessionTimeout)
 	}
 }
+
+func TestAnotherCloudsMetadataServiceIsNoCredentials(t *testing.T) {
+	// Azure answers 411, AWS 400, GCP 405 or 404.
+	for _, status := range []int{http.StatusBadRequest, http.StatusNotFound, http.StatusMethodNotAllowed, http.StatusLengthRequired} {
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(status)
+		}))
+		t.Cleanup(server.Close)
+
+		_, err := (&InstanceMetadataCredentials{Endpoint: server.URL}).Token(context.Background())
+		if !errors.Is(err, ErrNoCredentials) {
+			t.Errorf("HTTP %d: err = %v, want ErrNoCredentials", status, err)
+		}
+	}
+}

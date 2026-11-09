@@ -75,7 +75,8 @@ type Credentials interface {
 // ErrNoCredentials is returned when there are none: by [DefaultCredentials]
 // when neither the environment nor a CLI session holds any and
 // ORIGINCLOUD_METADATA_DISABLED is true, and by
-// [InstanceMetadataCredentials.Token] when no metadata service answers.
+// [InstanceMetadataCredentials.Token] when no Origin Cloud metadata service
+// answers.
 var ErrNoCredentials = errors.New("origincloud: no credentials: set ORIGINCLOUD_CLIENT_ID and ORIGINCLOUD_CLIENT_SECRET, set ORIGINCLOUD_ACCESS_TOKEN, log in with `origin id login`, or run on an instance that runs as a service account")
 
 // DefaultCredentials returns the first credentials found, in the order
@@ -292,6 +293,11 @@ func (c *InstanceMetadataCredentials) requestCredential(ctx context.Context) (in
 	return c.ask(ctx, metadataCredentialTimeout, http.MethodGet, "/latest/meta-data/service-account/token", "X-Origincloud-Metadata-Token", session)
 }
 
+// openSession opens a metadata session. Only Origin Cloud's metadata
+// service answers its request with a session: another cloud's, at the same
+// address, refuses a request it doesn't know, and an address that is no
+// instance's is refused too, so a refusal is [ErrNoCredentials] unless it
+// is one only Origin Cloud's service gives.
 func (c *InstanceMetadataCredentials) openSession(ctx context.Context) (string, time.Time, error) {
 	expiry := time.Now().Add(metadataSessionTTL)
 	ttl := strconv.Itoa(int(metadataSessionTTL / time.Second))
@@ -301,13 +307,12 @@ func (c *InstanceMetadataCredentials) openSession(ctx context.Context) (string, 
 	}
 	switch status {
 	case http.StatusOK:
-	case http.StatusNotFound:
-		// The service answers, but not for an instance.
-		return "", time.Time{}, ErrNoCredentials
 	case http.StatusForbidden:
 		return "", time.Time{}, errMetadataProxy
-	default:
+	case http.StatusServiceUnavailable:
 		return "", time.Time{}, fmt.Errorf("origincloud: the metadata service refused a session (HTTP %d)", status)
+	default:
+		return "", time.Time{}, ErrNoCredentials
 	}
 	session := strings.TrimSpace(string(body))
 	if session == "" {
