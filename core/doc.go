@@ -19,6 +19,11 @@
 //  2. ORIGINCLOUD_CLIENT_ID and ORIGINCLOUD_CLIENT_SECRET: a service
 //     account's credential, exchanged for access tokens as they expire.
 //  3. The session the origin CLI stored at its last login (origin id login).
+//  4. The instance's metadata service, on an instance that runs as a
+//     service account: the account's access tokens, fetched as they
+//     expire. ORIGINCLOUD_METADATA_DISABLED=true leaves this step out;
+//     ORIGINCLOUD_METADATA_ENDPOINT asks another address than
+//     [MetadataEndpoint].
 //
 // # Endpoints
 //

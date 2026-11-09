@@ -82,6 +82,11 @@ func main() {
    credential, exchanged for access tokens as they expire. This is what
    automation should use.
 3. The session the `origin` CLI stored at its last login (`origin id login`).
+4. The instance's metadata service, on an Origin Cloud instance that runs as a
+   service account: the account's access tokens, fetched as they expire, with
+   no secret on the instance. `ORIGINCLOUD_METADATA_DISABLED=true` leaves this
+   step out; `ORIGINCLOUD_METADATA_ENDPOINT` asks another address than
+   `http://169.254.169.254`.
 
 `core.WithCredentials` sets them explicitly instead.
 
