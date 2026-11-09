@@ -6,10 +6,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -20,10 +22,16 @@ import (
 // tokens.
 const TokenURL = "https://auth.origincloud.eu/realms/origincloud/protocol/openid-connect/token"
 
+// MetadataEndpoint is the instance's metadata service, which hands out the
+// access tokens of the service account the instance runs as.
+const MetadataEndpoint = "http://169.254.169.254"
+
 const (
 	envAccessToken  = "ORIGINCLOUD_ACCESS_TOKEN"
 	envClientID     = "ORIGINCLOUD_CLIENT_ID"
 	envClientSecret = "ORIGINCLOUD_CLIENT_SECRET"
+
+	envMetadataDisabled = "ORIGINCLOUD_METADATA_DISABLED"
 
 	// The OAuth client the CLI logs in as, which its refresh token
 	// belongs to.
@@ -32,6 +40,13 @@ const (
 	// How long before its expiry a token is replaced, so that it doesn't
 	// expire on the way.
 	expiryMargin = 30 * time.Second
+
+	// The most of an answer to a token request that is read.
+	maxTokenBytes = 1 << 20
+
+	// How long a metadata session is asked to live: the most the
+	// metadata service grants.
+	metadataSessionTTL = 6 * time.Hour
 )
 
 // Credentials supply the access token each call is sent with.
@@ -40,12 +55,16 @@ type Credentials interface {
 	Token(ctx context.Context) (string, error)
 }
 
-// ErrNoCredentials is returned by [DefaultCredentials] when neither the
-// environment nor a CLI session holds any.
-var ErrNoCredentials = errors.New("origincloud: no credentials: set ORIGINCLOUD_CLIENT_ID and ORIGINCLOUD_CLIENT_SECRET, set ORIGINCLOUD_ACCESS_TOKEN, or log in with `origin id login`")
+// ErrNoCredentials is returned when there are none: by [DefaultCredentials]
+// when neither the environment nor a CLI session holds any and
+// ORIGINCLOUD_METADATA_DISABLED is true, and by
+// [InstanceMetadataCredentials.Token] when no metadata service answers.
+var ErrNoCredentials = errors.New("origincloud: no credentials: set ORIGINCLOUD_CLIENT_ID and ORIGINCLOUD_CLIENT_SECRET, set ORIGINCLOUD_ACCESS_TOKEN, log in with `origin id login`, or run on an instance that runs as a service account")
 
 // DefaultCredentials returns the first credentials found, in the order
-// the package documentation lists.
+// the package documentation lists. The last, the instance's metadata
+// service, is not looked for here: it makes no request until a token is
+// asked for.
 func DefaultCredentials(ctx context.Context) (Credentials, error) {
 	if token := os.Getenv(envAccessToken); token != "" {
 		return AccessToken(token), nil
@@ -58,10 +77,13 @@ func DefaultCredentials(ctx context.Context) (Credentials, error) {
 		return nil, fmt.Errorf("origincloud: %s and %s must be set together", envClientID, envClientSecret)
 	}
 	session, err := CLISession()
-	if errors.Is(err, os.ErrNotExist) {
+	if !errors.Is(err, os.ErrNotExist) {
+		return session, err
+	}
+	if strings.EqualFold(os.Getenv(envMetadataDisabled), "true") {
 		return nil, ErrNoCredentials
 	}
-	return session, err
+	return InstanceMetadata(), nil
 }
 
 // AccessToken returns credentials that always send token. It is not
@@ -167,6 +189,145 @@ func (c *CLISessionCredentials) Token(ctx context.Context) (string, error) {
 	})
 }
 
+// InstanceMetadata returns credentials that fetch the access tokens of the
+// service account the instance runs as from its metadata service, as they
+// expire. It makes no request until a token is asked for.
+func InstanceMetadata() *InstanceMetadataCredentials {
+	return &InstanceMetadataCredentials{}
+}
+
+// InstanceMetadataCredentials are the service account the instance runs as,
+// whose access tokens the instance's metadata service hands out.
+type InstanceMetadataCredentials struct {
+	// Endpoint is the metadata service; [MetadataEndpoint] when empty.
+	Endpoint string
+	// HTTPClient sends the requests to the metadata service; when nil, a
+	// client that never goes through a proxy, which the service refuses,
+	// and gives up on a service that doesn't connect within a second.
+	HTTPClient *http.Client
+
+	cache   tokenCache
+	session tokenCache
+}
+
+// The client the metadata service is asked with by default.
+var metadataHTTPClient = &http.Client{
+	Timeout: 5 * time.Second,
+	Transport: &http.Transport{
+		// Never through a proxy, whatever HTTP_PROXY says: the service
+		// refuses a request that came through one.
+		Proxy:       nil,
+		DialContext: (&net.Dialer{Timeout: time.Second}).DialContext,
+	},
+}
+
+// Token returns the instance's service account's access token, fetching a
+// new one when it is about to expire. It returns [ErrNoCredentials] when no
+// metadata service answers: the program runs on no instance.
+func (c *InstanceMetadataCredentials) Token(ctx context.Context) (string, error) {
+	return c.cache.get(func() (string, time.Time, error) {
+		status, body, err := c.requestCredential(ctx)
+		if err == nil && status == http.StatusUnauthorized {
+			// The session expired, or the host no longer knows it: open
+			// another.
+			c.session.drop()
+			status, body, err = c.requestCredential(ctx)
+		}
+		if err != nil {
+			return "", time.Time{}, err
+		}
+		switch status {
+		case http.StatusOK:
+		case http.StatusNotFound:
+			return "", time.Time{}, errors.New("origincloud: the instance runs as no service account")
+		case http.StatusForbidden:
+			return "", time.Time{}, errMetadataProxy
+		default:
+			return "", time.Time{}, fmt.Errorf("origincloud: the metadata service answered HTTP %d", status)
+		}
+		var answer struct {
+			AccessToken string    `json:"access_token"`
+			ExpiresAt   time.Time `json:"expires_at"`
+		}
+		if json.Unmarshal(body, &answer) != nil || answer.AccessToken == "" || answer.ExpiresAt.IsZero() {
+			return "", time.Time{}, errors.New("origincloud: the metadata service's answer is not a credential")
+		}
+		return answer.AccessToken, answer.ExpiresAt, nil
+	})
+}
+
+var errMetadataProxy = errors.New("origincloud: the metadata service refused a request that came through a proxy")
+
+// requestCredential asks for the service account's access token with the
+// current session, opening one when there is none.
+func (c *InstanceMetadataCredentials) requestCredential(ctx context.Context) (int, []byte, error) {
+	session, err := c.session.get(func() (string, time.Time, error) {
+		return c.openSession(ctx)
+	})
+	if err != nil {
+		return 0, nil, err
+	}
+	return c.ask(ctx, http.MethodGet, "/latest/meta-data/service-account/token", "X-Origincloud-Metadata-Token", session)
+}
+
+func (c *InstanceMetadataCredentials) openSession(ctx context.Context) (string, time.Time, error) {
+	expiry := time.Now().Add(metadataSessionTTL)
+	ttl := strconv.Itoa(int(metadataSessionTTL / time.Second))
+	status, body, err := c.ask(ctx, http.MethodPut, "/latest/api/token", "X-Origincloud-Metadata-Token-TTL-Seconds", ttl)
+	if err != nil {
+		return "", time.Time{}, err
+	}
+	switch status {
+	case http.StatusOK:
+	case http.StatusNotFound:
+		// The service answers, but not for an instance.
+		return "", time.Time{}, ErrNoCredentials
+	case http.StatusForbidden:
+		return "", time.Time{}, errMetadataProxy
+	default:
+		return "", time.Time{}, fmt.Errorf("origincloud: the metadata service refused a session (HTTP %d)", status)
+	}
+	session := strings.TrimSpace(string(body))
+	if session == "" {
+		return "", time.Time{}, errors.New("origincloud: the metadata service's answer is not a credential")
+	}
+	return session, expiry, nil
+}
+
+// ask sends the metadata service a request with one header, and returns
+// the answer's status and body. A service that doesn't answer is
+// [ErrNoCredentials].
+func (c *InstanceMetadataCredentials) ask(ctx context.Context, method, path, header, value string) (int, []byte, error) {
+	client := c.HTTPClient
+	if client == nil {
+		client = metadataHTTPClient
+	}
+	endpoint := c.Endpoint
+	if endpoint == "" {
+		endpoint = MetadataEndpoint
+	}
+	req, err := http.NewRequestWithContext(ctx, method, strings.TrimSuffix(endpoint, "/")+path, nil)
+	if err != nil {
+		return 0, nil, fmt.Errorf("origincloud: asking the metadata service: %w", err)
+	}
+	req.Header.Set(header, value)
+	resp, err := client.Do(req)
+	if err != nil {
+		// The caller's deadline or cancellation is its own, not proof
+		// that there is no metadata service.
+		if ctx.Err() != nil {
+			return 0, nil, fmt.Errorf("origincloud: asking the metadata service: %w", err)
+		}
+		return 0, nil, ErrNoCredentials
+	}
+	defer resp.Body.Close()
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maxTokenBytes))
+	if err != nil {
+		return 0, nil, fmt.Errorf("origincloud: asking the metadata service: %w", err)
+	}
+	return resp.StatusCode, body, nil
+}
+
 // The file the CLI stores its session in.
 type cliSession struct {
 	AccessToken    string    `json:"access_token"`
@@ -210,6 +371,13 @@ func (c *tokenCache) get(renew func() (string, time.Time, error)) (string, error
 	return token, nil
 }
 
+// drop forgets the token, so that the next get renews it.
+func (c *tokenCache) drop() {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.token = ""
+}
+
 // A token endpoint's answer.
 type grantedToken struct {
 	AccessToken      string `json:"access_token"`
@@ -242,7 +410,7 @@ func requestToken(ctx context.Context, client *http.Client, endpoint string, for
 		return grantedToken{}, fmt.Errorf("origincloud: requesting a token: %w", err)
 	}
 	defer resp.Body.Close()
-	body, err := io.ReadAll(io.LimitReader(resp.Body, 1<<20))
+	body, err := io.ReadAll(io.LimitReader(resp.Body, maxTokenBytes))
 	if err != nil {
 		return grantedToken{}, fmt.Errorf("origincloud: requesting a token: %w", err)
 	}

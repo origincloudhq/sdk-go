@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -19,7 +21,7 @@ import (
 // environment and a data directory of its own.
 func clearCredentialEnv(t *testing.T) string {
 	t.Helper()
-	for _, name := range []string{envAccessToken, envClientID, envClientSecret, envRegion} {
+	for _, name := range []string{envAccessToken, envClientID, envClientSecret, envMetadataDisabled, envRegion} {
 		t.Setenv(name, "")
 	}
 	dir := t.TempDir()
@@ -97,10 +99,23 @@ func TestHalfAServiceAccountIsRefused(t *testing.T) {
 
 func TestNoCredentialsAtAll(t *testing.T) {
 	clearCredentialEnv(t)
+	t.Setenv(envMetadataDisabled, "TRUE")
 
 	_, err := NewClient(context.Background())
 	if !errors.Is(err, ErrNoCredentials) {
 		t.Fatalf("err = %v, want ErrNoCredentials", err)
+	}
+}
+
+func TestWithNothingElseTheMetadataServiceComesLast(t *testing.T) {
+	clearCredentialEnv(t)
+
+	credentials, err := DefaultCredentials(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := credentials.(*InstanceMetadataCredentials); !ok {
+		t.Fatalf("credentials = %T, want the metadata service's", credentials)
 	}
 }
 
@@ -217,5 +232,162 @@ func TestACLISessionPastItsRefreshExpiryAsksToLogIn(t *testing.T) {
 	_, err = credentials.Token(context.Background())
 	if err == nil || !strings.Contains(err.Error(), "origin id login") {
 		t.Fatalf("err = %v, want a request to log in", err)
+	}
+}
+
+// metadataServer is a fake metadata service. It opens sessions numbered
+// from 1 and hands out access tokens numbered from 1, expiring in five
+// minutes; credential answers with the status the credential request
+// gets, or 0 to hand out a token.
+type metadataServer struct {
+	*httptest.Server
+
+	mu         sync.Mutex
+	requests   []string
+	ttls       []string
+	sessions   int
+	tokens     int
+	credential func(session string) int
+}
+
+func newMetadataServer(t *testing.T) *metadataServer {
+	t.Helper()
+	m := &metadataServer{credential: func(string) int { return 0 }}
+	m.Server = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		m.mu.Lock()
+		defer m.mu.Unlock()
+		m.requests = append(m.requests, r.Method+" "+r.URL.Path)
+		switch {
+		case r.Method == http.MethodPut && r.URL.Path == "/latest/api/token":
+			m.ttls = append(m.ttls, r.Header.Get("X-Origincloud-Metadata-Token-TTL-Seconds"))
+			m.sessions++
+			_, _ = w.Write([]byte("session-" + string(rune('0'+m.sessions))))
+		case r.Method == http.MethodGet && r.URL.Path == "/latest/meta-data/service-account/token":
+			if status := m.credential(r.Header.Get("X-Origincloud-Metadata-Token")); status != 0 {
+				w.WriteHeader(status)
+				return
+			}
+			m.tokens++
+			_ = json.NewEncoder(w).Encode(map[string]string{
+				"access_token": "access-" + string(rune('0'+m.tokens)),
+				"token_type":   "Bearer",
+				"expires_at":   time.Now().Add(5 * time.Minute).UTC().Format(time.RFC3339),
+			})
+		default:
+			w.WriteHeader(http.StatusNotFound)
+		}
+	}))
+	t.Cleanup(m.Close)
+	return m
+}
+
+func (m *metadataServer) seen() []string {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return append([]string(nil), m.requests...)
+}
+
+func TestTheMetadataServiceHandsOutTheInstancesToken(t *testing.T) {
+	server := newMetadataServer(t)
+	var sessions []string
+	server.credential = func(session string) int {
+		sessions = append(sessions, session)
+		return 0
+	}
+	credentials := &InstanceMetadataCredentials{Endpoint: server.URL}
+
+	for range 3 {
+		if token, err := credentials.Token(context.Background()); err != nil || token != "access-1" {
+			t.Fatalf("Token() = %q, %v; want access-1", token, err)
+		}
+	}
+	want := []string{"PUT /latest/api/token", "GET /latest/meta-data/service-account/token"}
+	if got := server.seen(); strings.Join(got, ", ") != strings.Join(want, ", ") {
+		t.Fatalf("requests = %v, want %v", got, want)
+	}
+	if server.ttls[0] != "21600" {
+		t.Fatalf("session TTL = %q, want 21600", server.ttls[0])
+	}
+	if sessions[0] != "session-1" {
+		t.Fatalf("the credential was asked for with session %q, want session-1", sessions[0])
+	}
+}
+
+func TestAnUnknownMetadataSessionIsOpenedAgainOnce(t *testing.T) {
+	server := newMetadataServer(t)
+	server.credential = func(session string) int {
+		if session == "session-1" {
+			return http.StatusUnauthorized
+		}
+		return 0
+	}
+	credentials := &InstanceMetadataCredentials{Endpoint: server.URL}
+
+	if token, err := credentials.Token(context.Background()); err != nil || token != "access-1" {
+		t.Fatalf("Token() = %q, %v; want access-1", token, err)
+	}
+	if server.sessions != 2 {
+		t.Fatalf("%d sessions opened, want 2", server.sessions)
+	}
+
+	// A session refused again is not opened a third time.
+	server.credential = func(string) int { return http.StatusUnauthorized }
+	refused := &InstanceMetadataCredentials{Endpoint: server.URL}
+	_, err := refused.Token(context.Background())
+	if err == nil || !strings.Contains(err.Error(), "the metadata service answered HTTP 401") {
+		t.Fatalf("err = %v, want the status", err)
+	}
+	if server.sessions != 4 {
+		t.Fatalf("%d sessions opened, want 4", server.sessions)
+	}
+}
+
+func TestTheMetadataServiceSaysWhyItHandsOutNoToken(t *testing.T) {
+	for status, want := range map[int]string{
+		http.StatusNotFound:           "origincloud: the instance runs as no service account",
+		http.StatusForbidden:          "origincloud: the metadata service refused a request that came through a proxy",
+		http.StatusServiceUnavailable: "origincloud: the metadata service answered HTTP 503",
+	} {
+		server := newMetadataServer(t)
+		server.credential = func(string) int { return status }
+		credentials := &InstanceMetadataCredentials{Endpoint: server.URL}
+
+		_, err := credentials.Token(context.Background())
+		if err == nil || err.Error() != want || errors.Is(err, ErrNoCredentials) {
+			t.Errorf("HTTP %d: err = %v, want %q", status, err, want)
+		}
+	}
+}
+
+func TestNoMetadataServiceIsNoCredentials(t *testing.T) {
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	closed := "http://" + listener.Addr().String()
+	listener.Close()
+	credentials := &InstanceMetadataCredentials{Endpoint: closed}
+
+	start := time.Now()
+	_, err = credentials.Token(context.Background())
+	if !errors.Is(err, ErrNoCredentials) {
+		t.Fatalf("err = %v, want ErrNoCredentials", err)
+	}
+	if took := time.Since(start); took > 2*time.Second {
+		t.Fatalf("giving up took %v", took)
+	}
+
+	// Nor is an address the service knows no instance of.
+	server := httptest.NewServer(http.NotFoundHandler())
+	t.Cleanup(server.Close)
+	_, err = (&InstanceMetadataCredentials{Endpoint: server.URL}).Token(context.Background())
+	if !errors.Is(err, ErrNoCredentials) {
+		t.Fatalf("err = %v, want ErrNoCredentials", err)
+	}
+}
+
+func TestTheMetadataServiceIsNeverAskedThroughAProxy(t *testing.T) {
+	if transport := metadataHTTPClient.Transport.(*http.Transport); transport.Proxy != nil {
+		t.Fatal("the metadata client goes through the environment's proxy")
 	}
 }

@@ -86,7 +86,9 @@ func WithMaxAttempts(attempts int) Option {
 }
 
 // NewClient returns a client configured by opts and the environment. It
-// fails when no credentials are found or an option is invalid.
+// fails when an option is invalid, or when no credentials are found and
+// the metadata service is disabled; otherwise the first call fails with
+// [ErrNoCredentials] when no metadata service answers.
 func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 	var s settings
 	for _, opt := range opts {
