@@ -23,6 +23,7 @@ go get go.origincloud.eu/sdk
 | `go.origincloud.eu/sdk/support/v1beta1` | Support cases and their messages |
 | `go.origincloud.eu/sdk/dns/v1beta1` | Hosted zones, record sets and private zones' VPC attachments |
 | `go.origincloud.eu/sdk/observability/v1beta1` | The metrics of a project's compute instances, volumes and network interfaces |
+| `go.origincloud.eu/sdk/sts/v1beta1` | The security token service: a CI job's or another identity provider's OIDC token exchanged for a `WORKLOAD` service account's access token |
 | `go.origincloud.eu/sdk/longrunning/v1beta1` | Operations, for resuming one by name |
 
 ## Example

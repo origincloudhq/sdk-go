@@ -21,7 +21,7 @@ type SecurityTokenClient struct {
 
 // NewSecurityTokenClient returns a client of SecurityTokenService that sends its calls through client.
 func NewSecurityTokenClient(client *core.Client) *SecurityTokenClient {
-	return &SecurityTokenClient{service: client.Service("sts", true)}
+	return &SecurityTokenClient{service: client.Service("sts", false)}
 }
 
 // Service returns the endpoint the client sends its calls to, which
