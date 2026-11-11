@@ -80,9 +80,19 @@ func main() {
 1. `ORIGINCLOUD_ACCESS_TOKEN`: an access token, sent as it is.
 2. `ORIGINCLOUD_CLIENT_ID` and `ORIGINCLOUD_CLIENT_SECRET`: a service account's
    credential, exchanged for access tokens as they expire. This is what
-   automation should use.
-3. The session the `origin` CLI stored at its last login (`origin id login`).
-4. The instance's metadata service, on an Origin Cloud instance that runs as a
+   automation outside CI should use.
+3. A CI job's OIDC token, exchanged at the security token service for a
+   `WORKLOAD` service account's access tokens as they expire, with no secret in
+   the CI system: the token in the file `ORIGINCLOUD_OIDC_TOKEN_FILE` names (any
+   CI provider, a Kubernetes projected token), read again at every exchange, or
+   else, in a GitHub Actions job with `permissions: id-token: write`, the
+   job's. A federated credential on the service account decides which jobs'
+   tokens it trusts. `ORIGINCLOUD_OIDC_DISABLED=true` leaves this step out;
+   `ORIGINCLOUD_STS_ENDPOINT` asks another service than
+   `https://sts.origincloudapis.eu`, and `ORIGINCLOUD_OIDC_AUDIENCE` asks GitHub
+   for another audience than `https://sts.origincloudapis.eu`.
+4. The session the `origin` CLI stored at its last login (`origin id login`).
+5. The instance's metadata service, on an Origin Cloud instance that runs as a
    service account: the account's access tokens, fetched as they expire, with
    no secret on the instance. `ORIGINCLOUD_METADATA_DISABLED=true` leaves this
    step out; `ORIGINCLOUD_METADATA_ENDPOINT` asks another address than

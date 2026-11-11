@@ -73,16 +73,16 @@ type Credentials interface {
 }
 
 // ErrNoCredentials is returned when there are none: by [DefaultCredentials]
-// when neither the environment nor a CLI session holds any and
-// ORIGINCLOUD_METADATA_DISABLED is true, and by
+// when neither the environment, a CI job's OIDC token nor a CLI session
+// holds any and ORIGINCLOUD_METADATA_DISABLED is true, and by
 // [InstanceMetadataCredentials.Token] when no Origin Cloud metadata service
 // answers.
-var ErrNoCredentials = errors.New("origincloud: no credentials: set ORIGINCLOUD_CLIENT_ID and ORIGINCLOUD_CLIENT_SECRET, set ORIGINCLOUD_ACCESS_TOKEN, log in with `origin id login`, or run on an instance that runs as a service account")
+var ErrNoCredentials = errors.New("origincloud: no credentials: set ORIGINCLOUD_CLIENT_ID and ORIGINCLOUD_CLIENT_SECRET, set ORIGINCLOUD_ACCESS_TOKEN, run in a GitHub Actions job with `permissions: id-token: write` or set ORIGINCLOUD_OIDC_TOKEN_FILE, log in with `origin id login`, or run on an instance that runs as a service account")
 
 // DefaultCredentials returns the first credentials found, in the order
-// the package documentation lists. The last, the instance's metadata
-// service, is not looked for here: it makes no request until a token is
-// asked for.
+// the package documentation lists. Neither a CI job's OIDC token nor the
+// last, the instance's metadata service, is asked for here: neither makes
+// a request until a token is asked for.
 func DefaultCredentials(ctx context.Context) (Credentials, error) {
 	if token := os.Getenv(envAccessToken); token != "" {
 		return AccessToken(token), nil
@@ -93,6 +93,9 @@ func DefaultCredentials(ctx context.Context) (Credentials, error) {
 		return ServiceAccount(id, secret), nil
 	case id != "" || secret != "":
 		return nil, fmt.Errorf("origincloud: %s and %s must be set together", envClientID, envClientSecret)
+	}
+	if federated := federatedFromEnvironment(); federated != nil {
+		return federated, nil
 	}
 	session, err := CLISession()
 	if !errors.Is(err, os.ErrNotExist) {
@@ -443,38 +446,53 @@ func (g grantedToken) expiry() time.Time {
 	return time.Now().Add(time.Duration(g.ExpiresIn) * time.Second)
 }
 
-func requestToken(ctx context.Context, client *http.Client, endpoint string, form url.Values) (grantedToken, error) {
-	if client == nil {
-		client = http.DefaultClient
+// reason is why the token endpoint refused: its description, or its code.
+func (g grantedToken) reason() string {
+	if g.ErrorDescription != "" {
+		return g.ErrorDescription
 	}
+	return g.Error
+}
+
+func requestToken(ctx context.Context, client *http.Client, endpoint string, form url.Values) (grantedToken, error) {
 	if endpoint == "" {
 		endpoint = TokenURL
 	}
+	status, granted, err := postToken(ctx, client, endpoint, form)
+	if err != nil {
+		return grantedToken{}, err
+	}
+	if status != http.StatusOK || granted.AccessToken == "" {
+		return grantedToken{}, fmt.Errorf("origincloud: the token request was refused (HTTP %d): %s", status, granted.reason())
+	}
+	return granted, nil
+}
+
+// postToken sends a token request and returns the answer's status and the
+// answer read as a token endpoint's. An answer that is not one is an error
+// with its status.
+func postToken(ctx context.Context, client *http.Client, endpoint string, form url.Values) (int, grantedToken, error) {
+	if client == nil {
+		client = http.DefaultClient
+	}
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, strings.NewReader(form.Encode()))
 	if err != nil {
-		return grantedToken{}, fmt.Errorf("origincloud: requesting a token: %w", err)
+		return 0, grantedToken{}, fmt.Errorf("origincloud: requesting a token: %w", err)
 	}
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Set("Accept", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
-		return grantedToken{}, fmt.Errorf("origincloud: requesting a token: %w", err)
+		return 0, grantedToken{}, fmt.Errorf("origincloud: requesting a token: %w", err)
 	}
 	defer resp.Body.Close()
 	body, err := io.ReadAll(io.LimitReader(resp.Body, maxTokenBytes))
 	if err != nil {
-		return grantedToken{}, fmt.Errorf("origincloud: requesting a token: %w", err)
+		return 0, grantedToken{}, fmt.Errorf("origincloud: requesting a token: %w", err)
 	}
 	var granted grantedToken
 	if err := json.Unmarshal(body, &granted); err != nil {
-		return grantedToken{}, fmt.Errorf("origincloud: requesting a token: HTTP %d, not a token response", resp.StatusCode)
+		return resp.StatusCode, grantedToken{}, fmt.Errorf("origincloud: requesting a token: HTTP %d, not a token response", resp.StatusCode)
 	}
-	if resp.StatusCode != http.StatusOK || granted.AccessToken == "" {
-		reason := granted.ErrorDescription
-		if reason == "" {
-			reason = granted.Error
-		}
-		return grantedToken{}, fmt.Errorf("origincloud: the token request was refused (HTTP %d): %s", resp.StatusCode, reason)
-	}
-	return granted, nil
+	return resp.StatusCode, granted, nil
 }

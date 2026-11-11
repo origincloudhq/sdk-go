@@ -21,7 +21,10 @@ import (
 // environment and a data directory of its own.
 func clearCredentialEnv(t *testing.T) string {
 	t.Helper()
-	for _, name := range []string{envAccessToken, envClientID, envClientSecret, envMetadataDisabled, envMetadataEndpoint, envRegion} {
+	for _, name := range []string{
+		envAccessToken, envClientID, envClientSecret, envMetadataDisabled, envMetadataEndpoint, envRegion,
+		envOIDCDisabled, envOIDCTokenFile, envOIDCAudience, envSTSEndpoint, envGitHubTokenURL, envGitHubRequestToken,
+	} {
 		t.Setenv(name, "")
 	}
 	dir := t.TempDir()
