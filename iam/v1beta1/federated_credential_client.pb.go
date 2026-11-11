@@ -115,7 +115,8 @@ func (c *FederatedCredentialClient) AllFederatedCredentials(ctx context.Context,
 // the account yourself. Refused with `INVALID_ARGUMENT` when a condition
 // contains `*`, or when no condition names an identity that never
 // changes: `repository_id` or `repository_owner_id` for GitHub Actions'
-// issuer, `sub` for any other.
+// issuer, `project_id` or `namespace_id` for GitLab.com's, `sub` for any
+// other.
 func (c *FederatedCredentialClient) CreateFederatedCredential(ctx context.Context, req *CreateFederatedCredentialRequest) (*FederatedCredential, error) {
 	if req.GetRequestId() == "" {
 		req = proto.Clone(req).(*CreateFederatedCredentialRequest)
