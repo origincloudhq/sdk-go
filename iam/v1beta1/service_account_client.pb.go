@@ -17,7 +17,9 @@ import (
 // Service accounts: an organization's credentials for software, which
 // authenticate with the OAuth 2.0 client credentials grant and never log
 // in interactively. A new service account holds no role: grant it one with
-// a role binding on its `member`.
+// a role binding on its `member`. An `EXTERNAL` service account's client
+// secret expires (`secret_expire_time`): rotate it before then with
+// RotateServiceAccountSecret.
 type ServiceAccountClient struct {
 	service *core.Service
 }
@@ -106,8 +108,9 @@ func (c *ServiceAccountClient) AllServiceAccounts(ctx context.Context, req *List
 }
 
 // CreateServiceAccount creates a service account and, for an `EXTERNAL` one, its client
-// secret. The response is the only place the secret is ever shown: store
-// it now. Needs `iam.service_account.create` on the organization.
+// secret, which expires after `secret_lifetime`. The response is the
+// only place the secret is ever shown: store it now. Needs
+// `iam.service_account.create` on the organization.
 func (c *ServiceAccountClient) CreateServiceAccount(ctx context.Context, req *CreateServiceAccountRequest) (*ServiceAccount, error) {
 	if req.GetRequestId() == "" {
 		req = proto.Clone(req).(*CreateServiceAccountRequest)
@@ -127,6 +130,34 @@ func (c *ServiceAccountClient) CreateServiceAccount(ctx context.Context, req *Cr
 		Path:       "/v1beta1/" + p1 + "/serviceAccounts",
 		Body:       req.GetServiceAccount(),
 		Query:      query,
+		Idempotent: true,
+	}, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// RotateServiceAccountSecret issues a new client secret for an `EXTERNAL` service account and
+// returns the service account with it in `client_secret`, the only place
+// it is ever shown. The previous secret is refused from then on, and the
+// new one is accepted at once, also when the previous one had expired.
+// It expires after `secret_lifetime`. An access token issued before
+// stays valid until it expires, within minutes. Needs
+// `iam.service_account.create` on the organization.
+func (c *ServiceAccountClient) RotateServiceAccountSecret(ctx context.Context, req *RotateServiceAccountSecretRequest) (*ServiceAccount, error) {
+	if req.GetRequestId() == "" {
+		req = proto.Clone(req).(*RotateServiceAccountSecretRequest)
+		req.RequestId = core.NewRequestID()
+	}
+	p1, err := core.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	out := new(ServiceAccount)
+	if err := c.service.Call(ctx, core.Request{
+		Method:     http.MethodPost,
+		Path:       "/v1beta1/" + p1 + ":rotateSecret",
+		Body:       req,
 		Idempotent: true,
 	}, out); err != nil {
 		return nil, err

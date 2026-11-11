@@ -10,6 +10,7 @@ import (
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	durationpb "google.golang.org/protobuf/types/known/durationpb"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
@@ -87,7 +88,8 @@ type ServiceAccount_State int32
 const (
 	// Not set.
 	ServiceAccount_STATE_UNSPECIFIED ServiceAccount_State = 0
-	// Its credential is accepted.
+	// Not deleted. An `EXTERNAL` service account's client secret is
+	// accepted until `secret_expire_time`.
 	ServiceAccount_ACTIVE ServiceAccount_State = 1
 	// Deleted: its credential is refused, and it holds no role binding.
 	ServiceAccount_DELETED ServiceAccount_State = 2
@@ -148,8 +150,8 @@ type ServiceAccount struct {
 	// service account.
 	ClientId string `protobuf:"bytes,4,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
 	// The OAuth 2.0 client secret it authenticates with. Set only in the
-	// response that created an `EXTERNAL` service account, and empty
-	// everywhere else: it can't be read again.
+	// response that created an `EXTERNAL` service account or rotated its
+	// secret, and empty everywhere else: it can't be read again.
 	ClientSecret string `protobuf:"bytes,5,opt,name=client_secret,json=clientSecret,proto3" json:"client_secret,omitempty"`
 	// Where the service account is in its lifecycle.
 	State ServiceAccount_State `protobuf:"varint,6,opt,name=state,proto3,enum=origincloud.iam.v1beta1.ServiceAccount_State" json:"state,omitempty"`
@@ -162,9 +164,14 @@ type ServiceAccount struct {
 	DeleteTime *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=delete_time,json=deleteTime,proto3" json:"delete_time,omitempty"`
 	// How the service account authenticates; `EXTERNAL` when the create
 	// leaves it unset.
-	Type          ServiceAccount_Type `protobuf:"varint,10,opt,name=type,proto3,enum=origincloud.iam.v1beta1.ServiceAccount_Type" json:"type,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Type ServiceAccount_Type `protobuf:"varint,10,opt,name=type,proto3,enum=origincloud.iam.v1beta1.ServiceAccount_Type" json:"type,omitempty"`
+	// When the client secret expires. From then on the secret is refused, so
+	// no new access token is issued with it, until RotateServiceAccountSecret
+	// issues a new one. Unset when the service account has no secret that
+	// expires, such as a `WORKLOAD` one.
+	SecretExpireTime *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=secret_expire_time,json=secretExpireTime,proto3" json:"secret_expire_time,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *ServiceAccount) Reset() {
@@ -265,6 +272,13 @@ func (x *ServiceAccount) GetType() ServiceAccount_Type {
 		return x.Type
 	}
 	return ServiceAccount_TYPE_UNSPECIFIED
+}
+
+func (x *ServiceAccount) GetSecretExpireTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.SecretExpireTime
+	}
+	return nil
 }
 
 // The request for GetServiceAccount.
@@ -457,9 +471,18 @@ type CreateServiceAccountRequest struct {
 	// service account under `serviceAccount`; delete it and create a new one
 	// to get a working secret. The same `request_id` with a different
 	// request is refused with `CONFLICT` without that metadata.
-	RequestId     string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	RequestId string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	// How long an `EXTERNAL` service account's client secret is accepted,
+	// from its creation: more than zero and at most 365 days. 90 days when
+	// left out. A `WORKLOAD` service account has no secret, and a create of
+	// one that sets it is refused.
+	//
+	// (-- api-linter: core::0133::request-unknown-fields=disabled
+	//
+	//	aip.dev/not-precedent: it sets how long the secret the create issues lives, which is not a field of the resource. --)
+	SecretLifetime *durationpb.Duration `protobuf:"bytes,4,opt,name=secret_lifetime,json=secretLifetime,proto3" json:"secret_lifetime,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *CreateServiceAccountRequest) Reset() {
@@ -513,6 +536,13 @@ func (x *CreateServiceAccountRequest) GetRequestId() string {
 	return ""
 }
 
+func (x *CreateServiceAccountRequest) GetSecretLifetime() *durationpb.Duration {
+	if x != nil {
+		return x.SecretLifetime
+	}
+	return nil
+}
+
 // The request for DeleteServiceAccount.
 type DeleteServiceAccountRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -559,11 +589,80 @@ func (x *DeleteServiceAccountRequest) GetName() string {
 	return ""
 }
 
+// The request for RotateServiceAccountSecret.
+type RotateServiceAccountSecretRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The `EXTERNAL` service account whose secret to replace.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// How long the new secret is accepted, from now: more than zero and at
+	// most 365 days. 90 days when left out.
+	SecretLifetime *durationpb.Duration `protobuf:"bytes,2,opt,name=secret_lifetime,json=secretLifetime,proto3" json:"secret_lifetime,omitempty"`
+	// A UUID. A repeat of the request with the same `request_id` within a
+	// day issues no secret and is refused with `CONFLICT`: the secret went
+	// to the first request only. Rotate again with a new `request_id` to get
+	// a working secret. The same `request_id` with a different request is
+	// refused with `CONFLICT` too.
+	RequestId     string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RotateServiceAccountSecretRequest) Reset() {
+	*x = RotateServiceAccountSecretRequest{}
+	mi := &file_origincloud_iam_v1beta1_service_account_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RotateServiceAccountSecretRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RotateServiceAccountSecretRequest) ProtoMessage() {}
+
+func (x *RotateServiceAccountSecretRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_origincloud_iam_v1beta1_service_account_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RotateServiceAccountSecretRequest.ProtoReflect.Descriptor instead.
+func (*RotateServiceAccountSecretRequest) Descriptor() ([]byte, []int) {
+	return file_origincloud_iam_v1beta1_service_account_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *RotateServiceAccountSecretRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *RotateServiceAccountSecretRequest) GetSecretLifetime() *durationpb.Duration {
+	if x != nil {
+		return x.SecretLifetime
+	}
+	return nil
+}
+
+func (x *RotateServiceAccountSecretRequest) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
 var File_origincloud_iam_v1beta1_service_account_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_service_account_proto_rawDesc = "" +
 	"\n" +
-	"-origincloud/iam/v1beta1/service_account.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfc\x05\n" +
+	"-origincloud/iam/v1beta1/service_account.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xcc\x06\n" +
 	"\x0eServiceAccount\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12(\n" +
 	"\fdisplay_name\x18\x02 \x01(\tB\x05\xe2A\x02\x02\x05R\vdisplayName\x12\x1c\n" +
@@ -577,7 +676,8 @@ const file_origincloud_iam_v1beta1_service_account_proto_rawDesc = "" +
 	"\vdelete_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"deleteTime\x12G\n" +
 	"\x04type\x18\n" +
-	" \x01(\x0e2,.origincloud.iam.v1beta1.ServiceAccount.TypeB\x05\xe2A\x02\x01\x05R\x04type\"8\n" +
+	" \x01(\x0e2,.origincloud.iam.v1beta1.ServiceAccount.TypeB\x05\xe2A\x02\x01\x05R\x04type\x12N\n" +
+	"\x12secret_expire_time\x18\v \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\x10secretExpireTime\"8\n" +
 	"\x04Type\x12\x14\n" +
 	"\x10TYPE_UNSPECIFIED\x10\x00\x12\f\n" +
 	"\bEXTERNAL\x10\x01\x12\f\n" +
@@ -599,19 +699,27 @@ const file_origincloud_iam_v1beta1_service_account_proto_rawDesc = "" +
 	"\fshow_deleted\x18\x04 \x01(\bB\x04\xe2A\x01\x01R\vshowDeleted\"\x99\x01\n" +
 	"\x1bListServiceAccountsResponse\x12R\n" +
 	"\x10service_accounts\x18\x01 \x03(\v2'.origincloud.iam.v1beta1.ServiceAccountR\x0fserviceAccounts\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xea\x01\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xb4\x02\n" +
 	"\x1bCreateServiceAccountRequest\x12F\n" +
 	"\x06parent\x18\x01 \x01(\tB.\xe2A\x01\x02\xfaA'\x12%iam.origincloudapis.eu/ServiceAccountR\x06parent\x12V\n" +
 	"\x0fservice_account\x18\x02 \x01(\v2'.origincloud.iam.v1beta1.ServiceAccountB\x04\xe2A\x01\x02R\x0eserviceAccount\x12+\n" +
 	"\n" +
-	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"a\n" +
+	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\x12H\n" +
+	"\x0fsecret_lifetime\x18\x04 \x01(\v2\x19.google.protobuf.DurationB\x04\xe2A\x01\x01R\x0esecretLifetime\"a\n" +
 	"\x1bDeleteServiceAccountRequest\x12B\n" +
 	"\x04name\x18\x01 \x01(\tB.\xe2A\x01\x02\xfaA'\n" +
-	"%iam.origincloudapis.eu/ServiceAccountR\x04name2\xb3\x06\n" +
+	"%iam.origincloudapis.eu/ServiceAccountR\x04name\"\xde\x01\n" +
+	"!RotateServiceAccountSecretRequest\x12B\n" +
+	"\x04name\x18\x01 \x01(\tB.\xe2A\x01\x02\xfaA'\n" +
+	"%iam.origincloudapis.eu/ServiceAccountR\x04name\x12H\n" +
+	"\x0fsecret_lifetime\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\x04\xe2A\x01\x01R\x0esecretLifetime\x12+\n" +
+	"\n" +
+	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId2\x89\b\n" +
 	"\x15ServiceAccountService\x12\xb1\x01\n" +
 	"\x11GetServiceAccount\x121.origincloud.iam.v1beta1.GetServiceAccountRequest\x1a'.origincloud.iam.v1beta1.ServiceAccount\"@\xdaA\x04name\x82\xd3\xe4\x93\x023\x121/v1beta1/{name=organizations/*/serviceAccounts/*}\x12\xc4\x01\n" +
 	"\x13ListServiceAccounts\x123.origincloud.iam.v1beta1.ListServiceAccountsRequest\x1a4.origincloud.iam.v1beta1.ListServiceAccountsResponse\"B\xdaA\x06parent\x82\xd3\xe4\x93\x023\x121/v1beta1/{parent=organizations/*}/serviceAccounts\x12\xda\x01\n" +
-	"\x14CreateServiceAccount\x124.origincloud.iam.v1beta1.CreateServiceAccountRequest\x1a'.origincloud.iam.v1beta1.ServiceAccount\"c\xdaA\x16parent,service_account\x82\xd3\xe4\x93\x02D:\x0fservice_account\"1/v1beta1/{parent=organizations/*}/serviceAccounts\x12\xa6\x01\n" +
+	"\x14CreateServiceAccount\x124.origincloud.iam.v1beta1.CreateServiceAccountRequest\x1a'.origincloud.iam.v1beta1.ServiceAccount\"c\xdaA\x16parent,service_account\x82\xd3\xe4\x93\x02D:\x0fservice_account\"1/v1beta1/{parent=organizations/*}/serviceAccounts\x12\xd3\x01\n" +
+	"\x1aRotateServiceAccountSecret\x12:.origincloud.iam.v1beta1.RotateServiceAccountSecretRequest\x1a'.origincloud.iam.v1beta1.ServiceAccount\"P\xdaA\x04name\x82\xd3\xe4\x93\x02C:\x01*\">/v1beta1/{name=organizations/*/serviceAccounts/*}:rotateSecret\x12\xa6\x01\n" +
 	"\x14DeleteServiceAccount\x124.origincloud.iam.v1beta1.DeleteServiceAccountRequest\x1a\x16.google.protobuf.Empty\"@\xdaA\x04name\x82\xd3\xe4\x93\x023*1/v1beta1/{name=organizations/*/serviceAccounts/*}\x1a\x19\xcaA\x16iam.origincloudapis.eub\x06proto3"
 
 var (
@@ -627,39 +735,46 @@ func file_origincloud_iam_v1beta1_service_account_proto_rawDescGZIP() []byte {
 }
 
 var file_origincloud_iam_v1beta1_service_account_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_origincloud_iam_v1beta1_service_account_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_origincloud_iam_v1beta1_service_account_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_origincloud_iam_v1beta1_service_account_proto_goTypes = []any{
-	(ServiceAccount_Type)(0),            // 0: origincloud.iam.v1beta1.ServiceAccount.Type
-	(ServiceAccount_State)(0),           // 1: origincloud.iam.v1beta1.ServiceAccount.State
-	(*ServiceAccount)(nil),              // 2: origincloud.iam.v1beta1.ServiceAccount
-	(*GetServiceAccountRequest)(nil),    // 3: origincloud.iam.v1beta1.GetServiceAccountRequest
-	(*ListServiceAccountsRequest)(nil),  // 4: origincloud.iam.v1beta1.ListServiceAccountsRequest
-	(*ListServiceAccountsResponse)(nil), // 5: origincloud.iam.v1beta1.ListServiceAccountsResponse
-	(*CreateServiceAccountRequest)(nil), // 6: origincloud.iam.v1beta1.CreateServiceAccountRequest
-	(*DeleteServiceAccountRequest)(nil), // 7: origincloud.iam.v1beta1.DeleteServiceAccountRequest
-	(*timestamppb.Timestamp)(nil),       // 8: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),               // 9: google.protobuf.Empty
+	(ServiceAccount_Type)(0),                  // 0: origincloud.iam.v1beta1.ServiceAccount.Type
+	(ServiceAccount_State)(0),                 // 1: origincloud.iam.v1beta1.ServiceAccount.State
+	(*ServiceAccount)(nil),                    // 2: origincloud.iam.v1beta1.ServiceAccount
+	(*GetServiceAccountRequest)(nil),          // 3: origincloud.iam.v1beta1.GetServiceAccountRequest
+	(*ListServiceAccountsRequest)(nil),        // 4: origincloud.iam.v1beta1.ListServiceAccountsRequest
+	(*ListServiceAccountsResponse)(nil),       // 5: origincloud.iam.v1beta1.ListServiceAccountsResponse
+	(*CreateServiceAccountRequest)(nil),       // 6: origincloud.iam.v1beta1.CreateServiceAccountRequest
+	(*DeleteServiceAccountRequest)(nil),       // 7: origincloud.iam.v1beta1.DeleteServiceAccountRequest
+	(*RotateServiceAccountSecretRequest)(nil), // 8: origincloud.iam.v1beta1.RotateServiceAccountSecretRequest
+	(*timestamppb.Timestamp)(nil),             // 9: google.protobuf.Timestamp
+	(*durationpb.Duration)(nil),               // 10: google.protobuf.Duration
+	(*emptypb.Empty)(nil),                     // 11: google.protobuf.Empty
 }
 var file_origincloud_iam_v1beta1_service_account_proto_depIdxs = []int32{
 	1,  // 0: origincloud.iam.v1beta1.ServiceAccount.state:type_name -> origincloud.iam.v1beta1.ServiceAccount.State
-	8,  // 1: origincloud.iam.v1beta1.ServiceAccount.create_time:type_name -> google.protobuf.Timestamp
-	8,  // 2: origincloud.iam.v1beta1.ServiceAccount.delete_time:type_name -> google.protobuf.Timestamp
+	9,  // 1: origincloud.iam.v1beta1.ServiceAccount.create_time:type_name -> google.protobuf.Timestamp
+	9,  // 2: origincloud.iam.v1beta1.ServiceAccount.delete_time:type_name -> google.protobuf.Timestamp
 	0,  // 3: origincloud.iam.v1beta1.ServiceAccount.type:type_name -> origincloud.iam.v1beta1.ServiceAccount.Type
-	2,  // 4: origincloud.iam.v1beta1.ListServiceAccountsResponse.service_accounts:type_name -> origincloud.iam.v1beta1.ServiceAccount
-	2,  // 5: origincloud.iam.v1beta1.CreateServiceAccountRequest.service_account:type_name -> origincloud.iam.v1beta1.ServiceAccount
-	3,  // 6: origincloud.iam.v1beta1.ServiceAccountService.GetServiceAccount:input_type -> origincloud.iam.v1beta1.GetServiceAccountRequest
-	4,  // 7: origincloud.iam.v1beta1.ServiceAccountService.ListServiceAccounts:input_type -> origincloud.iam.v1beta1.ListServiceAccountsRequest
-	6,  // 8: origincloud.iam.v1beta1.ServiceAccountService.CreateServiceAccount:input_type -> origincloud.iam.v1beta1.CreateServiceAccountRequest
-	7,  // 9: origincloud.iam.v1beta1.ServiceAccountService.DeleteServiceAccount:input_type -> origincloud.iam.v1beta1.DeleteServiceAccountRequest
-	2,  // 10: origincloud.iam.v1beta1.ServiceAccountService.GetServiceAccount:output_type -> origincloud.iam.v1beta1.ServiceAccount
-	5,  // 11: origincloud.iam.v1beta1.ServiceAccountService.ListServiceAccounts:output_type -> origincloud.iam.v1beta1.ListServiceAccountsResponse
-	2,  // 12: origincloud.iam.v1beta1.ServiceAccountService.CreateServiceAccount:output_type -> origincloud.iam.v1beta1.ServiceAccount
-	9,  // 13: origincloud.iam.v1beta1.ServiceAccountService.DeleteServiceAccount:output_type -> google.protobuf.Empty
-	10, // [10:14] is the sub-list for method output_type
-	6,  // [6:10] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	9,  // 4: origincloud.iam.v1beta1.ServiceAccount.secret_expire_time:type_name -> google.protobuf.Timestamp
+	2,  // 5: origincloud.iam.v1beta1.ListServiceAccountsResponse.service_accounts:type_name -> origincloud.iam.v1beta1.ServiceAccount
+	2,  // 6: origincloud.iam.v1beta1.CreateServiceAccountRequest.service_account:type_name -> origincloud.iam.v1beta1.ServiceAccount
+	10, // 7: origincloud.iam.v1beta1.CreateServiceAccountRequest.secret_lifetime:type_name -> google.protobuf.Duration
+	10, // 8: origincloud.iam.v1beta1.RotateServiceAccountSecretRequest.secret_lifetime:type_name -> google.protobuf.Duration
+	3,  // 9: origincloud.iam.v1beta1.ServiceAccountService.GetServiceAccount:input_type -> origincloud.iam.v1beta1.GetServiceAccountRequest
+	4,  // 10: origincloud.iam.v1beta1.ServiceAccountService.ListServiceAccounts:input_type -> origincloud.iam.v1beta1.ListServiceAccountsRequest
+	6,  // 11: origincloud.iam.v1beta1.ServiceAccountService.CreateServiceAccount:input_type -> origincloud.iam.v1beta1.CreateServiceAccountRequest
+	8,  // 12: origincloud.iam.v1beta1.ServiceAccountService.RotateServiceAccountSecret:input_type -> origincloud.iam.v1beta1.RotateServiceAccountSecretRequest
+	7,  // 13: origincloud.iam.v1beta1.ServiceAccountService.DeleteServiceAccount:input_type -> origincloud.iam.v1beta1.DeleteServiceAccountRequest
+	2,  // 14: origincloud.iam.v1beta1.ServiceAccountService.GetServiceAccount:output_type -> origincloud.iam.v1beta1.ServiceAccount
+	5,  // 15: origincloud.iam.v1beta1.ServiceAccountService.ListServiceAccounts:output_type -> origincloud.iam.v1beta1.ListServiceAccountsResponse
+	2,  // 16: origincloud.iam.v1beta1.ServiceAccountService.CreateServiceAccount:output_type -> origincloud.iam.v1beta1.ServiceAccount
+	2,  // 17: origincloud.iam.v1beta1.ServiceAccountService.RotateServiceAccountSecret:output_type -> origincloud.iam.v1beta1.ServiceAccount
+	11, // 18: origincloud.iam.v1beta1.ServiceAccountService.DeleteServiceAccount:output_type -> google.protobuf.Empty
+	14, // [14:19] is the sub-list for method output_type
+	9,  // [9:14] is the sub-list for method input_type
+	9,  // [9:9] is the sub-list for extension type_name
+	9,  // [9:9] is the sub-list for extension extendee
+	0,  // [0:9] is the sub-list for field type_name
 }
 
 func init() { file_origincloud_iam_v1beta1_service_account_proto_init() }
@@ -673,7 +788,7 @@ func file_origincloud_iam_v1beta1_service_account_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_origincloud_iam_v1beta1_service_account_proto_rawDesc), len(file_origincloud_iam_v1beta1_service_account_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
