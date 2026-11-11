@@ -18,8 +18,16 @@
 //  1. ORIGINCLOUD_ACCESS_TOKEN: an access token, sent as it is.
 //  2. ORIGINCLOUD_CLIENT_ID and ORIGINCLOUD_CLIENT_SECRET: a service
 //     account's credential, exchanged for access tokens as they expire.
-//  3. The session the origin CLI stored at its last login (origin id login).
-//  4. The instance's metadata service, on an instance that runs as a
+//  3. A CI job's OIDC token, exchanged at the security token service for a
+//     workload service account's access tokens as they expire: the token in
+//     the file ORIGINCLOUD_OIDC_TOKEN_FILE names, or else, in a GitHub
+//     Actions job with `permissions: id-token: write`, the job's.
+//     ORIGINCLOUD_OIDC_DISABLED=true leaves this step out;
+//     ORIGINCLOUD_STS_ENDPOINT asks another service than [STSEndpoint], and
+//     ORIGINCLOUD_OIDC_AUDIENCE asks GitHub for another audience than
+//     [OIDCAudience]. See [FederatedCredentials].
+//  4. The session the origin CLI stored at its last login (origin id login).
+//  5. The instance's metadata service, on an instance that runs as a
 //     service account: the account's access tokens, fetched as they
 //     expire. ORIGINCLOUD_METADATA_DISABLED=true leaves this step out;
 //     ORIGINCLOUD_METADATA_ENDPOINT asks another address than
