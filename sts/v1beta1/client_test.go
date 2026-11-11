@@ -19,10 +19,12 @@ type recorder struct {
 	body     string
 	urls     []string
 	requests []map[string]any
+	auth     []string
 }
 
 func (r *recorder) RoundTrip(req *http.Request) (*http.Response, error) {
 	r.urls = append(r.urls, req.Method+" "+req.URL.String())
+	r.auth = append(r.auth, req.Header.Get("Authorization"))
 	var sent map[string]any
 	if req.Body != nil {
 		_ = json.NewDecoder(req.Body).Decode(&sent)
@@ -47,7 +49,8 @@ func newClient(t *testing.T, rec *recorder, opts ...core.Option) *stsv1beta1.Sec
 }
 
 // The STS answers at its global host only: a client with a region still
-// calls it there.
+// calls it there. It authenticates no caller: the client's credentials
+// aren't sent.
 func TestAssumeServiceAccountCallsTheGlobalHostWithTheToken(t *testing.T) {
 	rec := &recorder{body: `{
 		"accessToken": "issued",
@@ -65,6 +68,9 @@ func TestAssumeServiceAccountCallsTheGlobalHostWithTheToken(t *testing.T) {
 	}
 	if want := "POST https://sts.origincloudapis.eu/v1beta1:assumeServiceAccount"; len(rec.urls) != 1 || rec.urls[0] != want {
 		t.Fatalf("called %v, want [%s]", rec.urls, want)
+	}
+	if rec.auth[0] != "" {
+		t.Fatalf("sent Authorization %q, want none", rec.auth[0])
 	}
 	sent := rec.requests[0]
 	if sent["token"] != "job-token" || sent["serviceAccount"] != "organizations/o/serviceAccounts/s" || sent["lifetime"] != "600s" {

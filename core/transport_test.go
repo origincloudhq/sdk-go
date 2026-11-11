@@ -74,6 +74,37 @@ func TestARequestCarriesItsCredentialsAndAgent(t *testing.T) {
 	}
 }
 
+// noCredentials never has a token, as a machine with none.
+type noCredentials struct{}
+
+func (noCredentials) Token(context.Context) (string, error) { return "", ErrNoCredentials }
+
+func TestAnUnauthenticatedCallIsSentWithoutCredentials(t *testing.T) {
+	var got *http.Request
+	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
+		got = r
+		_, _ = io.WriteString(w, `{}`)
+	}, WithCredentials(noCredentials{}))
+	sts := client.Service("sts", false)
+
+	err := sts.Call(context.Background(), Request{
+		Method: http.MethodPost, Path: "/v1beta1:assumeServiceAccount", Unauthenticated: true,
+	}, &structpb.Struct{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if auth, ok := got.Header["Authorization"]; ok {
+		t.Errorf("Authorization = %q, want none", auth)
+	}
+
+	err = sts.Call(context.Background(), Request{
+		Method: http.MethodPost, Path: "/v1beta1:assumeServiceAccount",
+	}, &structpb.Struct{})
+	if !errors.Is(err, ErrNoCredentials) {
+		t.Errorf("an authenticated call: err = %v, want ErrNoCredentials", err)
+	}
+}
+
 func TestAnIdempotentCallIsRetriedWhileTheAnswerIsRetryable(t *testing.T) {
 	var calls atomic.Int32
 	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {

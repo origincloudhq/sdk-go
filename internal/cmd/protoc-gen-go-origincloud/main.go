@@ -30,6 +30,11 @@ import (
 // services, which have no regional name.
 var globalServices = map[string]bool{"iam": true, "resourcemanager": true, "location": true, "billing": true, "support": true, "dns": true, "sts": true}
 
+// The services that authenticate no caller: their calls are sent without
+// the client's credentials, so that they work with none. The security token
+// service's request carries its own proof, the token it exchanges.
+var unauthenticatedServices = map[string]bool{"sts": true}
+
 const (
 	corePackage    = protogen.GoImportPath("go.origincloud.eu/sdk/core")
 	contextPackage = protogen.GoImportPath("context")
@@ -216,6 +221,10 @@ func generateMethod(g *protogen.GeneratedFile, client string, m *protogen.Method
 	}
 	if idempotent {
 		request = append(request, "Idempotent: true,")
+	}
+	host, _ := proto.GetExtension(m.Parent.Desc.Options(), annotations.E_DefaultHost).(string)
+	if shortcode, _, _ := strings.Cut(host, "."); unauthenticatedServices[shortcode] {
+		request = append(request, "Unauthenticated: true,")
 	}
 
 	g.P("out := new(", g.QualifiedGoIdent(m.Output.GoIdent), ")")

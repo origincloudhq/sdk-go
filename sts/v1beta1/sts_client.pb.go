@@ -41,9 +41,10 @@ func (c *SecurityTokenClient) Service() *core.Service {
 func (c *SecurityTokenClient) AssumeServiceAccount(ctx context.Context, req *AssumeServiceAccountRequest) (*AssumeServiceAccountResponse, error) {
 	out := new(AssumeServiceAccountResponse)
 	if err := c.service.Call(ctx, core.Request{
-		Method: http.MethodPost,
-		Path:   "/v1beta1:assumeServiceAccount",
-		Body:   req,
+		Method:          http.MethodPost,
+		Path:            "/v1beta1:assumeServiceAccount",
+		Body:            req,
+		Unauthenticated: true,
 	}, out); err != nil {
 		return nil, err
 	}
