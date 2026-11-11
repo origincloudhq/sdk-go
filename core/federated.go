@@ -159,7 +159,7 @@ func federatedFromEnvironment() *FederatedCredentials {
 	switch path := os.Getenv(envOIDCTokenFile); {
 	case path != "":
 		c = FederatedFromFile(path)
-	case strings.TrimSpace(os.Getenv(envOIDCToken)) != "":
+	case os.Getenv(envOIDCToken) != "":
 		c = federatedFromToken(os.Getenv(envOIDCToken), envOIDCToken)
 	case requestURL != "" && requestToken != "":
 		c = FederatedFromGitHubActions(requestURL, requestToken)

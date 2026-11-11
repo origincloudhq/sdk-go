@@ -414,6 +414,24 @@ func TestAServiceAccountInTheEnvironmentComesBeforeAJobToken(t *testing.T) {
 	}
 }
 
+// A variable that is set but blank is still the credential, as in the
+// other SDKs: the job meant to hand over a token, so it hears that it's
+// empty instead of being sent to the next source.
+func TestABlankVariableIsAnEmptyJobToken(t *testing.T) {
+	clearCredentialEnv(t)
+	t.Setenv(envOIDCToken, " \n")
+	t.Setenv(envGitHubTokenURL, "https://github.test/idtoken?api-version=2.0")
+	t.Setenv(envGitHubRequestToken, gitHubRequestToken)
+
+	credentials, err := DefaultCredentials(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := credentials.Token(context.Background()); err == nil || !strings.Contains(err.Error(), "empty") {
+		t.Fatalf("Token() error = %v, want the empty token's", err)
+	}
+}
+
 func TestAJobTokenIsLeftOutWhenDisabledOrIncomplete(t *testing.T) {
 	for name, env := range map[string]map[string]string{
 		"disabled": {
@@ -427,7 +445,6 @@ func TestAJobTokenIsLeftOutWhenDisabledOrIncomplete(t *testing.T) {
 			envOIDCToken:    "variable-token",
 			envOIDCDisabled: "true",
 		},
-		"blank variable":   {envOIDCToken: " \n"},
 		"no request token": {envGitHubTokenURL: "https://github.test/idtoken?api-version=2.0"},
 		"no request URL":   {envGitHubRequestToken: gitHubRequestToken},
 	} {
