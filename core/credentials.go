@@ -77,7 +77,7 @@ type Credentials interface {
 // holds any and ORIGINCLOUD_METADATA_DISABLED is true, and by
 // [InstanceMetadataCredentials.Token] when no Origin Cloud metadata service
 // answers.
-var ErrNoCredentials = errors.New("origincloud: no credentials: set ORIGINCLOUD_CLIENT_ID and ORIGINCLOUD_CLIENT_SECRET, set ORIGINCLOUD_ACCESS_TOKEN, run in a GitHub Actions job with `permissions: id-token: write` or set ORIGINCLOUD_OIDC_TOKEN_FILE, log in with `origin id login`, or run on an instance that runs as a service account")
+var ErrNoCredentials = errors.New("origincloud: no credentials: set ORIGINCLOUD_CLIENT_ID and ORIGINCLOUD_CLIENT_SECRET, set ORIGINCLOUD_ACCESS_TOKEN, run in a GitHub Actions job with `permissions: id-token: write`, set ORIGINCLOUD_OIDC_TOKEN_FILE or ORIGINCLOUD_OIDC_TOKEN, log in with `origin id login`, or run on an instance that runs as a service account")
 
 // DefaultCredentials returns the first credentials found, in the order
 // the package documentation lists. Neither a CI job's OIDC token nor the

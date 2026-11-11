@@ -84,8 +84,10 @@ func main() {
 3. A CI job's OIDC token, exchanged at the security token service for a
    `WORKLOAD` service account's access tokens as they expire, with no secret in
    the CI system: the token in the file `ORIGINCLOUD_OIDC_TOKEN_FILE` names (any
-   CI provider, a Kubernetes projected token), read again at every exchange, or
-   else, in a GitHub Actions job with `permissions: id-token: write`, the
+   CI provider, a Kubernetes projected token), read again at every exchange; or
+   else the token `ORIGINCLOUD_OIDC_TOKEN` holds (a GitLab CI job's `id_tokens`
+   entry of that name), which can't be renewed and so serves until it expires;
+   or else, in a GitHub Actions job with `permissions: id-token: write`, the
    job's. A federated credential on the service account decides which jobs'
    tokens it trusts. `ORIGINCLOUD_OIDC_DISABLED=true` leaves this step out;
    `ORIGINCLOUD_STS_ENDPOINT` asks another service than

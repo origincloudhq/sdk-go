@@ -20,8 +20,11 @@
 //     account's credential, exchanged for access tokens as they expire.
 //  3. A CI job's OIDC token, exchanged at the security token service for a
 //     workload service account's access tokens as they expire: the token in
-//     the file ORIGINCLOUD_OIDC_TOKEN_FILE names, or else, in a GitHub
-//     Actions job with `permissions: id-token: write`, the job's.
+//     the file ORIGINCLOUD_OIDC_TOKEN_FILE names, read again at every
+//     exchange; or else the token ORIGINCLOUD_OIDC_TOKEN holds, such as the
+//     one GitLab CI sets for a job's id_tokens, which can't be renewed and
+//     so serves until it expires; or else, in a GitHub Actions job with
+//     `permissions: id-token: write`, the job's.
 //     ORIGINCLOUD_OIDC_DISABLED=true leaves this step out;
 //     ORIGINCLOUD_STS_ENDPOINT asks another service than [STSEndpoint], and
 //     ORIGINCLOUD_OIDC_AUDIENCE asks GitHub for another audience than

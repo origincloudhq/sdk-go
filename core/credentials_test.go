@@ -23,7 +23,7 @@ func clearCredentialEnv(t *testing.T) string {
 	t.Helper()
 	for _, name := range []string{
 		envAccessToken, envClientID, envClientSecret, envMetadataDisabled, envMetadataEndpoint, envRegion,
-		envOIDCDisabled, envOIDCTokenFile, envOIDCAudience, envSTSEndpoint, envGitHubTokenURL, envGitHubRequestToken,
+		envOIDCDisabled, envOIDCTokenFile, envOIDCToken, envOIDCAudience, envSTSEndpoint, envGitHubTokenURL, envGitHubRequestToken,
 	} {
 		t.Setenv(name, "")
 	}
