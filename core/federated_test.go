@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -419,8 +420,14 @@ func TestAJobTokenIsLeftOutWhenDisabledOrIncomplete(t *testing.T) {
 			envGitHubTokenURL:     "https://github.test/idtoken?api-version=2.0",
 			envGitHubRequestToken: gitHubRequestToken,
 			envOIDCTokenFile:      "/var/run/token",
+			envOIDCToken:          "variable-token",
 			envOIDCDisabled:       "True",
 		},
+		"disabled with the variable alone": {
+			envOIDCToken:    "variable-token",
+			envOIDCDisabled: "true",
+		},
+		"blank variable":   {envOIDCToken: " \n"},
 		"no request token": {envGitHubTokenURL: "https://github.test/idtoken?api-version=2.0"},
 		"no request URL":   {envGitHubRequestToken: gitHubRequestToken},
 	} {
@@ -452,5 +459,182 @@ func TestADetectedJobTokenIsTheCredentialEvenWhenItFails(t *testing.T) {
 	}
 	if _, err := credentials.Token(context.Background()); !errors.Is(err, os.ErrNotExist) {
 		t.Fatalf("err = %v, want the token file's, not the CLI session's token", err)
+	}
+}
+
+// unsignedJWT returns a JWT whose payload is claims, signed by no one: the
+// SDK reads the claims without verifying them.
+func unsignedJWT(t *testing.T, claims map[string]any) string {
+	t.Helper()
+	payload, err := json.Marshal(claims)
+	if err != nil {
+		t.Fatal(err)
+	}
+	encode := base64.RawURLEncoding.EncodeToString
+	return encode([]byte(`{"alg":"none"}`)) + "." + encode(payload) + ".signature"
+}
+
+func TestATokenInTheVariableIsExchanged(t *testing.T) {
+	dir := clearCredentialEnv(t)
+	// Federation comes before the CLI's session.
+	writeSession(t, dir, time.Now().Add(time.Hour), time.Now().Add(time.Hour))
+	sts := newSTSServer(t)
+	token := unsignedJWT(t, map[string]any{"sub": "project_path:group/project", "exp": time.Now().Add(time.Hour).Unix()})
+	t.Setenv(envOIDCToken, token)
+	t.Setenv(envSTSEndpoint, sts.URL)
+	// The token was issued for its audience already: this one is GitHub's
+	// alone.
+	t.Setenv(envOIDCAudience, "https://example.test/aud")
+
+	credentials, err := DefaultCredentials(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, err := credentials.Token(context.Background()); err != nil || got != "access-1" {
+		t.Fatalf("Token() = %q, %v; want the exchanged access-1", got, err)
+	}
+	want := url.Values{
+		"grant_type":         {"urn:ietf:params:oauth:grant-type:token-exchange"},
+		"subject_token":      {token},
+		"subject_token_type": {"urn:ietf:params:oauth:token-type:jwt"},
+	}
+	if got := sts.exchanges(); len(got) != 1 || got[0].Encode() != want.Encode() {
+		t.Fatalf("exchanges = %v, want the variable's token once", got)
+	}
+}
+
+func TestATokenFileComesBeforeTheVariable(t *testing.T) {
+	clearCredentialEnv(t)
+	sts := newSTSServer(t)
+	path := filepath.Join(t.TempDir(), "token")
+	if err := os.WriteFile(path, []byte("file-token"), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv(envOIDCTokenFile, path)
+	t.Setenv(envOIDCToken, "variable-token")
+	t.Setenv(envSTSEndpoint, sts.URL)
+
+	credentials, err := DefaultCredentials(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := credentials.Token(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if got := strings.Join(sts.subjects(), ", "); got != "file-token" {
+		t.Fatalf("exchanged %q, want the file's token alone", got)
+	}
+}
+
+func TestTheVariableComesBeforeTheGitHubActionsJobsToken(t *testing.T) {
+	clearCredentialEnv(t)
+	github, sts := newGitHubServer(t), newSTSServer(t)
+	t.Setenv(envGitHubTokenURL, github.URL+"/idtoken?api-version=2.0")
+	t.Setenv(envGitHubRequestToken, gitHubRequestToken)
+	t.Setenv(envOIDCToken, "variable-token")
+	t.Setenv(envSTSEndpoint, sts.URL)
+
+	credentials, err := DefaultCredentials(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := credentials.Token(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if got := strings.Join(sts.subjects(), ", "); got != "variable-token" || github.requests() != 0 {
+		t.Fatalf("exchanged %q and asked GitHub %d times, want the variable's token alone", got, github.requests())
+	}
+}
+
+func TestAnExpiredTokenInTheVariableIsNotExchanged(t *testing.T) {
+	clearCredentialEnv(t)
+	sts := newSTSServer(t)
+	expiry := time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC)
+	token := unsignedJWT(t, map[string]any{"sub": "project_path:group/project", "exp": expiry.Unix()})
+	t.Setenv(envOIDCToken, token)
+	t.Setenv(envSTSEndpoint, sts.URL)
+
+	credentials, err := DefaultCredentials(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = credentials.Token(context.Background())
+	want := "origincloud: the CI job's OIDC token in ORIGINCLOUD_OIDC_TOKEN expired at 2026-01-02T03:04:05Z, and a token in a variable can't be renewed: ask the CI provider for a longer-lived one, or use ORIGINCLOUD_OIDC_TOKEN_FILE"
+	if err == nil || err.Error() != want {
+		t.Fatalf("err = %v, want %q", err, want)
+	}
+	assertNoToken(t, err, token, strings.Split(token, ".")[1])
+	if len(sts.exchanges()) != 0 {
+		t.Fatal("the security token service was asked with an expired token")
+	}
+}
+
+func TestAnExpiredTokenHandedOverNamesNoVariable(t *testing.T) {
+	sts := newSTSServer(t)
+	token := unsignedJWT(t, map[string]any{"exp": time.Now().Add(-time.Minute).Unix()})
+	credentials := FederatedFromToken(token)
+	credentials.Endpoint = sts.URL
+
+	_, err := credentials.Token(context.Background())
+	if err == nil || !strings.Contains(err.Error(), "expired at") || strings.Contains(err.Error(), "ORIGINCLOUD_") {
+		t.Fatalf("err = %v, want the expiry without a variable named", err)
+	}
+	assertNoToken(t, err, token, strings.Split(token, ".")[1])
+	if len(sts.exchanges()) != 0 {
+		t.Fatal("the security token service was asked with an expired token")
+	}
+}
+
+func TestATokenWhosePayloadCantBeReadIsLeftToTheSTS(t *testing.T) {
+	for name, token := range map[string]string{
+		"not a JWT":          "opaque-token",
+		"payload not JSON":   "header." + base64.RawURLEncoding.EncodeToString([]byte("not json")) + ".signature",
+		"payload not base64": "header.!!!.signature",
+		"no exp":             unsignedJWT(t, map[string]any{"sub": "project_path:group/project"}),
+		"exp not a number":   unsignedJWT(t, map[string]any{"exp": "yesterday"}),
+	} {
+		t.Run(name, func(t *testing.T) {
+			sts := newSTSServer(t)
+			credentials := FederatedFromToken(token)
+			credentials.Endpoint = sts.URL
+
+			if got, err := credentials.Token(context.Background()); err != nil || got != "access-1" {
+				t.Fatalf("Token() = %q, %v; want access-1", got, err)
+			}
+			if got := sts.subjects(); len(got) != 1 || got[0] != token {
+				t.Fatalf("exchanged %v, want the token as it is", got)
+			}
+		})
+	}
+}
+
+func TestATokenHandedOverIsExchangedAgainAtEveryRenewal(t *testing.T) {
+	sts := newSTSServer(t)
+	// Within a minute of its expiry from the start.
+	sts.expiresIn = 50
+	token := unsignedJWT(t, map[string]any{"exp": time.Now().Add(time.Hour).Unix()})
+	credentials := FederatedFromToken(token)
+	credentials.Endpoint = sts.URL
+
+	for _, want := range []string{"access-1", "access-2", "access-3"} {
+		if got, err := credentials.Token(context.Background()); err != nil || got != want {
+			t.Fatalf("Token() = %q, %v; want %s", got, err, want)
+		}
+	}
+	if got := sts.subjects(); len(got) != 3 || got[0] != token || got[1] != token || got[2] != token {
+		t.Fatalf("exchanged %v, want the same token each time", got)
+	}
+}
+
+func TestAnEmptyTokenHandedOverIsNotExchanged(t *testing.T) {
+	sts := newSTSServer(t)
+	credentials := FederatedFromToken("  ")
+	credentials.Endpoint = sts.URL
+
+	if _, err := credentials.Token(context.Background()); err == nil {
+		t.Fatal("an empty token was taken")
+	}
+	if len(sts.exchanges()) != 0 {
+		t.Fatal("the security token service was asked without a token")
 	}
 }

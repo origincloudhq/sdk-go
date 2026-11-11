@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -24,6 +25,7 @@ const OIDCAudience = "https://sts.origincloudapis.eu"
 const (
 	envOIDCDisabled  = "ORIGINCLOUD_OIDC_DISABLED"
 	envOIDCTokenFile = "ORIGINCLOUD_OIDC_TOKEN_FILE"
+	envOIDCToken     = "ORIGINCLOUD_OIDC_TOKEN"
 	envOIDCAudience  = "ORIGINCLOUD_OIDC_AUDIENCE"
 	envSTSEndpoint   = "ORIGINCLOUD_STS_ENDPOINT"
 
@@ -49,14 +51,15 @@ const (
 // FederatedCredentials exchange a CI job's OIDC token for a workload
 // service account's access tokens at the security token service, as they
 // expire. A federated credential on the account decides which jobs'
-// tokens it trusts. Every exchange is of a fresh job token: a job's
-// tokens are short-lived.
+// tokens it trusts. Every exchange is of a fresh job token, as a job's
+// tokens are short-lived, except with [FederatedFromToken], whose one token
+// is exchanged again until it expires.
 type FederatedCredentials struct {
 	// Endpoint is the security token service; [STSEndpoint] when empty.
 	Endpoint string
 	// Audience is the audience the job's token is asked for;
-	// [OIDCAudience] when empty. A token file holds a token issued for
-	// whatever audience it was asked for.
+	// [OIDCAudience] when empty. A token file, or a token handed over as
+	// it is, holds a token issued for whatever audience it was asked for.
 	Audience string
 	// HTTPClient sends the requests for the job's token and the
 	// exchanges; [http.DefaultClient] when nil.
@@ -84,6 +87,54 @@ func FederatedFromFile(path string) *FederatedCredentials {
 	}}
 }
 
+// FederatedFromToken returns credentials that exchange token, a CI job's
+// OIDC token handed over as it is, such as one GitLab CI sets in a variable
+// the job names in its id_tokens. It can't be renewed: every exchange is of
+// the same token, which works until the token itself expires, and an
+// expired one is an error without asking the security token service.
+func FederatedFromToken(token string) *FederatedCredentials {
+	return federatedFromToken(token, "")
+}
+
+// federatedFromToken is FederatedFromToken, whose errors name variable,
+// the environment variable the token came from, when it is not empty.
+func federatedFromToken(token, variable string) *FederatedCredentials {
+	token = strings.TrimSpace(token)
+	return &FederatedCredentials{subjectToken: func(context.Context, *http.Client, string) (string, error) {
+		if token == "" {
+			return "", errors.New("origincloud: the CI job's OIDC token is empty")
+		}
+		if expiry, ok := jwtExpiry(token); ok && !time.Now().Before(expiry) {
+			if variable != "" {
+				return "", fmt.Errorf("origincloud: the CI job's OIDC token in %s expired at %s, and a token in a variable can't be renewed: ask the CI provider for a longer-lived one, or use %s", variable, expiry.UTC().Format(time.RFC3339), envOIDCTokenFile)
+			}
+			return "", fmt.Errorf("origincloud: the CI job's OIDC token expired at %s, and a token handed over as it is can't be renewed: ask the CI provider for a longer-lived one, or use FederatedFromFile", expiry.UTC().Format(time.RFC3339))
+		}
+		return token, nil
+	}}
+}
+
+// jwtExpiry is the expiry a JWT's payload claims, read without verifying
+// its signature: the security token service verifies it. ok is false when
+// the payload can't be read or claims no expiry.
+func jwtExpiry(token string) (expiry time.Time, ok bool) {
+	parts := strings.Split(token, ".")
+	if len(parts) != 3 {
+		return time.Time{}, false
+	}
+	payload, err := base64.RawURLEncoding.DecodeString(strings.TrimRight(parts[1], "="))
+	if err != nil {
+		return time.Time{}, false
+	}
+	var claims struct {
+		Exp *float64 `json:"exp"`
+	}
+	if json.Unmarshal(payload, &claims) != nil || claims.Exp == nil {
+		return time.Time{}, false
+	}
+	return time.Unix(int64(*claims.Exp), 0), true
+}
+
 // FederatedFromGitHubActions returns credentials that exchange the GitHub
 // Actions job's OIDC token, asked for at requestURL with requestToken: the
 // values of ACTIONS_ID_TOKEN_REQUEST_URL and ACTIONS_ID_TOKEN_REQUEST_TOKEN,
@@ -95,9 +146,10 @@ func FederatedFromGitHubActions(requestURL, requestToken string) *FederatedCrede
 }
 
 // federatedFromEnvironment returns the federated credentials the
-// environment names: a token file, or else a GitHub Actions job. It
-// returns nil when it names neither, or when ORIGINCLOUD_OIDC_DISABLED is
-// true.
+// environment names: a token file, which comes first as Kubernetes rotates
+// it in place, or else a token in ORIGINCLOUD_OIDC_TOKEN, or else a GitHub
+// Actions job. It returns nil when it names none, or when
+// ORIGINCLOUD_OIDC_DISABLED is true.
 func federatedFromEnvironment() *FederatedCredentials {
 	if strings.EqualFold(os.Getenv(envOIDCDisabled), "true") {
 		return nil
@@ -107,6 +159,8 @@ func federatedFromEnvironment() *FederatedCredentials {
 	switch path := os.Getenv(envOIDCTokenFile); {
 	case path != "":
 		c = FederatedFromFile(path)
+	case strings.TrimSpace(os.Getenv(envOIDCToken)) != "":
+		c = federatedFromToken(os.Getenv(envOIDCToken), envOIDCToken)
 	case requestURL != "" && requestToken != "":
 		c = FederatedFromGitHubActions(requestURL, requestToken)
 	default:
@@ -117,12 +171,12 @@ func federatedFromEnvironment() *FederatedCredentials {
 	return c
 }
 
-// Token returns the current access token, exchanging a fresh job token
-// for a new one about a minute before it expires.
+// Token returns the current access token, exchanging a job token for a
+// new one about a minute before it expires.
 func (c *FederatedCredentials) Token(ctx context.Context) (string, error) {
 	return c.cache.getWithin(federatedExpiryMargin, func() (string, time.Time, error) {
 		if c.subjectToken == nil {
-			return "", time.Time{}, errors.New("origincloud: federated credentials need a job token's source: use FederatedFromFile or FederatedFromGitHubActions")
+			return "", time.Time{}, errors.New("origincloud: federated credentials need a job token's source: use FederatedFromFile, FederatedFromToken or FederatedFromGitHubActions")
 		}
 		audience := c.Audience
 		if audience == "" {
