@@ -28,7 +28,7 @@ const (
 type AssumeServiceAccountRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The OIDC token, a JWT its issuer signed, such as a CI job's.
-	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	OidcToken string `protobuf:"bytes,1,opt,name=oidc_token,json=oidcToken,proto3" json:"oidc_token,omitempty"`
 	// The service account to assume,
 	// `organizations/{organization}/serviceAccounts/{service_account}`. Only
 	// its federated credentials are considered. Without it, any service
@@ -71,9 +71,9 @@ func (*AssumeServiceAccountRequest) Descriptor() ([]byte, []int) {
 	return file_origincloud_sts_v1beta1_sts_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *AssumeServiceAccountRequest) GetToken() string {
+func (x *AssumeServiceAccountRequest) GetOidcToken() string {
 	if x != nil {
-		return x.Token
+		return x.OidcToken
 	}
 	return ""
 }
@@ -171,9 +171,10 @@ var File_origincloud_sts_v1beta1_sts_proto protoreflect.FileDescriptor
 
 const file_origincloud_sts_v1beta1_sts_proto_rawDesc = "" +
 	"\n" +
-	"!origincloud/sts/v1beta1/sts.proto\x12\x17origincloud.sts.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xcf\x01\n" +
-	"\x1bAssumeServiceAccountRequest\x12\x1a\n" +
-	"\x05token\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\x05token\x12W\n" +
+	"!origincloud/sts/v1beta1/sts.proto\x12\x17origincloud.sts.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd8\x01\n" +
+	"\x1bAssumeServiceAccountRequest\x12#\n" +
+	"\n" +
+	"oidc_token\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\toidcToken\x12W\n" +
 	"\x0fservice_account\x18\x02 \x01(\tB.\xe2A\x01\x01\xfaA'\n" +
 	"%iam.origincloudapis.eu/ServiceAccountR\x0eserviceAccount\x12;\n" +
 	"\blifetime\x18\x03 \x01(\v2\x19.google.protobuf.DurationB\x04\xe2A\x01\x01R\blifetime\"\xb7\x02\n" +
