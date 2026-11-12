@@ -11,7 +11,7 @@ import (
 )
 
 // Version is this SDK's version, sent in the User-Agent header.
-const Version = "0.26.0"
+const Version = "0.26.1"
 
 const (
 	envRegion = "ORIGINCLOUD_REGION"

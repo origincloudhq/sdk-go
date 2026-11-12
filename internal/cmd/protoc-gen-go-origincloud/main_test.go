@@ -52,3 +52,13 @@ func TestTheGlobalServicesHaveNoRegionalHost(t *testing.T) {
 		}
 	}
 }
+
+func TestOnlyTheSecurityTokenServiceIsUnauthenticated(t *testing.T) {
+	for shortcode, unauthenticated := range map[string]bool{
+		"sts": true, "iam": false, "resourcemanager": false, "pvs": false, "compute": false,
+	} {
+		if unauthenticatedServices[shortcode] != unauthenticated {
+			t.Errorf("%s: unauthenticated = %v, want %v", shortcode, unauthenticatedServices[shortcode], unauthenticated)
+		}
+	}
+}

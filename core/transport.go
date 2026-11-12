@@ -58,6 +58,10 @@ type Request struct {
 	// sending it once: a read, or a mutation with a request id. Only an
 	// idempotent call is retried.
 	Idempotent bool
+	// Unauthenticated sends the call without the client's credentials, to
+	// a method that authenticates no caller, such as the security token
+	// service's: it then works with none.
+	Unauthenticated bool
 }
 
 // Call sends r, retrying it while that is safe and the answer allows it,
@@ -113,11 +117,13 @@ func (s *Service) send(ctx context.Context, r Request, body []byte) ([]byte, err
 	if err != nil {
 		return nil, fmt.Errorf("origincloud: %w", err)
 	}
-	token, err := s.client.credentials.Token(ctx)
-	if err != nil {
-		return nil, err
+	if !r.Unauthenticated {
+		token, err := s.client.credentials.Token(ctx)
+		if err != nil {
+			return nil, err
+		}
+		req.Header.Set("Authorization", "Bearer "+token)
 	}
-	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("User-Agent", s.client.userAgent)
 	if body != nil {
