@@ -59,7 +59,7 @@ func TestAssumeServiceAccountCallsTheGlobalHostWithTheToken(t *testing.T) {
 		"federatedCredential": "organizations/o/serviceAccounts/s/federatedCredentials/f"
 	}`}
 	resp, err := newClient(t, rec, core.WithRegion("eu-central1")).AssumeServiceAccount(context.Background(), &stsv1beta1.AssumeServiceAccountRequest{
-		Token:          "job-token",
+		OidcToken:      "job-token",
 		ServiceAccount: "organizations/o/serviceAccounts/s",
 		Lifetime:       durationpb.New(10 * time.Minute),
 	})
@@ -73,7 +73,7 @@ func TestAssumeServiceAccountCallsTheGlobalHostWithTheToken(t *testing.T) {
 		t.Fatalf("sent Authorization %q, want none", rec.auth[0])
 	}
 	sent := rec.requests[0]
-	if sent["token"] != "job-token" || sent["serviceAccount"] != "organizations/o/serviceAccounts/s" || sent["lifetime"] != "600s" {
+	if sent["oidcToken"] != "job-token" || sent["serviceAccount"] != "organizations/o/serviceAccounts/s" || sent["lifetime"] != "600s" {
 		t.Fatalf("sent %v", sent)
 	}
 	if resp.GetAccessToken() != "issued" ||
