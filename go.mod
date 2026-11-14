@@ -4,6 +4,7 @@ go 1.26.0
 
 require (
 	cloud.google.com/go/longrunning v1.4.0
+	google.golang.org/genproto v0.0.0-20260715232425-e75dac1f907d
 	google.golang.org/genproto/googleapis/api v0.0.0-20261026165753-2ffab32bce7e
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261026165753-2ffab32bce7e
 	google.golang.org/protobuf v1.36.12
