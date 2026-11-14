@@ -394,3 +394,56 @@ func TestACancelledContextStopsRetrying(t *testing.T) {
 		t.Fatalf("err = %v after %s", err, time.Since(start))
 	}
 }
+
+func TestAFileIsReturnedAsItIs(t *testing.T) {
+	pdf := "%PDF-1.7\n\x00\xff binary"
+	var accept string
+	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
+		accept = r.Header.Get("Accept")
+		w.Header().Set("Content-Type", "application/pdf")
+		_, _ = io.WriteString(w, pdf)
+	})
+
+	file, err := client.Service("billing", false).CallHTTPBody(context.Background(), Request{
+		Method: http.MethodGet, Path: "/v1beta1/legalDocuments/terms/versions/1:download", Idempotent: true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if file.GetContentType() != "application/pdf" || string(file.GetData()) != pdf {
+		t.Errorf("file = %q (%s), want the PDF as it was answered", file.GetData(), file.GetContentType())
+	}
+	if accept == "application/json" {
+		t.Errorf("Accept = %q, want any media type", accept)
+	}
+}
+
+func TestAFileCallThatIsRefusedIsAnError(t *testing.T) {
+	var calls atomic.Int32
+	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
+		if calls.Add(1) < 2 {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			_, _ = io.WriteString(w, unavailable)
+			return
+		}
+		w.WriteHeader(http.StatusBadRequest)
+		_, _ = io.WriteString(w, badRequest)
+	})
+
+	file, err := client.Service("billing", false).CallHTTPBody(context.Background(), Request{Method: http.MethodGet, Path: "/x", Idempotent: true})
+	if file != nil || ReasonOf(err) != "BAD_REQUEST" || calls.Load() != 2 {
+		t.Fatalf("file = %v, err = %v after %d calls, want BAD_REQUEST after a retry", file, err, calls.Load())
+	}
+}
+
+func TestAResponseLargerThanTheMostIsAnError(t *testing.T) {
+	client := testClient(t, func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/pdf")
+		_, _ = w.Write(make([]byte, maxResponseBytes+1))
+	})
+
+	file, err := client.Service("billing", false).CallHTTPBody(context.Background(), Request{Method: http.MethodGet, Path: "/x"})
+	if file != nil || err == nil || !strings.Contains(err.Error(), "larger than") {
+		t.Fatalf("got a file: %v, err = %v, want an error rather than a cut-off file", file != nil, err)
+	}
+}

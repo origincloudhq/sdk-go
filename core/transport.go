@@ -13,6 +13,7 @@ import (
 	"strings"
 	"time"
 
+	"google.golang.org/genproto/googleapis/api/httpbody"
 	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/proto"
 )
@@ -67,45 +68,74 @@ type Request struct {
 // Call sends r, retrying it while that is safe and the answer allows it,
 // and reads the answer into out.
 func (s *Service) Call(ctx context.Context, r Request, out proto.Message) error {
+	got, err := s.call(ctx, r, "application/json")
+	if err != nil {
+		return err
+	}
+	if err := unmarshalOptions.Unmarshal(got.body, out); err != nil {
+		return fmt.Errorf("origincloud: reading the response to %s %s: %w", r.Method, r.Path, err)
+	}
+	return nil
+}
+
+// CallHTTPBody sends r like Call, to a method that answers with a file
+// rather than JSON, a google.api.HttpBody: it returns the file as it is,
+// its bytes in Data and their media type, such as "application/pdf", in
+// ContentType. A refused call is an [*Error] all the same.
+func (s *Service) CallHTTPBody(ctx context.Context, r Request) (*httpbody.HttpBody, error) {
+	got, err := s.call(ctx, r, "*/*")
+	if err != nil {
+		return nil, err
+	}
+	return &httpbody.HttpBody{ContentType: got.contentType, Data: got.body}, nil
+}
+
+// An answer: the body of a 200, and its media type.
+type answer struct {
+	body        []byte
+	contentType string
+}
+
+// call sends r, asking for the media types accept names, retrying it while
+// that is safe and the answer allows it.
+func (s *Service) call(ctx context.Context, r Request, accept string) (answer, error) {
 	var body []byte
 	if r.Body != nil {
 		var err error
 		if body, err = marshalOptions.Marshal(r.Body); err != nil {
-			return fmt.Errorf("origincloud: encoding the request: %w", err)
+			return answer{}, fmt.Errorf("origincloud: encoding the request: %w", err)
 		}
 	}
 	for attempt := 1; ; attempt++ {
-		answer, err := s.send(ctx, r, body)
+		got, err := s.send(ctx, r, body, accept)
 		if err == nil {
-			if err := unmarshalOptions.Unmarshal(answer, out); err != nil {
-				return fmt.Errorf("origincloud: reading the response to %s %s: %w", r.Method, r.Path, err)
-			}
-			return nil
+			return got, nil
 		}
 		if !r.Idempotent || attempt >= s.client.maxAttempts {
-			return err
+			return answer{}, err
 		}
 		delay, retry := retryDelay(err, attempt)
 		if !retry {
-			return err
+			return answer{}, err
 		}
 		timer := time.NewTimer(delay)
 		select {
 		case <-ctx.Done():
 			timer.Stop()
-			return err
+			return answer{}, err
 		case <-timer.C:
 		}
 	}
 }
 
-// send makes one attempt, and answers with the body of a 200.
-func (s *Service) send(ctx context.Context, r Request, body []byte) ([]byte, error) {
+// send makes one attempt, and answers with the body of a 200 and its
+// media type.
+func (s *Service) send(ctx context.Context, r Request, body []byte, accept string) (answer, error) {
 	target := *s.base
 	target.RawPath = s.base.EscapedPath() + r.Path
 	path, err := url.PathUnescape(target.RawPath)
 	if err != nil {
-		return nil, fmt.Errorf("origincloud: %w", err)
+		return answer{}, fmt.Errorf("origincloud: %w", err)
 	}
 	target.Path = path
 	target.RawQuery = r.Query.Encode()
@@ -115,16 +145,16 @@ func (s *Service) send(ctx context.Context, r Request, body []byte) ([]byte, err
 	}
 	req, err := http.NewRequestWithContext(ctx, r.Method, target.String(), reader)
 	if err != nil {
-		return nil, fmt.Errorf("origincloud: %w", err)
+		return answer{}, fmt.Errorf("origincloud: %w", err)
 	}
 	if !r.Unauthenticated {
 		token, err := s.client.credentials.Token(ctx)
 		if err != nil {
-			return nil, err
+			return answer{}, err
 		}
 		req.Header.Set("Authorization", "Bearer "+token)
 	}
-	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Accept", accept)
 	req.Header.Set("User-Agent", s.client.userAgent)
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
@@ -134,7 +164,7 @@ func (s *Service) send(ctx context.Context, r Request, body []byte) ([]byte, err
 	}
 	resp, err := s.client.httpClient.Do(req)
 	if err != nil {
-		return nil, &transportError{err: err}
+		return answer{}, &transportError{err: err}
 	}
 	defer resp.Body.Close()
 	// A failed mutation may still have applied a command: its token comes
@@ -142,14 +172,19 @@ func (s *Service) send(ctx context.Context, r Request, body []byte) ([]byte, err
 	if answered := resp.Header.Get(ConsistencyTokenHeader); answered != "" {
 		s.client.SetConsistencyToken(answered)
 	}
-	answer, err := io.ReadAll(io.LimitReader(resp.Body, maxResponseBytes))
+	// One byte more than the most, to tell a body cut off at the limit
+	// from one that ends there.
+	data, err := io.ReadAll(io.LimitReader(resp.Body, maxResponseBytes+1))
 	if err != nil {
-		return nil, &transportError{err: err}
+		return answer{}, &transportError{err: err}
 	}
 	if resp.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(resp.StatusCode, answer)
+		return answer{}, errorFromResponse(resp.StatusCode, data)
 	}
-	return answer, nil
+	if len(data) > maxResponseBytes {
+		return answer{}, fmt.Errorf("origincloud: the response to %s %s is larger than %d MiB", r.Method, r.Path, maxResponseBytes>>20)
+	}
+	return answer{body: data, contentType: resp.Header.Get("Content-Type")}, nil
 }
 
 // A call that got no answer: the connection failed or broke off.

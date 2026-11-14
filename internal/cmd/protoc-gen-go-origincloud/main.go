@@ -7,7 +7,8 @@
 // core.Operation of the result its operation_info names. A list method
 // (AIP-158) also gets an All... method iterating over every page. A
 // method with a request_id gets one filled in when it is empty, so that
-// it is safe to retry.
+// it is safe to retry. A method answering with a google.api.HttpBody
+// returns the file the API answers with as it is, not read as JSON.
 package main
 
 import (
@@ -44,25 +45,28 @@ const (
 
 	operationType = "google.longrunning.Operation"
 	emptyType     = "google.protobuf.Empty"
+	httpBodyType  = "google.api.HttpBody"
 )
 
 func main() {
-	protogen.Options{}.Run(func(gen *protogen.Plugin) error {
-		gen.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
-		messages := map[protoreflect.FullName]*protogen.Message{}
-		for _, f := range gen.Files {
-			collect(messages, f.Messages)
+	protogen.Options{}.Run(generate)
+}
+
+func generate(gen *protogen.Plugin) error {
+	gen.SupportedFeatures = uint64(pluginpb.CodeGeneratorResponse_FEATURE_PROTO3_OPTIONAL)
+	messages := map[protoreflect.FullName]*protogen.Message{}
+	for _, f := range gen.Files {
+		collect(messages, f.Messages)
+	}
+	for _, f := range gen.Files {
+		if !f.Generate || len(f.Services) == 0 {
+			continue
 		}
-		for _, f := range gen.Files {
-			if !f.Generate || len(f.Services) == 0 {
-				continue
-			}
-			if err := generateFile(gen, f, messages); err != nil {
-				return err
-			}
+		if err := generateFile(gen, f, messages); err != nil {
+			return err
 		}
-		return nil
-	})
+	}
+	return nil
 }
 
 func collect(into map[protoreflect.FullName]*protogen.Message, messages []*protogen.Message) {
@@ -154,6 +158,9 @@ func generateMethod(g *protogen.GeneratedFile, client string, m *protogen.Method
 	if err != nil {
 		return err
 	}
+	if sendsHTTPBody(m.Input, rule.GetBody()) {
+		return fmt.Errorf("a request body of %s isn't supported", httpBodyType)
+	}
 
 	ctx := g.QualifiedGoIdent(contextPackage.Ident("Context"))
 	input := g.QualifiedGoIdent(m.Input.GoIdent)
@@ -227,6 +234,15 @@ func generateMethod(g *protogen.GeneratedFile, client string, m *protogen.Method
 		request = append(request, "Unauthenticated: true,")
 	}
 
+	if m.Output.Desc.FullName() == httpBodyType {
+		g.P("return c.service.CallHTTPBody(ctx, ", g.QualifiedGoIdent(corePackage.Ident("Request")), "{")
+		for _, line := range request {
+			g.P(line)
+		}
+		g.P("})")
+		g.P("}")
+		return nil
+	}
 	g.P("out := new(", g.QualifiedGoIdent(m.Output.GoIdent), ")")
 	g.P("if err := c.service.Call(ctx, ", g.QualifiedGoIdent(corePackage.Ident("Request")), "{")
 	for _, line := range request {
@@ -243,6 +259,17 @@ func generateMethod(g *protogen.GeneratedFile, client string, m *protogen.Method
 	}
 	g.P("}")
 	return nil
+}
+
+// sendsHTTPBody reports whether a request sends a google.api.HttpBody as
+// its body: the whole request, or the field body names, is one. Its
+// content would have to be sent as it is, not as JSON.
+func sendsHTTPBody(input *protogen.Message, body string) bool {
+	if input.Desc.FullName() == httpBodyType {
+		return true
+	}
+	field := fieldNamed(input, body)
+	return field != nil && field.Message != nil && field.Message.Desc.FullName() == httpBodyType
 }
 
 // resultOf returns what a method returns, and for one answering with a
@@ -425,6 +452,10 @@ func writeMethodDoc(g *protogen.GeneratedFile, m *protogen.Method, operationResu
 		writeDoc(g, m.GoName+" "+lowerFirst(doc))
 	}
 	switch {
+	case m.Output.Desc.FullName() == httpBodyType:
+		g.P("//")
+		g.P("// It returns the file the API answers with as it is: its bytes in Data,")
+		g.P("// their media type in ContentType.")
 	case operationResult == nil:
 	case operationResult.Desc.FullName() == emptyType:
 		g.P("//")
