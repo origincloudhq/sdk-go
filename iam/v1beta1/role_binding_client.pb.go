@@ -26,6 +26,14 @@ import (
 //     account's current one.
 //   - `serviceAccount:{service_account}`: a service account of the same
 //     organization, by its id.
+//   - `serviceAgent:{service_agent}`: a platform service agent, by its name,
+//     such as `serviceAgent:compute`. A service agent is the identity one of
+//     the platform's services acts as in an organization. Any organization
+//     can bind one, but only to a role its service needs; nobody outside the
+//     platform can act as one or get a credential for it. Every organization
+//     is created with `serviceAgent:compute` bound to
+//     `roles/kms.grant-delegate`; delete that binding and compute makes no
+//     new grants on the organization's keys.
 //
 // and shown, never accepted, as:
 //   - `userId:{user}`: a user by the id of their account, when no verified
@@ -128,7 +136,8 @@ func (c *RoleBindingClient) AllRoleBindings(ctx context.Context, req *ListRoleBi
 // verified email: nothing is held for an address until its account
 // exists. Refused with `CONFLICT` when the member already holds the role
 // at that scope, and with `BAD_REQUEST` when the member is a deleted
-// service account.
+// service account, names no service agent the platform has, or is a
+// service agent and the role isn't one its service needs.
 func (c *RoleBindingClient) CreateRoleBinding(ctx context.Context, req *CreateRoleBindingRequest) (*RoleBinding, error) {
 	if req.GetRequestId() == "" {
 		req = proto.Clone(req).(*CreateRoleBindingRequest)

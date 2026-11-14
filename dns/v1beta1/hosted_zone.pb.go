@@ -158,7 +158,7 @@ const (
 	// Not set.
 	OwnershipChallenge_SUSPENSION_REASON_UNSPECIFIED OwnershipChallenge_SuspensionReason = 0
 	// Several daily checks in a row found the name delegated to other name
-	// servers, without the zone's token.
+	// servers than the zone's, without the zone's token.
 	OwnershipChallenge_CHALLENGE_LOST OwnershipChallenge_SuspensionReason = 1
 )
 
@@ -201,18 +201,20 @@ func (OwnershipChallenge_SuspensionReason) EnumDescriptor() ([]byte, []int) {
 	return file_origincloud_dns_v1beta1_hosted_zone_proto_rawDescGZIP(), []int{1, 0}
 }
 
-// What a check of the challenge found.
+// What a check of the zone's proof of control found.
 type OwnershipChallenge_CheckOutcome int32
 
 const (
 	// Not set.
 	OwnershipChallenge_CHECK_OUTCOME_UNSPECIFIED OwnershipChallenge_CheckOutcome = 0
-	// The token answers, and the zone holds its name: it is `ACTIVE`.
+	// The name is delegated to the zone's name servers or the token
+	// answers, and the zone holds its name: it is `ACTIVE`.
 	OwnershipChallenge_OK OwnershipChallenge_CheckOutcome = 1
-	// The token doesn't answer at the TXT record's name, or the name's DNS
-	// can't be asked.
+	// The name isn't delegated to the zone's name servers and the token
+	// doesn't answer at the TXT record's name, or the name's DNS can't be
+	// asked.
 	OwnershipChallenge_NOT_FOUND OwnershipChallenge_CheckOutcome = 2
-	// The token answers, but another zone holds the name.
+	// The zone proves control, but another zone holds the name.
 	OwnershipChallenge_NAME_HELD OwnershipChallenge_CheckOutcome = 3
 )
 
@@ -268,7 +270,10 @@ type HostedZone struct {
 	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// The domain, such as `example.com`, without the final dot; answered in
 	// lowercase. A public zone's has at least two labels and at most 235
-	// characters, so its challenge name fits. A private zone's may have one
+	// characters, so its challenge name fits, and isn't a special-use domain
+	// or below one, as none is delegated on the internet: `test`,
+	// `localhost`, `invalid`, `example`, `local`, `onion`, `alt`, `internal`
+	// and `home.arpa`. A private zone's may have one
 	// label, but isn't `internal` or a name below it, which answer each
 	// instance's own name. Neither is one of the platform's own domains or a
 	// name below one.
@@ -282,8 +287,10 @@ type HostedZone struct {
 	// Whether the zone is answered.
 	State HostedZone_State `protobuf:"varint,5,opt,name=state,proto3,enum=origincloud.dns.v1beta1.HostedZone_State" json:"state,omitempty"`
 	// The name servers to delegate a public zone to at its registrar, as NS
-	// records of its name. Fixed when the zone is created. Empty for a
-	// private zone.
+	// records of its name. They are the zone's own: no other zone is given
+	// them, so a delegation to them proves control of the name and verifies
+	// the zone, as the challenge does. Fixed when the zone is created. Empty
+	// for a private zone.
 	NameServers []string `protobuf:"bytes,6,rep,name=name_servers,json=nameServers,proto3" json:"name_servers,omitempty"`
 	// How a public zone proves control of its name, and how it went. Unset
 	// for a private zone.
@@ -400,8 +407,10 @@ func (x *HostedZone) GetTags() map[string]string {
 	return nil
 }
 
-// A public zone's proof of control of its name: a TXT record named
-// `dns_name` whose value is `token`, answered by the name's current DNS.
+// How a public zone proves control of its name: a TXT record named
+// `dns_name` whose value is `token`, answered by the name's current DNS,
+// unless the name is delegated to the zone's `name_servers`, which proves
+// it as well.
 type OwnershipChallenge struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The name of the TXT record to create where the zone's name is hosted

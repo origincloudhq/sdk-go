@@ -18,21 +18,24 @@ import (
 //
 // A public zone holds its name only once it proves control of it: until
 // then it is `PENDING_VERIFICATION`, and any number of zones of any
-// project may be pending for the same name. It proves control with a TXT
-// record at `_origin-challenge.{dns_name}` holding the zone's token,
-// answered by the name's current DNS. The first zone of a name to verify
-// becomes `ACTIVE`, holds the name, and is answered from the platform's
-// name servers once the name is delegated to them; the others stay
-// pending. A zone that doesn't verify within its window is deleted with
+// project may be pending for the same name. It proves control in either
+// of two ways: the name's parent (its registry, for a registered domain)
+// delegates it to the zone's own `name_servers`, which no other zone is
+// given; or a TXT record at `_origin-challenge.{dns_name}` holding the
+// zone's token answers at the name's current DNS. The first zone of a name
+// to verify becomes `ACTIVE`, holds the name, and is answered from the
+// platform's name servers once the name is delegated to them; the others
+// stay pending. A zone that doesn't verify within its window is deleted with
 // its record sets. The platform checks pending zones on its own, more
 // rarely the longer they stay pending; `VerifyHostedZone` checks one now.
 //
 // An active public zone is checked again every day. It keeps its name
-// while the name is delegated to the platform's name servers, or while the
-// token still answers at the name's other name servers. After several
-// checks in a row find the name delegated elsewhere without the token, it
-// is `SUSPENDED`: no longer answered, its record sets kept, and its name
-// free for another zone to verify. Verifying it again while its name is
+// while the name is delegated to its name servers, or while the token
+// still answers at the name's other name servers. After several checks in
+// a row find the name delegated elsewhere without the token, or to other
+// platform name servers than the zone's, it is `SUSPENDED`: no longer
+// answered, its record sets kept, and its name free for another zone to
+// verify. Verifying it again while its name is
 // free makes it active again.
 //
 // A private zone is active from the start, and answers in the VPCs it is
@@ -207,10 +210,10 @@ func (c *HostedZoneClient) DeleteHostedZone(ctx context.Context, req *DeleteHost
 	return out, nil
 }
 
-// VerifyHostedZone checks a public zone's challenge now, instead of waiting for the
+// VerifyHostedZone checks a public zone's proof of control now, instead of waiting for the
 // platform's next check, and returns the zone as it is then, with the
-// check's outcome in `challenge.last_check`. A pending zone whose token
-// answers becomes `ACTIVE`, and so does a suspended one while its name is
+// check's outcome in `challenge.last_check`. A pending zone that proves
+// control becomes `ACTIVE`, and so does a suspended one while its name is
 // free; otherwise the zone stays as it was. A call within 30 seconds of
 // the zone's last check answers with that check's outcome and asks the
 // name's DNS nothing. Refused with `NOT_FOUND` once a pending zone's
@@ -218,7 +221,8 @@ func (c *HostedZoneClient) DeleteHostedZone(ctx context.Context, req *DeleteHost
 // retryable, when the name's DNS didn't answer in time or too many checks
 // are under way. A private zone has no challenge, and is refused with
 // `BAD_REQUEST`. Checking an active zone changes nothing, so a client may
-// repeat the call.
+// repeat the call; `NOT_FOUND` for one means its proof is lost, and the
+// daily checks suspend it unless the proof comes back.
 func (c *HostedZoneClient) VerifyHostedZone(ctx context.Context, req *VerifyHostedZoneRequest) (*HostedZone, error) {
 	p1, err := core.PathValue("name", req.GetName(), "projects/*/hostedZones/*")
 	if err != nil {
