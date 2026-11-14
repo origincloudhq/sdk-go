@@ -7,7 +7,8 @@
 // Users, service accounts, roles, role bindings, permissions and the audit log.
 //
 // A role is a predefined, named set of permissions; a role binding grants
-// one to a user or a service account, organization-wide or in one project.
+// one to a user, a service account or a platform service agent,
+// organization-wide or in one project.
 // An organization's audit log records each change to who may do what in it.
 
 package iamv1beta1
@@ -39,8 +40,8 @@ type RoleBinding struct {
 	// The binding's URN, the identifier access policies and the audit log
 	// use.
 	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
-	// Who holds the role: `user:{email}` or
-	// `serviceAccount:{service_account}`. A user is shown with their
+	// Who holds the role: `user:{email}`, `serviceAccount:{service_account}`
+	// or `serviceAgent:{service_agent}`. A user is shown with their
 	// account's current verified address, as `userId:{user}` when it has
 	// none, or as `deleted:user:{user}` once the account is gone.
 	Member string `protobuf:"bytes,3,opt,name=member,proto3" json:"member,omitempty"`
@@ -192,8 +193,9 @@ type ListRoleBindingsRequest struct {
 	// or `organizations/-` for the caller's own bindings in every
 	// organization.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
-	// Only the bindings of this member, `user:{email}` or
-	// `serviceAccount:{service_account}`. Every member's when empty.
+	// Only the bindings of this member, `user:{email}`,
+	// `serviceAccount:{service_account}` or `serviceAgent:{service_agent}`.
+	// Every member's when empty.
 	//
 	// (-- api-linter: core::0132::request-unknown-fields=disabled
 	//
