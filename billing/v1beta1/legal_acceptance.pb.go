@@ -306,62 +306,6 @@ func (x *LegalRequirement) GetBlocking() bool {
 	return false
 }
 
-// A version to accept, with the text it was shown as.
-type LegalDocumentVersionToAccept struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// The version, `legalDocuments/{legal_document}/versions/{version}`.
-	LegalDocumentVersion string `protobuf:"bytes,1,opt,name=legal_document_version,json=legalDocumentVersion,proto3" json:"legal_document_version,omitempty"`
-	// The version's `sha256`, as read with it: an acceptance is refused when
-	// the text shown isn't the version's.
-	Sha256        string `protobuf:"bytes,2,opt,name=sha256,proto3" json:"sha256,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *LegalDocumentVersionToAccept) Reset() {
-	*x = LegalDocumentVersionToAccept{}
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[2]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *LegalDocumentVersionToAccept) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*LegalDocumentVersionToAccept) ProtoMessage() {}
-
-func (x *LegalDocumentVersionToAccept) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[2]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use LegalDocumentVersionToAccept.ProtoReflect.Descriptor instead.
-func (*LegalDocumentVersionToAccept) Descriptor() ([]byte, []int) {
-	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *LegalDocumentVersionToAccept) GetLegalDocumentVersion() string {
-	if x != nil {
-		return x.LegalDocumentVersion
-	}
-	return ""
-}
-
-func (x *LegalDocumentVersionToAccept) GetSha256() string {
-	if x != nil {
-		return x.Sha256
-	}
-	return ""
-}
-
 // The request for ListLegalAcceptances.
 type ListLegalAcceptancesRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -379,7 +323,7 @@ type ListLegalAcceptancesRequest struct {
 
 func (x *ListLegalAcceptancesRequest) Reset() {
 	*x = ListLegalAcceptancesRequest{}
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[3]
+	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -391,7 +335,7 @@ func (x *ListLegalAcceptancesRequest) String() string {
 func (*ListLegalAcceptancesRequest) ProtoMessage() {}
 
 func (x *ListLegalAcceptancesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[3]
+	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -404,7 +348,7 @@ func (x *ListLegalAcceptancesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListLegalAcceptancesRequest.ProtoReflect.Descriptor instead.
 func (*ListLegalAcceptancesRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{3}
+	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ListLegalAcceptancesRequest) GetParent() string {
@@ -442,7 +386,7 @@ type ListLegalAcceptancesResponse struct {
 
 func (x *ListLegalAcceptancesResponse) Reset() {
 	*x = ListLegalAcceptancesResponse{}
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[4]
+	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -454,7 +398,7 @@ func (x *ListLegalAcceptancesResponse) String() string {
 func (*ListLegalAcceptancesResponse) ProtoMessage() {}
 
 func (x *ListLegalAcceptancesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[4]
+	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -467,7 +411,7 @@ func (x *ListLegalAcceptancesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListLegalAcceptancesResponse.ProtoReflect.Descriptor instead.
 func (*ListLegalAcceptancesResponse) Descriptor() ([]byte, []int) {
-	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{4}
+	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListLegalAcceptancesResponse) GetLegalAcceptances() []*LegalAcceptance {
@@ -495,7 +439,7 @@ type GetLegalAcceptanceRequest struct {
 
 func (x *GetLegalAcceptanceRequest) Reset() {
 	*x = GetLegalAcceptanceRequest{}
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[5]
+	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -507,7 +451,7 @@ func (x *GetLegalAcceptanceRequest) String() string {
 func (*GetLegalAcceptanceRequest) ProtoMessage() {}
 
 func (x *GetLegalAcceptanceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[5]
+	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -520,7 +464,7 @@ func (x *GetLegalAcceptanceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLegalAcceptanceRequest.ProtoReflect.Descriptor instead.
 func (*GetLegalAcceptanceRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{5}
+	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetLegalAcceptanceRequest) GetName() string {
@@ -547,7 +491,7 @@ type AcceptLegalDocumentsRequest struct {
 
 func (x *AcceptLegalDocumentsRequest) Reset() {
 	*x = AcceptLegalDocumentsRequest{}
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[6]
+	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -559,7 +503,7 @@ func (x *AcceptLegalDocumentsRequest) String() string {
 func (*AcceptLegalDocumentsRequest) ProtoMessage() {}
 
 func (x *AcceptLegalDocumentsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[6]
+	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -572,7 +516,7 @@ func (x *AcceptLegalDocumentsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AcceptLegalDocumentsRequest.ProtoReflect.Descriptor instead.
 func (*AcceptLegalDocumentsRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{6}
+	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *AcceptLegalDocumentsRequest) GetName() string {
@@ -608,7 +552,7 @@ type QueryLegalRequirementsRequest struct {
 
 func (x *QueryLegalRequirementsRequest) Reset() {
 	*x = QueryLegalRequirementsRequest{}
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[7]
+	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -620,7 +564,7 @@ func (x *QueryLegalRequirementsRequest) String() string {
 func (*QueryLegalRequirementsRequest) ProtoMessage() {}
 
 func (x *QueryLegalRequirementsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[7]
+	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -633,7 +577,7 @@ func (x *QueryLegalRequirementsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use QueryLegalRequirementsRequest.ProtoReflect.Descriptor instead.
 func (*QueryLegalRequirementsRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{7}
+	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *QueryLegalRequirementsRequest) GetName() string {
@@ -654,7 +598,7 @@ type QueryLegalRequirementsResponse struct {
 
 func (x *QueryLegalRequirementsResponse) Reset() {
 	*x = QueryLegalRequirementsResponse{}
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[8]
+	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -666,7 +610,7 @@ func (x *QueryLegalRequirementsResponse) String() string {
 func (*QueryLegalRequirementsResponse) ProtoMessage() {}
 
 func (x *QueryLegalRequirementsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[8]
+	mi := &file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -679,7 +623,7 @@ func (x *QueryLegalRequirementsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use QueryLegalRequirementsResponse.ProtoReflect.Descriptor instead.
 func (*QueryLegalRequirementsResponse) Descriptor() ([]byte, []int) {
-	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{8}
+	return file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *QueryLegalRequirementsResponse) GetRequirements() []*LegalRequirement {
@@ -693,7 +637,7 @@ var File_origincloud_billing_v1beta1_legal_acceptance_proto protoreflect.FileDes
 
 const file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDesc = "" +
 	"\n" +
-	"2origincloud/billing/v1beta1/legal_acceptance.proto\x12\x1borigincloud.billing.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16google/type/date.proto\x1a1origincloud/billing/v1beta1/billing_account.proto\"\xdf\x06\n" +
+	"2origincloud/billing/v1beta1/legal_acceptance.proto\x12\x1borigincloud.billing.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16google/type/date.proto\x1a1origincloud/billing/v1beta1/billing_account.proto\x1a0origincloud/billing/v1beta1/legal_document.proto\"\xdf\x06\n" +
 	"\x0fLegalAcceptance\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12n\n" +
 	"\x16legal_document_version\x18\x02 \x01(\tB8\xe2A\x01\x03\xfaA1\n" +
@@ -723,11 +667,7 @@ const file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDesc = "" +
 	"\x0eeffective_date\x18\x03 \x01(\v2\x11.google.type.DateB\x04\xe2A\x01\x03R\reffectiveDate\x12+\n" +
 	"\x0echange_summary\x18\x04 \x01(\tB\x04\xe2A\x01\x03R\rchangeSummary\x12\x1c\n" +
 	"\x06sha256\x18\x05 \x01(\tB\x04\xe2A\x01\x03R\x06sha256\x12 \n" +
-	"\bblocking\x18\x06 \x01(\bB\x04\xe2A\x01\x03R\bblocking\"\xac\x01\n" +
-	"\x1cLegalDocumentVersionToAccept\x12n\n" +
-	"\x16legal_document_version\x18\x01 \x01(\tB8\xe2A\x01\x02\xfaA1\n" +
-	"/billing.origincloudapis.eu/LegalDocumentVersionR\x14legalDocumentVersion\x12\x1c\n" +
-	"\x06sha256\x18\x02 \x01(\tB\x04\xe2A\x01\x02R\x06sha256\"\xb2\x01\n" +
+	"\bblocking\x18\x06 \x01(\bB\x04\xe2A\x01\x03R\bblocking\"\xb2\x01\n" +
 	"\x1bListLegalAcceptancesRequest\x12K\n" +
 	"\x06parent\x18\x01 \x01(\tB3\xe2A\x01\x02\xfaA,\x12*billing.origincloudapis.eu/LegalAcceptanceR\x06parent\x12!\n" +
 	"\tpage_size\x18\x02 \x01(\x05B\x04\xe2A\x01\x01R\bpageSize\x12#\n" +
@@ -768,38 +708,38 @@ func file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDescGZIP() []byt
 }
 
 var file_origincloud_billing_v1beta1_legal_acceptance_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_origincloud_billing_v1beta1_legal_acceptance_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_origincloud_billing_v1beta1_legal_acceptance_proto_goTypes = []any{
 	(LegalAcceptance_Method)(0),            // 0: origincloud.billing.v1beta1.LegalAcceptance.Method
 	(*LegalAcceptance)(nil),                // 1: origincloud.billing.v1beta1.LegalAcceptance
 	(*LegalRequirement)(nil),               // 2: origincloud.billing.v1beta1.LegalRequirement
-	(*LegalDocumentVersionToAccept)(nil),   // 3: origincloud.billing.v1beta1.LegalDocumentVersionToAccept
-	(*ListLegalAcceptancesRequest)(nil),    // 4: origincloud.billing.v1beta1.ListLegalAcceptancesRequest
-	(*ListLegalAcceptancesResponse)(nil),   // 5: origincloud.billing.v1beta1.ListLegalAcceptancesResponse
-	(*GetLegalAcceptanceRequest)(nil),      // 6: origincloud.billing.v1beta1.GetLegalAcceptanceRequest
-	(*AcceptLegalDocumentsRequest)(nil),    // 7: origincloud.billing.v1beta1.AcceptLegalDocumentsRequest
-	(*QueryLegalRequirementsRequest)(nil),  // 8: origincloud.billing.v1beta1.QueryLegalRequirementsRequest
-	(*QueryLegalRequirementsResponse)(nil), // 9: origincloud.billing.v1beta1.QueryLegalRequirementsResponse
-	(*timestamppb.Timestamp)(nil),          // 10: google.protobuf.Timestamp
-	(*BillingAddress)(nil),                 // 11: origincloud.billing.v1beta1.BillingAddress
-	(*date.Date)(nil),                      // 12: google.type.Date
+	(*ListLegalAcceptancesRequest)(nil),    // 3: origincloud.billing.v1beta1.ListLegalAcceptancesRequest
+	(*ListLegalAcceptancesResponse)(nil),   // 4: origincloud.billing.v1beta1.ListLegalAcceptancesResponse
+	(*GetLegalAcceptanceRequest)(nil),      // 5: origincloud.billing.v1beta1.GetLegalAcceptanceRequest
+	(*AcceptLegalDocumentsRequest)(nil),    // 6: origincloud.billing.v1beta1.AcceptLegalDocumentsRequest
+	(*QueryLegalRequirementsRequest)(nil),  // 7: origincloud.billing.v1beta1.QueryLegalRequirementsRequest
+	(*QueryLegalRequirementsResponse)(nil), // 8: origincloud.billing.v1beta1.QueryLegalRequirementsResponse
+	(*timestamppb.Timestamp)(nil),          // 9: google.protobuf.Timestamp
+	(*BillingAddress)(nil),                 // 10: origincloud.billing.v1beta1.BillingAddress
+	(*date.Date)(nil),                      // 11: google.type.Date
+	(*LegalDocumentVersionToAccept)(nil),   // 12: origincloud.billing.v1beta1.LegalDocumentVersionToAccept
 }
 var file_origincloud_billing_v1beta1_legal_acceptance_proto_depIdxs = []int32{
-	10, // 0: origincloud.billing.v1beta1.LegalAcceptance.accept_time:type_name -> google.protobuf.Timestamp
+	9,  // 0: origincloud.billing.v1beta1.LegalAcceptance.accept_time:type_name -> google.protobuf.Timestamp
 	0,  // 1: origincloud.billing.v1beta1.LegalAcceptance.method:type_name -> origincloud.billing.v1beta1.LegalAcceptance.Method
-	11, // 2: origincloud.billing.v1beta1.LegalAcceptance.billing_address:type_name -> origincloud.billing.v1beta1.BillingAddress
-	12, // 3: origincloud.billing.v1beta1.LegalRequirement.effective_date:type_name -> google.type.Date
+	10, // 2: origincloud.billing.v1beta1.LegalAcceptance.billing_address:type_name -> origincloud.billing.v1beta1.BillingAddress
+	11, // 3: origincloud.billing.v1beta1.LegalRequirement.effective_date:type_name -> google.type.Date
 	1,  // 4: origincloud.billing.v1beta1.ListLegalAcceptancesResponse.legal_acceptances:type_name -> origincloud.billing.v1beta1.LegalAcceptance
-	3,  // 5: origincloud.billing.v1beta1.AcceptLegalDocumentsRequest.versions:type_name -> origincloud.billing.v1beta1.LegalDocumentVersionToAccept
+	12, // 5: origincloud.billing.v1beta1.AcceptLegalDocumentsRequest.versions:type_name -> origincloud.billing.v1beta1.LegalDocumentVersionToAccept
 	2,  // 6: origincloud.billing.v1beta1.QueryLegalRequirementsResponse.requirements:type_name -> origincloud.billing.v1beta1.LegalRequirement
-	4,  // 7: origincloud.billing.v1beta1.LegalAcceptanceService.ListLegalAcceptances:input_type -> origincloud.billing.v1beta1.ListLegalAcceptancesRequest
-	6,  // 8: origincloud.billing.v1beta1.LegalAcceptanceService.GetLegalAcceptance:input_type -> origincloud.billing.v1beta1.GetLegalAcceptanceRequest
-	7,  // 9: origincloud.billing.v1beta1.LegalAcceptanceService.AcceptLegalDocuments:input_type -> origincloud.billing.v1beta1.AcceptLegalDocumentsRequest
-	8,  // 10: origincloud.billing.v1beta1.LegalAcceptanceService.QueryLegalRequirements:input_type -> origincloud.billing.v1beta1.QueryLegalRequirementsRequest
-	5,  // 11: origincloud.billing.v1beta1.LegalAcceptanceService.ListLegalAcceptances:output_type -> origincloud.billing.v1beta1.ListLegalAcceptancesResponse
+	3,  // 7: origincloud.billing.v1beta1.LegalAcceptanceService.ListLegalAcceptances:input_type -> origincloud.billing.v1beta1.ListLegalAcceptancesRequest
+	5,  // 8: origincloud.billing.v1beta1.LegalAcceptanceService.GetLegalAcceptance:input_type -> origincloud.billing.v1beta1.GetLegalAcceptanceRequest
+	6,  // 9: origincloud.billing.v1beta1.LegalAcceptanceService.AcceptLegalDocuments:input_type -> origincloud.billing.v1beta1.AcceptLegalDocumentsRequest
+	7,  // 10: origincloud.billing.v1beta1.LegalAcceptanceService.QueryLegalRequirements:input_type -> origincloud.billing.v1beta1.QueryLegalRequirementsRequest
+	4,  // 11: origincloud.billing.v1beta1.LegalAcceptanceService.ListLegalAcceptances:output_type -> origincloud.billing.v1beta1.ListLegalAcceptancesResponse
 	1,  // 12: origincloud.billing.v1beta1.LegalAcceptanceService.GetLegalAcceptance:output_type -> origincloud.billing.v1beta1.LegalAcceptance
-	5,  // 13: origincloud.billing.v1beta1.LegalAcceptanceService.AcceptLegalDocuments:output_type -> origincloud.billing.v1beta1.ListLegalAcceptancesResponse
-	9,  // 14: origincloud.billing.v1beta1.LegalAcceptanceService.QueryLegalRequirements:output_type -> origincloud.billing.v1beta1.QueryLegalRequirementsResponse
+	4,  // 13: origincloud.billing.v1beta1.LegalAcceptanceService.AcceptLegalDocuments:output_type -> origincloud.billing.v1beta1.ListLegalAcceptancesResponse
+	8,  // 14: origincloud.billing.v1beta1.LegalAcceptanceService.QueryLegalRequirements:output_type -> origincloud.billing.v1beta1.QueryLegalRequirementsResponse
 	11, // [11:15] is the sub-list for method output_type
 	7,  // [7:11] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
@@ -813,13 +753,14 @@ func file_origincloud_billing_v1beta1_legal_acceptance_proto_init() {
 		return
 	}
 	file_origincloud_billing_v1beta1_billing_account_proto_init()
+	file_origincloud_billing_v1beta1_legal_document_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDesc), len(file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   9,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

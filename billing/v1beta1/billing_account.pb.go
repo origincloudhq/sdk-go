@@ -705,9 +705,25 @@ type CreateBillingAccountRequest struct {
 	BillingAccount *BillingAccount `protobuf:"bytes,2,opt,name=billing_account,json=billingAccount,proto3" json:"billing_account,omitempty"`
 	// A UUID; a repeat with the same id returns the billing account the first
 	// request created instead of creating a second one.
-	RequestId     string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	RequestId string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	// The legal document versions the new billing account accepts, each with
+	// the `sha256` of the text shown. Required once a version of a document
+	// customers accept is in force: every such version must be accepted, or
+	// the request fails naming `acceptedLegalDocuments` and creates nothing.
+	//
+	// (-- api-linter: core::0133::request-unknown-fields=disabled
+	//
+	//	aip.dev/not-precedent: the legal entity a billing account is accepts the contract when it is created; an acceptance is not a field of the resource. --)
+	AcceptedLegalDocuments []*LegalDocumentVersionToAccept `protobuf:"bytes,4,rep,name=accepted_legal_documents,json=acceptedLegalDocuments,proto3" json:"accepted_legal_documents,omitempty"`
+	// That the caller acts as a business (§ 14 BGB) for the billing account's
+	// legal entity. Must be true when `accepted_legal_documents` is set.
+	//
+	// (-- api-linter: core::0133::request-unknown-fields=disabled
+	//
+	//	aip.dev/not-precedent: part of the acceptance above. --)
+	ActsAsBusiness bool `protobuf:"varint,5,opt,name=acts_as_business,json=actsAsBusiness,proto3" json:"acts_as_business,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *CreateBillingAccountRequest) Reset() {
@@ -759,6 +775,20 @@ func (x *CreateBillingAccountRequest) GetRequestId() string {
 		return x.RequestId
 	}
 	return ""
+}
+
+func (x *CreateBillingAccountRequest) GetAcceptedLegalDocuments() []*LegalDocumentVersionToAccept {
+	if x != nil {
+		return x.AcceptedLegalDocuments
+	}
+	return nil
+}
+
+func (x *CreateBillingAccountRequest) GetActsAsBusiness() bool {
+	if x != nil {
+		return x.ActsAsBusiness
+	}
+	return false
 }
 
 // The request for UpdateBillingAccount.
@@ -1400,7 +1430,7 @@ var File_origincloud_billing_v1beta1_billing_account_proto protoreflect.FileDesc
 
 const file_origincloud_billing_v1beta1_billing_account_proto_rawDesc = "" +
 	"\n" +
-	"1origincloud/billing/v1beta1/billing_account.proto\x12\x1borigincloud.billing.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xba\x05\n" +
+	"1origincloud/billing/v1beta1/billing_account.proto\x12\x1borigincloud.billing.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/billing/v1beta1/legal_document.proto\"\xba\x05\n" +
 	"\x0eBillingAccount\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
 	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12'\n" +
@@ -1456,12 +1486,14 @@ const file_origincloud_billing_v1beta1_billing_account_proto_rawDesc = "" +
 	"page_token\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\tpageToken\"\x9d\x01\n" +
 	"\x1bListBillingAccountsResponse\x12V\n" +
 	"\x10billing_accounts\x18\x01 \x03(\v2+.origincloud.billing.v1beta1.BillingAccountR\x0fbillingAccounts\x12&\n" +
-	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xf2\x01\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\x9d\x03\n" +
 	"\x1bCreateBillingAccountRequest\x12J\n" +
 	"\x06parent\x18\x01 \x01(\tB2\xe2A\x01\x02\xfaA+\x12)billing.origincloudapis.eu/BillingAccountR\x06parent\x12Z\n" +
 	"\x0fbilling_account\x18\x02 \x01(\v2+.origincloud.billing.v1beta1.BillingAccountB\x04\xe2A\x01\x02R\x0ebillingAccount\x12+\n" +
 	"\n" +
-	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\xbc\x01\n" +
+	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\x12y\n" +
+	"\x18accepted_legal_documents\x18\x04 \x03(\v29.origincloud.billing.v1beta1.LegalDocumentVersionToAcceptB\x04\xe2A\x01\x01R\x16acceptedLegalDocuments\x12.\n" +
+	"\x10acts_as_business\x18\x05 \x01(\bB\x04\xe2A\x01\x01R\x0eactsAsBusiness\"\xbc\x01\n" +
 	"\x1bUpdateBillingAccountRequest\x12Z\n" +
 	"\x0fbilling_account\x18\x01 \x01(\v2+.origincloud.billing.v1beta1.BillingAccountB\x04\xe2A\x01\x02R\x0ebillingAccount\x12A\n" +
 	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x04\xe2A\x01\x02R\n" +
@@ -1555,8 +1587,9 @@ var file_origincloud_billing_v1beta1_billing_account_proto_goTypes = []any{
 	(*ListBillingCountriesRequest)(nil),      // 20: origincloud.billing.v1beta1.ListBillingCountriesRequest
 	(*ListBillingCountriesResponse)(nil),     // 21: origincloud.billing.v1beta1.ListBillingCountriesResponse
 	(*timestamppb.Timestamp)(nil),            // 22: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),            // 23: google.protobuf.FieldMask
-	(*emptypb.Empty)(nil),                    // 24: google.protobuf.Empty
+	(*LegalDocumentVersionToAccept)(nil),     // 23: origincloud.billing.v1beta1.LegalDocumentVersionToAccept
+	(*fieldmaskpb.FieldMask)(nil),            // 24: google.protobuf.FieldMask
+	(*emptypb.Empty)(nil),                    // 25: google.protobuf.Empty
 }
 var file_origincloud_billing_v1beta1_billing_account_proto_depIdxs = []int32{
 	2,  // 0: origincloud.billing.v1beta1.BillingAccount.billing_address:type_name -> origincloud.billing.v1beta1.BillingAddress
@@ -1565,41 +1598,42 @@ var file_origincloud_billing_v1beta1_billing_account_proto_depIdxs = []int32{
 	0,  // 3: origincloud.billing.v1beta1.PaymentMethod.state:type_name -> origincloud.billing.v1beta1.PaymentMethod.State
 	1,  // 4: origincloud.billing.v1beta1.ListBillingAccountsResponse.billing_accounts:type_name -> origincloud.billing.v1beta1.BillingAccount
 	1,  // 5: origincloud.billing.v1beta1.CreateBillingAccountRequest.billing_account:type_name -> origincloud.billing.v1beta1.BillingAccount
-	1,  // 6: origincloud.billing.v1beta1.UpdateBillingAccountRequest.billing_account:type_name -> origincloud.billing.v1beta1.BillingAccount
-	23, // 7: origincloud.billing.v1beta1.UpdateBillingAccountRequest.update_mask:type_name -> google.protobuf.FieldMask
-	4,  // 8: origincloud.billing.v1beta1.UpdateProjectBillingInfoRequest.project_billing_info:type_name -> origincloud.billing.v1beta1.ProjectBillingInfo
-	23, // 9: origincloud.billing.v1beta1.UpdateProjectBillingInfoRequest.update_mask:type_name -> google.protobuf.FieldMask
-	4,  // 10: origincloud.billing.v1beta1.ListProjectBillingInfoResponse.project_billing_infos:type_name -> origincloud.billing.v1beta1.ProjectBillingInfo
-	5,  // 11: origincloud.billing.v1beta1.ListBillingCountriesResponse.billing_countries:type_name -> origincloud.billing.v1beta1.BillingCountry
-	6,  // 12: origincloud.billing.v1beta1.BillingAccountService.GetBillingAccount:input_type -> origincloud.billing.v1beta1.GetBillingAccountRequest
-	7,  // 13: origincloud.billing.v1beta1.BillingAccountService.ListBillingAccounts:input_type -> origincloud.billing.v1beta1.ListBillingAccountsRequest
-	9,  // 14: origincloud.billing.v1beta1.BillingAccountService.CreateBillingAccount:input_type -> origincloud.billing.v1beta1.CreateBillingAccountRequest
-	10, // 15: origincloud.billing.v1beta1.BillingAccountService.UpdateBillingAccount:input_type -> origincloud.billing.v1beta1.UpdateBillingAccountRequest
-	11, // 16: origincloud.billing.v1beta1.BillingAccountService.DeleteBillingAccount:input_type -> origincloud.billing.v1beta1.DeleteBillingAccountRequest
-	12, // 17: origincloud.billing.v1beta1.BillingAccountService.StartPaymentMethodSetup:input_type -> origincloud.billing.v1beta1.StartPaymentMethodSetupRequest
-	14, // 18: origincloud.billing.v1beta1.BillingAccountService.ConfirmPaymentMethodSetup:input_type -> origincloud.billing.v1beta1.ConfirmPaymentMethodSetupRequest
-	15, // 19: origincloud.billing.v1beta1.BillingAccountService.GetProjectBillingInfo:input_type -> origincloud.billing.v1beta1.GetProjectBillingInfoRequest
-	16, // 20: origincloud.billing.v1beta1.BillingAccountService.UpdateProjectBillingInfo:input_type -> origincloud.billing.v1beta1.UpdateProjectBillingInfoRequest
-	17, // 21: origincloud.billing.v1beta1.BillingAccountService.ListProjectBillingInfo:input_type -> origincloud.billing.v1beta1.ListProjectBillingInfoRequest
-	19, // 22: origincloud.billing.v1beta1.BillingAccountService.GetBillingCountry:input_type -> origincloud.billing.v1beta1.GetBillingCountryRequest
-	20, // 23: origincloud.billing.v1beta1.BillingAccountService.ListBillingCountries:input_type -> origincloud.billing.v1beta1.ListBillingCountriesRequest
-	1,  // 24: origincloud.billing.v1beta1.BillingAccountService.GetBillingAccount:output_type -> origincloud.billing.v1beta1.BillingAccount
-	8,  // 25: origincloud.billing.v1beta1.BillingAccountService.ListBillingAccounts:output_type -> origincloud.billing.v1beta1.ListBillingAccountsResponse
-	1,  // 26: origincloud.billing.v1beta1.BillingAccountService.CreateBillingAccount:output_type -> origincloud.billing.v1beta1.BillingAccount
-	1,  // 27: origincloud.billing.v1beta1.BillingAccountService.UpdateBillingAccount:output_type -> origincloud.billing.v1beta1.BillingAccount
-	24, // 28: origincloud.billing.v1beta1.BillingAccountService.DeleteBillingAccount:output_type -> google.protobuf.Empty
-	13, // 29: origincloud.billing.v1beta1.BillingAccountService.StartPaymentMethodSetup:output_type -> origincloud.billing.v1beta1.StartPaymentMethodSetupResponse
-	1,  // 30: origincloud.billing.v1beta1.BillingAccountService.ConfirmPaymentMethodSetup:output_type -> origincloud.billing.v1beta1.BillingAccount
-	4,  // 31: origincloud.billing.v1beta1.BillingAccountService.GetProjectBillingInfo:output_type -> origincloud.billing.v1beta1.ProjectBillingInfo
-	4,  // 32: origincloud.billing.v1beta1.BillingAccountService.UpdateProjectBillingInfo:output_type -> origincloud.billing.v1beta1.ProjectBillingInfo
-	18, // 33: origincloud.billing.v1beta1.BillingAccountService.ListProjectBillingInfo:output_type -> origincloud.billing.v1beta1.ListProjectBillingInfoResponse
-	5,  // 34: origincloud.billing.v1beta1.BillingAccountService.GetBillingCountry:output_type -> origincloud.billing.v1beta1.BillingCountry
-	21, // 35: origincloud.billing.v1beta1.BillingAccountService.ListBillingCountries:output_type -> origincloud.billing.v1beta1.ListBillingCountriesResponse
-	24, // [24:36] is the sub-list for method output_type
-	12, // [12:24] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	23, // 6: origincloud.billing.v1beta1.CreateBillingAccountRequest.accepted_legal_documents:type_name -> origincloud.billing.v1beta1.LegalDocumentVersionToAccept
+	1,  // 7: origincloud.billing.v1beta1.UpdateBillingAccountRequest.billing_account:type_name -> origincloud.billing.v1beta1.BillingAccount
+	24, // 8: origincloud.billing.v1beta1.UpdateBillingAccountRequest.update_mask:type_name -> google.protobuf.FieldMask
+	4,  // 9: origincloud.billing.v1beta1.UpdateProjectBillingInfoRequest.project_billing_info:type_name -> origincloud.billing.v1beta1.ProjectBillingInfo
+	24, // 10: origincloud.billing.v1beta1.UpdateProjectBillingInfoRequest.update_mask:type_name -> google.protobuf.FieldMask
+	4,  // 11: origincloud.billing.v1beta1.ListProjectBillingInfoResponse.project_billing_infos:type_name -> origincloud.billing.v1beta1.ProjectBillingInfo
+	5,  // 12: origincloud.billing.v1beta1.ListBillingCountriesResponse.billing_countries:type_name -> origincloud.billing.v1beta1.BillingCountry
+	6,  // 13: origincloud.billing.v1beta1.BillingAccountService.GetBillingAccount:input_type -> origincloud.billing.v1beta1.GetBillingAccountRequest
+	7,  // 14: origincloud.billing.v1beta1.BillingAccountService.ListBillingAccounts:input_type -> origincloud.billing.v1beta1.ListBillingAccountsRequest
+	9,  // 15: origincloud.billing.v1beta1.BillingAccountService.CreateBillingAccount:input_type -> origincloud.billing.v1beta1.CreateBillingAccountRequest
+	10, // 16: origincloud.billing.v1beta1.BillingAccountService.UpdateBillingAccount:input_type -> origincloud.billing.v1beta1.UpdateBillingAccountRequest
+	11, // 17: origincloud.billing.v1beta1.BillingAccountService.DeleteBillingAccount:input_type -> origincloud.billing.v1beta1.DeleteBillingAccountRequest
+	12, // 18: origincloud.billing.v1beta1.BillingAccountService.StartPaymentMethodSetup:input_type -> origincloud.billing.v1beta1.StartPaymentMethodSetupRequest
+	14, // 19: origincloud.billing.v1beta1.BillingAccountService.ConfirmPaymentMethodSetup:input_type -> origincloud.billing.v1beta1.ConfirmPaymentMethodSetupRequest
+	15, // 20: origincloud.billing.v1beta1.BillingAccountService.GetProjectBillingInfo:input_type -> origincloud.billing.v1beta1.GetProjectBillingInfoRequest
+	16, // 21: origincloud.billing.v1beta1.BillingAccountService.UpdateProjectBillingInfo:input_type -> origincloud.billing.v1beta1.UpdateProjectBillingInfoRequest
+	17, // 22: origincloud.billing.v1beta1.BillingAccountService.ListProjectBillingInfo:input_type -> origincloud.billing.v1beta1.ListProjectBillingInfoRequest
+	19, // 23: origincloud.billing.v1beta1.BillingAccountService.GetBillingCountry:input_type -> origincloud.billing.v1beta1.GetBillingCountryRequest
+	20, // 24: origincloud.billing.v1beta1.BillingAccountService.ListBillingCountries:input_type -> origincloud.billing.v1beta1.ListBillingCountriesRequest
+	1,  // 25: origincloud.billing.v1beta1.BillingAccountService.GetBillingAccount:output_type -> origincloud.billing.v1beta1.BillingAccount
+	8,  // 26: origincloud.billing.v1beta1.BillingAccountService.ListBillingAccounts:output_type -> origincloud.billing.v1beta1.ListBillingAccountsResponse
+	1,  // 27: origincloud.billing.v1beta1.BillingAccountService.CreateBillingAccount:output_type -> origincloud.billing.v1beta1.BillingAccount
+	1,  // 28: origincloud.billing.v1beta1.BillingAccountService.UpdateBillingAccount:output_type -> origincloud.billing.v1beta1.BillingAccount
+	25, // 29: origincloud.billing.v1beta1.BillingAccountService.DeleteBillingAccount:output_type -> google.protobuf.Empty
+	13, // 30: origincloud.billing.v1beta1.BillingAccountService.StartPaymentMethodSetup:output_type -> origincloud.billing.v1beta1.StartPaymentMethodSetupResponse
+	1,  // 31: origincloud.billing.v1beta1.BillingAccountService.ConfirmPaymentMethodSetup:output_type -> origincloud.billing.v1beta1.BillingAccount
+	4,  // 32: origincloud.billing.v1beta1.BillingAccountService.GetProjectBillingInfo:output_type -> origincloud.billing.v1beta1.ProjectBillingInfo
+	4,  // 33: origincloud.billing.v1beta1.BillingAccountService.UpdateProjectBillingInfo:output_type -> origincloud.billing.v1beta1.ProjectBillingInfo
+	18, // 34: origincloud.billing.v1beta1.BillingAccountService.ListProjectBillingInfo:output_type -> origincloud.billing.v1beta1.ListProjectBillingInfoResponse
+	5,  // 35: origincloud.billing.v1beta1.BillingAccountService.GetBillingCountry:output_type -> origincloud.billing.v1beta1.BillingCountry
+	21, // 36: origincloud.billing.v1beta1.BillingAccountService.ListBillingCountries:output_type -> origincloud.billing.v1beta1.ListBillingCountriesResponse
+	25, // [25:37] is the sub-list for method output_type
+	13, // [13:25] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_origincloud_billing_v1beta1_billing_account_proto_init() }
@@ -1607,6 +1641,7 @@ func file_origincloud_billing_v1beta1_billing_account_proto_init() {
 	if File_origincloud_billing_v1beta1_billing_account_proto != nil {
 		return
 	}
+	file_origincloud_billing_v1beta1_legal_document_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
