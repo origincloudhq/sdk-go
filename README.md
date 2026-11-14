@@ -122,6 +122,9 @@ func main() {
   after waiting on an operation, always sees it.
 - **Pages.** Each list method has an `All...` counterpart that iterates over
   every page.
+- **Files.** A method that answers with a file rather than JSON, such as a
+  PDF, returns a `google.api.HttpBody`: the file's bytes in `Data` and their
+  media type in `ContentType`, as the API sent them.
 - **Errors.** A refused call returns a `*core.Error`; branch on its `Reason`,
   the platform's error code. Its `Metadata` carries what the API adds to the
   reason, such as `serviceAccount`, the account a repeated create refused with

@@ -9,6 +9,10 @@
 #   scripts/generate.sh           # check the checked-in code is current
 #   scripts/generate.sh --write   # generate it again
 #
+# --write also runs `go mod tidy`: the generated code imports what the API
+# definitions use, such as google.type.Date's package, and go.mod and go.sum
+# have to require it, as CI checks.
+#
 # A package's directory is its path without the leading origincloud/, and
 # its name that path without slashes: origincloud/pvs/v1beta1 is
 # go.origincloud.eu/sdk/pvs/v1beta1, package pvsv1beta1, the name buf's
@@ -57,6 +61,7 @@ generated() { (cd "$1" && find . -name '*.pb.go' -not -path './internal/*' | LC_
 if [[ "${1:-}" == "--write" ]]; then
   generated "${ROOT}" | (cd "${ROOT}" && xargs -r rm -f)
   (cd "${tmp}/gen" && find . -name '*.pb.go' -exec cp --parents {} "${ROOT}" \;)
+  (cd "${ROOT}" && go mod tidy)
   echo "wrote $(generated "${ROOT}" | wc -l) files from origincloudhq/api@${revision:0:12}"
   exit 0
 fi

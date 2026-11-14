@@ -42,7 +42,7 @@ README.md's table first: these wait for review ([RELEASING.md](RELEASING.md)).
 Go and network access are all you need; buf runs through `go run`.
 
 ```sh
-scripts/generate.sh --write   # generate the service packages again; without --write, check them
+scripts/generate.sh --write   # generate the service packages again and tidy go.mod; without --write, check them
 scripts/update.sh             # move to the newest API, and generate
 go test -race ./...           # the live tests skip without a zone
 ORIGINCLOUD_LIVE_ZONE=projects/<project>/zones/<zone> \
