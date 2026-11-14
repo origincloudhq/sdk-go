@@ -33,6 +33,10 @@ const (
 	AuditLogEntry_SUCCEEDED AuditLogEntry_Outcome = 1
 	// It was refused for lack of a permission.
 	AuditLogEntry_DENIED AuditLogEntry_Outcome = 2
+	// It was attempted and refused for another reason, which `details`
+	// names in `reason`, such as a key asked to decrypt under the wrong
+	// encryption context.
+	AuditLogEntry_FAILED AuditLogEntry_Outcome = 3
 )
 
 // Enum value maps for AuditLogEntry_Outcome.
@@ -41,11 +45,13 @@ var (
 		0: "OUTCOME_UNSPECIFIED",
 		1: "SUCCEEDED",
 		2: "DENIED",
+		3: "FAILED",
 	}
 	AuditLogEntry_Outcome_value = map[string]int32{
 		"OUTCOME_UNSPECIFIED": 0,
 		"SUCCEEDED":           1,
 		"DENIED":              2,
+		"FAILED":              3,
 	}
 )
 
@@ -87,8 +93,9 @@ type AuditLogEntry struct {
 	// Who made the change, as it was when the change was made:
 	// `user:{email}` with the verified address the account had then,
 	// `userId:{user}` when none was recorded, `serviceAccount:{service_account}`,
-	// or `platform` for a change the platform made itself. A later change of
-	// address doesn't change it.
+	// `serviceAgent:{service_agent}` for a platform service agent acting in
+	// the organization, or `platform` for a change the platform made itself.
+	// A later change of address doesn't change it.
 	Actor string `protobuf:"bytes,3,opt,name=actor,proto3" json:"actor,omitempty"`
 	// What was done, as a permission key names it, such as
 	// `iam.role.assign`.
@@ -253,8 +260,8 @@ type ListAuditLogEntriesRequest struct {
 	//	aip.dev/not-precedent: a typed filter, in place of a filter string. --)
 	Project string `protobuf:"bytes,2,opt,name=project,proto3" json:"project,omitempty"`
 	// Only the entries of changes made by this member's account,
-	// `user:{email}` or `serviceAccount:{service_account}`. Every actor's
-	// when empty.
+	// `user:{email}`, `serviceAccount:{service_account}` or
+	// `serviceAgent:{service_agent}`. Every actor's when empty.
 	//
 	// (-- api-linter: core::0132::request-unknown-fields=disabled
 	//
@@ -421,7 +428,7 @@ var File_origincloud_iam_v1beta1_audit_log_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_audit_log_proto_rawDesc = "" +
 	"\n" +
-	"'origincloud/iam/v1beta1/audit_log.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8f\x05\n" +
+	"'origincloud/iam/v1beta1/audit_log.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9b\x05\n" +
 	"\rAuditLogEntry\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x1e\n" +
 	"\aproject\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\aproject\x12\x1a\n" +
@@ -434,12 +441,14 @@ const file_origincloud_iam_v1beta1_audit_log_proto_rawDesc = "" +
 	"\adetails\x18\b \x03(\v23.origincloud.iam.v1beta1.AuditLogEntry.DetailsEntryB\x04\xe2A\x01\x03R\adetails\x1a:\n" +
 	"\fDetailsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"=\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"I\n" +
 	"\aOutcome\x12\x17\n" +
 	"\x13OUTCOME_UNSPECIFIED\x10\x00\x12\r\n" +
 	"\tSUCCEEDED\x10\x01\x12\n" +
 	"\n" +
-	"\x06DENIED\x10\x02:\x8a\x01\xeaA\x86\x01\n" +
+	"\x06DENIED\x10\x02\x12\n" +
+	"\n" +
+	"\x06FAILED\x10\x03:\x8a\x01\xeaA\x86\x01\n" +
 	"$iam.origincloudapis.eu/AuditLogEntry\x12>organizations/{organization}/auditLogEntries/{audit_log_entry}*\x0fauditLogEntries2\rauditLogEntry\"\\\n" +
 	"\x17GetAuditLogEntryRequest\x12A\n" +
 	"\x04name\x18\x01 \x01(\tB-\xe2A\x01\x02\xfaA&\n" +
