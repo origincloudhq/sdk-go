@@ -110,6 +110,18 @@ func main() {
   `ORIGINCLOUD_REGION`, picks a region's front door instead,
   `{service}.{region}.origincloudapis.eu`; `location`, `resourcemanager` and
   `iam` are global and have none, so they always answer at their own host.
+- **Names.** A resource's `Name` is its relative name; its full resource
+  name, `//{service}.origincloudapis.eu/{name}`, is what references carry.
+  `core.ParseFullName` parses one (refusing a URN, a relative name, a
+  regional or zonal host, a version), `core.FullNameFromRelative` builds
+  one, and a `core.FullName` gives its `Service`, `Host`, `Relative` name
+  and `URL`; principals and roles are iam names (`Principal`, `Role`). A
+  request's `Name` or `Parent` takes either form. A full name is checked
+  against the type the field refers to: the client's own service for its
+  own resources, the referenced type's service otherwise (a billing
+  account's `Parent` takes `//resourcemanager.origincloudapis.eu/organizations/o`).
+  It is sent as its relative name, in the path and the body alike, and a
+  full name on any other host is refused before anything is sent.
 - **Operations.** A change the API carries out after answering, such as
   creating a volume or an instance, returns a `core.Operation`; its `Wait`
   returns the resource once the change is complete, or the error the change

@@ -34,9 +34,17 @@ func (c *ImageClient) Service() *core.Service {
 
 // GetImage returns one of the project's own images.
 func (c *ImageClient) GetImage(ctx context.Context, req *GetImageRequest) (*Image, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/images/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "compute")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/images/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetImageRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -57,9 +65,17 @@ func (c *ImageClient) GetImage(ctx context.Context, req *GetImageRequest) (*Imag
 // ListImages lists the project's own images in a zone, oldest first. The public
 // images are listed by `ListPublicImages`.
 func (c *ImageClient) ListImages(ctx context.Context, req *ListImagesRequest) (*ListImagesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "compute")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListImagesRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -109,9 +125,17 @@ func (c *ImageClient) CreateImage(ctx context.Context, req *CreateImageRequest) 
 		req = proto.Clone(req).(*CreateImageRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "compute")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateImageRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "image")
 	if err != nil {
@@ -132,9 +156,17 @@ func (c *ImageClient) CreateImage(ctx context.Context, req *CreateImageRequest) 
 
 // UpdateImage changes an image's description or tags.
 func (c *ImageClient) UpdateImage(ctx context.Context, req *UpdateImageRequest) (*Image, error) {
-	p1, err := core.PathValue("image.name", req.GetImage().GetName(), "projects/*/zones/*/images/*")
+	n1, err := c.service.RelativeName("image.name", req.GetImage().GetName(), "compute")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("image.name", n1, "projects/*/zones/*/images/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetImage().GetName() {
+		req = proto.Clone(req).(*UpdateImageRequest)
+		req.Image.Name = n1
 	}
 	query, err := core.Query(req, "image.name", "image")
 	if err != nil {
@@ -154,9 +186,17 @@ func (c *ImageClient) UpdateImage(ctx context.Context, req *UpdateImageRequest) 
 
 // DeleteImage deletes an image. Instances launched from it are unaffected.
 func (c *ImageClient) DeleteImage(ctx context.Context, req *DeleteImageRequest) (*emptypb.Empty, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/images/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "compute")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/images/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteImageRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

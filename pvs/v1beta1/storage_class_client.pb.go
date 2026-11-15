@@ -6,6 +6,7 @@ package pvsv1beta1
 import (
 	context "context"
 	core "go.origincloud.eu/sdk/core"
+	proto "google.golang.org/protobuf/proto"
 	http "net/http"
 )
 
@@ -31,9 +32,17 @@ func (c *StorageClassClient) Service() *core.Service {
 
 // GetStorageClass returns a storage class.
 func (c *StorageClassClient) GetStorageClass(ctx context.Context, req *GetStorageClassRequest) (*StorageClass, error) {
-	p1, err := core.PathValue("name", req.GetName(), "storageClasses/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "storageClasses/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetStorageClassRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

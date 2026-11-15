@@ -33,9 +33,17 @@ func (c *CaseMessageClient) Service() *core.Service {
 // GetCaseMessage returns one message of a case. Needs `admin.support_case.get` on the
 // organization.
 func (c *CaseMessageClient) GetCaseMessage(ctx context.Context, req *GetCaseMessageRequest) (*CaseMessage, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/cases/*/messages/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "support")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/cases/*/messages/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetCaseMessageRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -56,9 +64,17 @@ func (c *CaseMessageClient) GetCaseMessage(ctx context.Context, req *GetCaseMess
 // ListCaseMessages lists a case's messages, oldest first. Needs `admin.support_case.get`
 // on the organization.
 func (c *CaseMessageClient) ListCaseMessages(ctx context.Context, req *ListCaseMessagesRequest) (*ListCaseMessagesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*/cases/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "support")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*/cases/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListCaseMessagesRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -110,9 +126,17 @@ func (c *CaseMessageClient) CreateCaseMessage(ctx context.Context, req *CreateCa
 		req = proto.Clone(req).(*CreateCaseMessageRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*/cases/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "support")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*/cases/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateCaseMessageRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "caseMessage")
 	if err != nil {

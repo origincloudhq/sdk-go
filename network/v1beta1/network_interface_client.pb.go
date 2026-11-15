@@ -36,9 +36,17 @@ func (c *NetworkInterfaceClient) Service() *core.Service {
 
 // GetNetworkInterface returns a network interface.
 func (c *NetworkInterfaceClient) GetNetworkInterface(ctx context.Context, req *GetNetworkInterfaceRequest) (*NetworkInterface, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/networkInterfaces/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/networkInterfaces/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetNetworkInterfaceRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -58,9 +66,17 @@ func (c *NetworkInterfaceClient) GetNetworkInterface(ctx context.Context, req *G
 
 // ListNetworkInterfaces lists the network interfaces in a zone, oldest first.
 func (c *NetworkInterfaceClient) ListNetworkInterfaces(ctx context.Context, req *ListNetworkInterfacesRequest) (*ListNetworkInterfacesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListNetworkInterfacesRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -114,9 +130,17 @@ func (c *NetworkInterfaceClient) CreateNetworkInterface(ctx context.Context, req
 		req = proto.Clone(req).(*CreateNetworkInterfaceRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateNetworkInterfaceRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "networkInterface")
 	if err != nil {
@@ -145,9 +169,17 @@ func (c *NetworkInterfaceClient) UpdateNetworkInterface(ctx context.Context, req
 		req = proto.Clone(req).(*UpdateNetworkInterfaceRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("networkInterface.name", req.GetNetworkInterface().GetName(), "projects/*/zones/*/networkInterfaces/*")
+	n1, err := c.service.RelativeName("networkInterface.name", req.GetNetworkInterface().GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("networkInterface.name", n1, "projects/*/zones/*/networkInterfaces/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetNetworkInterface().GetName() {
+		req = proto.Clone(req).(*UpdateNetworkInterfaceRequest)
+		req.NetworkInterface.Name = n1
 	}
 	query, err := core.Query(req, "networkInterface.name", "networkInterface")
 	if err != nil {
@@ -177,9 +209,17 @@ func (c *NetworkInterfaceClient) DeleteNetworkInterface(ctx context.Context, req
 		req = proto.Clone(req).(*DeleteNetworkInterfaceRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/networkInterfaces/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/networkInterfaces/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteNetworkInterfaceRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

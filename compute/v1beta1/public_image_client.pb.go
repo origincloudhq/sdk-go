@@ -33,9 +33,17 @@ func (c *PublicImageClient) Service() *core.Service {
 
 // GetPublicImage returns a public image.
 func (c *PublicImageClient) GetPublicImage(ctx context.Context, req *GetPublicImageRequest) (*PublicImage, error) {
-	p1, err := core.PathValue("name", req.GetName(), "zones/*/images/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "compute")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "zones/*/images/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetPublicImageRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -55,9 +63,17 @@ func (c *PublicImageClient) GetPublicImage(ctx context.Context, req *GetPublicIm
 
 // ListPublicImages lists the public images in a zone, oldest first.
 func (c *PublicImageClient) ListPublicImages(ctx context.Context, req *ListPublicImagesRequest) (*ListPublicImagesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "location")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListPublicImagesRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {

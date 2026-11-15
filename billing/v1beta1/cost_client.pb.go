@@ -38,9 +38,17 @@ func (c *CostClient) Service() *core.Service {
 // QueryProjectCost returns a project's cost in a period, by service and product, in hourly
 // or daily buckets. Needs `admin.usage.list` on the organization.
 func (c *CostClient) QueryProjectCost(ctx context.Context, req *QueryProjectCostRequest) (*CostReport, error) {
-	p1, err := core.PathValue("project", req.GetProject(), "projects/*")
+	n1, err := c.service.RelativeName("project", req.GetProject(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("project", n1, "projects/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetProject() {
+		req = proto.Clone(req).(*QueryProjectCostRequest)
+		req.Project = n1
 	}
 	query, err := core.Query(req, "project")
 	if err != nil {
@@ -63,9 +71,17 @@ func (c *CostClient) QueryProjectCost(ctx context.Context, req *QueryProjectCost
 // `admin.usage.list` on the organization, which reads every project's
 // cost in it.
 func (c *CostClient) QueryOrganizationCost(ctx context.Context, req *QueryOrganizationCostRequest) (*OrganizationCostReport, error) {
-	p1, err := core.PathValue("organization", req.GetOrganization(), "organizations/*")
+	n1, err := c.service.RelativeName("organization", req.GetOrganization(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("organization", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetOrganization() {
+		req = proto.Clone(req).(*QueryOrganizationCostRequest)
+		req.Organization = n1
 	}
 	query, err := core.Query(req, "organization")
 	if err != nil {
@@ -89,9 +105,17 @@ func (c *CostClient) QueryOrganizationCost(ctx context.Context, req *QueryOrgani
 // later cost. Its spend limit compares the calendar month's total with
 // `limit`. Needs `admin.spend_limit.get` on the organization.
 func (c *CostClient) QueryBillingAccountCost(ctx context.Context, req *QueryBillingAccountCostRequest) (*CostReport, error) {
-	p1, err := core.PathValue("billingAccount", req.GetBillingAccount(), "organizations/*/billingAccounts/*")
+	n1, err := c.service.RelativeName("billingAccount", req.GetBillingAccount(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("billingAccount", n1, "organizations/*/billingAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetBillingAccount() {
+		req = proto.Clone(req).(*QueryBillingAccountCostRequest)
+		req.BillingAccount = n1
 	}
 	query, err := core.Query(req, "billingAccount")
 	if err != nil {
@@ -113,9 +137,17 @@ func (c *CostClient) QueryBillingAccountCost(ctx context.Context, req *QueryBill
 // input its cost is priced from, oldest first. Needs `admin.usage.list`
 // on the organization.
 func (c *CostClient) QueryProjectUsage(ctx context.Context, req *QueryProjectUsageRequest) (*QueryProjectUsageResponse, error) {
-	p1, err := core.PathValue("project", req.GetProject(), "projects/*")
+	n1, err := c.service.RelativeName("project", req.GetProject(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("project", n1, "projects/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetProject() {
+		req = proto.Clone(req).(*QueryProjectUsageRequest)
+		req.Project = n1
 	}
 	query, err := core.Query(req, "project")
 	if err != nil {

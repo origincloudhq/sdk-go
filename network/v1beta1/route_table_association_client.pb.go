@@ -41,9 +41,17 @@ func (c *RouteTableAssociationClient) Service() *core.Service {
 
 // GetRouteTableAssociation returns a route table association.
 func (c *RouteTableAssociationClient) GetRouteTableAssociation(ctx context.Context, req *GetRouteTableAssociationRequest) (*RouteTableAssociation, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/subnets/*/routeTableAssociations/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/subnets/*/routeTableAssociations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetRouteTableAssociationRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -63,9 +71,17 @@ func (c *RouteTableAssociationClient) GetRouteTableAssociation(ctx context.Conte
 
 // ListRouteTableAssociations lists a subnet's route table associations: none or one.
 func (c *RouteTableAssociationClient) ListRouteTableAssociations(ctx context.Context, req *ListRouteTableAssociationsRequest) (*ListRouteTableAssociationsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*/subnets/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*/subnets/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListRouteTableAssociationsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -118,9 +134,17 @@ func (c *RouteTableAssociationClient) CreateRouteTableAssociation(ctx context.Co
 		req = proto.Clone(req).(*CreateRouteTableAssociationRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*/subnets/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*/subnets/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateRouteTableAssociationRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "routeTableAssociation")
 	if err != nil {
@@ -150,9 +174,17 @@ func (c *RouteTableAssociationClient) DeleteRouteTableAssociation(ctx context.Co
 		req = proto.Clone(req).(*DeleteRouteTableAssociationRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/subnets/*/routeTableAssociations/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/subnets/*/routeTableAssociations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteRouteTableAssociationRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

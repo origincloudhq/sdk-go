@@ -38,9 +38,17 @@ func (c *FloatingIpClient) Service() *core.Service {
 
 // GetFloatingIp returns a floating IP.
 func (c *FloatingIpClient) GetFloatingIp(ctx context.Context, req *GetFloatingIpRequest) (*FloatingIp, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/floatingIps/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/floatingIps/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetFloatingIpRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -61,9 +69,17 @@ func (c *FloatingIpClient) GetFloatingIp(ctx context.Context, req *GetFloatingIp
 // ListFloatingIps lists the floating IPs in a zone, oldest first, those the platform
 // assigned at launch included.
 func (c *FloatingIpClient) ListFloatingIps(ctx context.Context, req *ListFloatingIpsRequest) (*ListFloatingIpsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListFloatingIpsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -116,9 +132,17 @@ func (c *FloatingIpClient) CreateFloatingIp(ctx context.Context, req *CreateFloa
 		req = proto.Clone(req).(*CreateFloatingIpRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateFloatingIpRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "floatingIp")
 	if err != nil {
@@ -146,9 +170,17 @@ func (c *FloatingIpClient) UpdateFloatingIp(ctx context.Context, req *UpdateFloa
 		req = proto.Clone(req).(*UpdateFloatingIpRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("floatingIp.name", req.GetFloatingIp().GetName(), "projects/*/zones/*/floatingIps/*")
+	n1, err := c.service.RelativeName("floatingIp.name", req.GetFloatingIp().GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("floatingIp.name", n1, "projects/*/zones/*/floatingIps/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetFloatingIp().GetName() {
+		req = proto.Clone(req).(*UpdateFloatingIpRequest)
+		req.FloatingIp.Name = n1
 	}
 	query, err := core.Query(req, "floatingIp.name", "floatingIp")
 	if err != nil {
@@ -177,9 +209,17 @@ func (c *FloatingIpClient) DeleteFloatingIp(ctx context.Context, req *DeleteFloa
 		req = proto.Clone(req).(*DeleteFloatingIpRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/floatingIps/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/floatingIps/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteFloatingIpRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

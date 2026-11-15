@@ -57,9 +57,17 @@ func (c *HostedZoneClient) Service() *core.Service {
 
 // GetHostedZone returns a hosted zone.
 func (c *HostedZoneClient) GetHostedZone(ctx context.Context, req *GetHostedZoneRequest) (*HostedZone, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/hostedZones/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "dns")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/hostedZones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetHostedZoneRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -79,9 +87,17 @@ func (c *HostedZoneClient) GetHostedZone(ctx context.Context, req *GetHostedZone
 
 // ListHostedZones lists a project's hosted zones, oldest first.
 func (c *HostedZoneClient) ListHostedZones(ctx context.Context, req *ListHostedZonesRequest) (*ListHostedZonesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListHostedZonesRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -135,9 +151,17 @@ func (c *HostedZoneClient) CreateHostedZone(ctx context.Context, req *CreateHost
 		req = proto.Clone(req).(*CreateHostedZoneRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateHostedZoneRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "hostedZone")
 	if err != nil {
@@ -162,9 +186,17 @@ func (c *HostedZoneClient) UpdateHostedZone(ctx context.Context, req *UpdateHost
 		req = proto.Clone(req).(*UpdateHostedZoneRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("hostedZone.name", req.GetHostedZone().GetName(), "projects/*/hostedZones/*")
+	n1, err := c.service.RelativeName("hostedZone.name", req.GetHostedZone().GetName(), "dns")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("hostedZone.name", n1, "projects/*/hostedZones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetHostedZone().GetName() {
+		req = proto.Clone(req).(*UpdateHostedZoneRequest)
+		req.HostedZone.Name = n1
 	}
 	query, err := core.Query(req, "hostedZone.name", "hostedZone")
 	if err != nil {
@@ -190,9 +222,17 @@ func (c *HostedZoneClient) DeleteHostedZone(ctx context.Context, req *DeleteHost
 		req = proto.Clone(req).(*DeleteHostedZoneRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/hostedZones/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "dns")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/hostedZones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteHostedZoneRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -224,9 +264,17 @@ func (c *HostedZoneClient) DeleteHostedZone(ctx context.Context, req *DeleteHost
 // repeat the call; `NOT_FOUND` for one means its proof is lost, and the
 // daily checks suspend it unless the proof comes back.
 func (c *HostedZoneClient) VerifyHostedZone(ctx context.Context, req *VerifyHostedZoneRequest) (*HostedZone, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/hostedZones/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "dns")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/hostedZones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*VerifyHostedZoneRequest)
+		req.Name = n1
 	}
 	out := new(HostedZone)
 	if err := c.service.Call(ctx, core.Request{

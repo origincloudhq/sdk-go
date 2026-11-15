@@ -34,9 +34,17 @@ func (c *VolumeClient) Service() *core.Service {
 
 // GetVolume returns a volume.
 func (c *VolumeClient) GetVolume(ctx context.Context, req *GetVolumeRequest) (*Volume, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/volumes/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/volumes/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetVolumeRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -59,9 +67,17 @@ func (c *VolumeClient) GetVolume(ctx context.Context, req *GetVolumeRequest) (*V
 // `pvs` with the location service (`location.origincloudapis.eu`), then
 // each zone's volumes.
 func (c *VolumeClient) ListVolumes(ctx context.Context, req *ListVolumesRequest) (*ListVolumesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListVolumesRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -113,9 +129,17 @@ func (c *VolumeClient) CreateVolume(ctx context.Context, req *CreateVolumeReques
 		req = proto.Clone(req).(*CreateVolumeRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateVolumeRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "volume")
 	if err != nil {
@@ -143,9 +167,17 @@ func (c *VolumeClient) ImportVolume(ctx context.Context, req *ImportVolumeReques
 		req = proto.Clone(req).(*ImportVolumeRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ImportVolumeRequest)
+		req.Parent = n1
 	}
 	out := new(longrunningpb.Operation)
 	if err := c.service.Call(ctx, core.Request{
@@ -169,9 +201,17 @@ func (c *VolumeClient) UpdateVolume(ctx context.Context, req *UpdateVolumeReques
 		req = proto.Clone(req).(*UpdateVolumeRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("volume.name", req.GetVolume().GetName(), "projects/*/zones/*/volumes/*")
+	n1, err := c.service.RelativeName("volume.name", req.GetVolume().GetName(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("volume.name", n1, "projects/*/zones/*/volumes/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetVolume().GetName() {
+		req = proto.Clone(req).(*UpdateVolumeRequest)
+		req.Volume.Name = n1
 	}
 	query, err := core.Query(req, "volume.name", "volume")
 	if err != nil {
@@ -199,9 +239,17 @@ func (c *VolumeClient) DeleteVolume(ctx context.Context, req *DeleteVolumeReques
 		req = proto.Clone(req).(*DeleteVolumeRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/volumes/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/volumes/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteVolumeRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

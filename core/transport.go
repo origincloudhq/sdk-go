@@ -41,6 +41,9 @@ var (
 type Service struct {
 	client *Client
 	base   *url.URL
+	// The service's shortcode, such as "pvs": its host's first label, and
+	// the service a full resource name in a path field must name.
+	shortcode string
 }
 
 // Client returns the client the service's calls go through.
@@ -228,9 +231,39 @@ func Query(m proto.Message, skip ...string) (url.Values, error) {
 	return queryFromJSON(encoded, skip)
 }
 
-// PathValue returns value as the path segments of a request, checking it
-// has the form pattern, such as "projects/*/zones/*/volumes/*", gives it.
-// field names it in the error.
+// RelativeName returns the relative name value, the path field field of a
+// call to the service, stands for: value itself, or the relative name of a
+// full resource name it is. Generated clients call it, and send the
+// relative name in the path and in the body alike.
+//
+// services are the short codes of the services whose full names the field
+// takes: the service of the type the field refers to, such as
+// "resourcemanager" for a billing account's parent (organizations/*),
+// [AnyService] for a field referring to any type, or none for the
+// service's own. A full name of one of them, such as
+// "//resourcemanager.origincloudapis.eu/organizations/o", stands for its
+// relative name. A full name of another service, one with a regional or
+// zonal host or an API version, a URN, a URL or a malformed full name is
+// refused with a [*FullNameError] naming the hosts the field takes.
+func (s *Service) RelativeName(field, value string, services ...string) (string, error) {
+	return pathName(s.shortcode, services, field, value)
+}
+
+// PathValue returns value, the path field field of a call to the service,
+// as the path segments of the request: its [Service.RelativeName], checked
+// against pattern and escaped as the function [PathValue] does.
+func (s *Service) PathValue(field, value, pattern string, services ...string) (string, error) {
+	relative, err := s.RelativeName(field, value, services...)
+	if err != nil {
+		return "", err
+	}
+	return PathValue(field, relative, pattern)
+}
+
+// PathValue returns value, a relative resource name, as the path segments
+// of a request, checking it has the form pattern, such as
+// "projects/*/zones/*/volumes/*", gives it. field names it in the error.
+// [Service.PathValue] also takes a full resource name of its service.
 func PathValue(field, value, pattern string) (string, error) {
 	got := strings.Split(value, "/")
 	want := strings.Split(pattern, "/")

@@ -6,6 +6,7 @@ package observabilityv1beta1
 import (
 	context "context"
 	core "go.origincloud.eu/sdk/core"
+	proto "google.golang.org/protobuf/proto"
 	http "net/http"
 )
 
@@ -50,9 +51,17 @@ func (c *MetricClient) Service() *core.Service {
 // Each query answered is billed as one request, however many series or
 // points it returns; a refused one isn't.
 func (c *MetricClient) QueryTimeSeries(ctx context.Context, req *QueryTimeSeriesRequest) (*QueryTimeSeriesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*QueryTimeSeriesRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {

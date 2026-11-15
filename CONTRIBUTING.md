@@ -25,7 +25,12 @@ The service packages (`<service>/<version>`) are generated from the API
 definitions in [origincloudhq/api](https://github.com/origincloudhq/api), at
 the commit `API_REVISION` names: protoc-gen-go writes the messages, and this
 repository's plugin, `internal/cmd/protoc-gen-go-origincloud`, the clients.
-`core` is written by hand. So a change to what a service offers starts in the
+The plugin also writes `core/resource_services.pb.go`, the services that
+have resources, drawn from the resource types the API declares: the hosts a
+full resource name may name, and passes each path field's own list to
+`Service.RelativeName`: the service of the type its
+`google.api.resource_reference` names (for a `child_type`, its parent's), or
+of the resource whose `name` it is. The rest of `core` is written by hand. So a change to what a service offers starts in the
 API, which is why it is requested by opening an issue rather than by editing
 a generated package; a change to how every client behaves is a change to the
 plugin or `core`.

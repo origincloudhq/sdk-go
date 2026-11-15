@@ -38,9 +38,17 @@ func (c *SecurityGroupClient) Service() *core.Service {
 
 // GetSecurityGroup returns a security group.
 func (c *SecurityGroupClient) GetSecurityGroup(ctx context.Context, req *GetSecurityGroupRequest) (*SecurityGroup, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/securityGroups/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/securityGroups/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetSecurityGroupRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -60,9 +68,17 @@ func (c *SecurityGroupClient) GetSecurityGroup(ctx context.Context, req *GetSecu
 
 // ListSecurityGroups lists the security groups in a region, oldest first.
 func (c *SecurityGroupClient) ListSecurityGroups(ctx context.Context, req *ListSecurityGroupsRequest) (*ListSecurityGroupsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/regions/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListSecurityGroupsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -115,9 +131,17 @@ func (c *SecurityGroupClient) CreateSecurityGroup(ctx context.Context, req *Crea
 		req = proto.Clone(req).(*CreateSecurityGroupRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/regions/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateSecurityGroupRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "securityGroup")
 	if err != nil {
@@ -145,9 +169,17 @@ func (c *SecurityGroupClient) UpdateSecurityGroup(ctx context.Context, req *Upda
 		req = proto.Clone(req).(*UpdateSecurityGroupRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("securityGroup.name", req.GetSecurityGroup().GetName(), "projects/*/regions/*/securityGroups/*")
+	n1, err := c.service.RelativeName("securityGroup.name", req.GetSecurityGroup().GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("securityGroup.name", n1, "projects/*/regions/*/securityGroups/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetSecurityGroup().GetName() {
+		req = proto.Clone(req).(*UpdateSecurityGroupRequest)
+		req.SecurityGroup.Name = n1
 	}
 	query, err := core.Query(req, "securityGroup.name", "securityGroup")
 	if err != nil {
@@ -177,9 +209,17 @@ func (c *SecurityGroupClient) DeleteSecurityGroup(ctx context.Context, req *Dele
 		req = proto.Clone(req).(*DeleteSecurityGroupRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/securityGroups/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/securityGroups/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteSecurityGroupRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

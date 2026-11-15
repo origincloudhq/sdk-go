@@ -33,9 +33,17 @@ func (c *BillingAccountClient) Service() *core.Service {
 // GetBillingAccount returns a billing account. Needs `admin.billing_account.get` on the
 // organization.
 func (c *BillingAccountClient) GetBillingAccount(ctx context.Context, req *GetBillingAccountRequest) (*BillingAccount, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/billingAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetBillingAccountRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -56,9 +64,17 @@ func (c *BillingAccountClient) GetBillingAccount(ctx context.Context, req *GetBi
 // ListBillingAccounts lists an organization's billing accounts, oldest first. Needs
 // `admin.billing_account.list` on the organization.
 func (c *BillingAccountClient) ListBillingAccounts(ctx context.Context, req *ListBillingAccountsRequest) (*ListBillingAccountsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListBillingAccountsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -113,9 +129,17 @@ func (c *BillingAccountClient) CreateBillingAccount(ctx context.Context, req *Cr
 		req = proto.Clone(req).(*CreateBillingAccountRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateBillingAccountRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "billingAccount")
 	if err != nil {
@@ -141,9 +165,17 @@ func (c *BillingAccountClient) CreateBillingAccount(ctx context.Context, req *Cr
 // for a billing address outside Germany), or the update is refused. Needs
 // `admin.billing_account.update` on the organization.
 func (c *BillingAccountClient) UpdateBillingAccount(ctx context.Context, req *UpdateBillingAccountRequest) (*BillingAccount, error) {
-	p1, err := core.PathValue("billingAccount.name", req.GetBillingAccount().GetName(), "organizations/*/billingAccounts/*")
+	n1, err := c.service.RelativeName("billingAccount.name", req.GetBillingAccount().GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("billingAccount.name", n1, "organizations/*/billingAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetBillingAccount().GetName() {
+		req = proto.Clone(req).(*UpdateBillingAccountRequest)
+		req.BillingAccount.Name = n1
 	}
 	query, err := core.Query(req, "billingAccount.name", "billingAccount")
 	if err != nil {
@@ -167,9 +199,17 @@ func (c *BillingAccountClient) UpdateBillingAccount(ctx context.Context, req *Up
 // has a spend limit (remove it first). Needs
 // `admin.billing_account.delete` on the organization.
 func (c *BillingAccountClient) DeleteBillingAccount(ctx context.Context, req *DeleteBillingAccountRequest) (*emptypb.Empty, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/billingAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteBillingAccountRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -194,9 +234,17 @@ func (c *BillingAccountClient) DeleteBillingAccount(ctx context.Context, req *De
 // `payment_method.state` is `NOT_REQUIRED`. Needs
 // `admin.billing_account.update` on the organization.
 func (c *BillingAccountClient) StartPaymentMethodSetup(ctx context.Context, req *StartPaymentMethodSetupRequest) (*StartPaymentMethodSetupResponse, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/billingAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*StartPaymentMethodSetupRequest)
+		req.Name = n1
 	}
 	out := new(StartPaymentMethodSetupResponse)
 	if err := c.service.Call(ctx, core.Request{
@@ -220,9 +268,17 @@ func (c *BillingAccountClient) StartPaymentMethodSetup(ctx context.Context, req 
 // whether it did. Needs `admin.billing_account.update` on the
 // organization.
 func (c *BillingAccountClient) ConfirmPaymentMethodSetup(ctx context.Context, req *ConfirmPaymentMethodSetupRequest) (*BillingAccount, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/billingAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*ConfirmPaymentMethodSetupRequest)
+		req.Name = n1
 	}
 	out := new(BillingAccount)
 	if err := c.service.Call(ctx, core.Request{
@@ -238,9 +294,17 @@ func (c *BillingAccountClient) ConfirmPaymentMethodSetup(ctx context.Context, re
 // GetProjectBillingInfo returns which billing account pays for a project. Needs
 // `admin.project.get` on the project.
 func (c *BillingAccountClient) GetProjectBillingInfo(ctx context.Context, req *GetProjectBillingInfoRequest) (*ProjectBillingInfo, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/billingInfo")
+	n1, err := c.service.RelativeName("name", req.GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/billingInfo")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetProjectBillingInfoRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -264,9 +328,17 @@ func (c *BillingAccountClient) GetProjectBillingInfo(ctx context.Context, req *G
 // account, so there is nothing to unlink. Needs `admin.project.attach`
 // on the project, which is separate from access to billing accounts.
 func (c *BillingAccountClient) UpdateProjectBillingInfo(ctx context.Context, req *UpdateProjectBillingInfoRequest) (*ProjectBillingInfo, error) {
-	p1, err := core.PathValue("projectBillingInfo.name", req.GetProjectBillingInfo().GetName(), "projects/*/billingInfo")
+	n1, err := c.service.RelativeName("projectBillingInfo.name", req.GetProjectBillingInfo().GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("projectBillingInfo.name", n1, "projects/*/billingInfo")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetProjectBillingInfo().GetName() {
+		req = proto.Clone(req).(*UpdateProjectBillingInfoRequest)
+		req.ProjectBillingInfo.Name = n1
 	}
 	query, err := core.Query(req, "projectBillingInfo.name", "projectBillingInfo")
 	if err != nil {
@@ -287,9 +359,17 @@ func (c *BillingAccountClient) UpdateProjectBillingInfo(ctx context.Context, req
 // ListProjectBillingInfo lists the projects a billing account pays for, oldest first. Needs
 // `admin.billing_account.get` on the organization.
 func (c *BillingAccountClient) ListProjectBillingInfo(ctx context.Context, req *ListProjectBillingInfoRequest) (*ListProjectBillingInfoResponse, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/billingAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*ListProjectBillingInfoRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -334,9 +414,17 @@ func (c *BillingAccountClient) AllProjectBillingInfos(ctx context.Context, req *
 
 // GetBillingCountry returns a country a billing address may be in.
 func (c *BillingAccountClient) GetBillingCountry(ctx context.Context, req *GetBillingCountryRequest) (*BillingCountry, error) {
-	p1, err := core.PathValue("name", req.GetName(), "billingCountries/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "billingCountries/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetBillingCountryRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
