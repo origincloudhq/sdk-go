@@ -161,6 +161,63 @@ func (x *GetUserRequest) GetName() string {
 	return ""
 }
 
+// The request for LookupUser.
+type LookupUserRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The email address the user's account has verified, matched exactly,
+	// case aside.
+	Email string `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
+	// The organization the caller looks the user up for, where it needs
+	// `iam.role.assign`: `organizations/{organization}`, or its full name.
+	Organization  string `protobuf:"bytes,2,opt,name=organization,proto3" json:"organization,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LookupUserRequest) Reset() {
+	*x = LookupUserRequest{}
+	mi := &file_origincloud_iam_v1beta1_user_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LookupUserRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LookupUserRequest) ProtoMessage() {}
+
+func (x *LookupUserRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_origincloud_iam_v1beta1_user_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LookupUserRequest.ProtoReflect.Descriptor instead.
+func (*LookupUserRequest) Descriptor() ([]byte, []int) {
+	return file_origincloud_iam_v1beta1_user_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *LookupUserRequest) GetEmail() string {
+	if x != nil {
+		return x.Email
+	}
+	return ""
+}
+
+func (x *LookupUserRequest) GetOrganization() string {
+	if x != nil {
+		return x.Organization
+	}
+	return ""
+}
+
 var File_origincloud_iam_v1beta1_user_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_user_proto_rawDesc = "" +
@@ -178,9 +235,15 @@ const file_origincloud_iam_v1beta1_user_proto_rawDesc = "" +
 	"\x1biam.origincloudapis.eu/User\x12\fusers/{user}*\x05users2\x04user\"J\n" +
 	"\x0eGetUserRequest\x128\n" +
 	"\x04name\x18\x01 \x01(\tB$\xe2A\x01\x02\xfaA\x1d\n" +
-	"\x1biam.origincloudapis.eu/UserR\x04name2\xa3\x01\n" +
+	"\x1biam.origincloudapis.eu/UserR\x04name\"\x8d\x01\n" +
+	"\x11LookupUserRequest\x12\x1a\n" +
+	"\x05email\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\x05email\x12\\\n" +
+	"\forganization\x18\x02 \x01(\tB8\xe2A\x01\x02\xfaA1\n" +
+	"/resourcemanager.origincloudapis.eu/OrganizationR\forganization2\xb1\x02\n" +
 	"\vUserService\x12y\n" +
-	"\aGetUser\x12'.origincloud.iam.v1beta1.GetUserRequest\x1a\x1d.origincloud.iam.v1beta1.User\"&\xdaA\x04name\x82\xd3\xe4\x93\x02\x19\x12\x17/v1beta1/{name=users/*}\x1a\x19\xcaA\x16iam.origincloudapis.eub\x06proto3"
+	"\aGetUser\x12'.origincloud.iam.v1beta1.GetUserRequest\x1a\x1d.origincloud.iam.v1beta1.User\"&\xdaA\x04name\x82\xd3\xe4\x93\x02\x19\x12\x17/v1beta1/{name=users/*}\x12\x8b\x01\n" +
+	"\n" +
+	"LookupUser\x12*.origincloud.iam.v1beta1.LookupUserRequest\x1a\x1d.origincloud.iam.v1beta1.User\"2\xdaA\x12email,organization\x82\xd3\xe4\x93\x02\x17\x12\x15/v1beta1/users:lookup\x1a\x19\xcaA\x16iam.origincloudapis.eub\x06proto3"
 
 var (
 	file_origincloud_iam_v1beta1_user_proto_rawDescOnce sync.Once
@@ -194,16 +257,19 @@ func file_origincloud_iam_v1beta1_user_proto_rawDescGZIP() []byte {
 	return file_origincloud_iam_v1beta1_user_proto_rawDescData
 }
 
-var file_origincloud_iam_v1beta1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_origincloud_iam_v1beta1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_origincloud_iam_v1beta1_user_proto_goTypes = []any{
-	(*User)(nil),           // 0: origincloud.iam.v1beta1.User
-	(*GetUserRequest)(nil), // 1: origincloud.iam.v1beta1.GetUserRequest
+	(*User)(nil),              // 0: origincloud.iam.v1beta1.User
+	(*GetUserRequest)(nil),    // 1: origincloud.iam.v1beta1.GetUserRequest
+	(*LookupUserRequest)(nil), // 2: origincloud.iam.v1beta1.LookupUserRequest
 }
 var file_origincloud_iam_v1beta1_user_proto_depIdxs = []int32{
 	1, // 0: origincloud.iam.v1beta1.UserService.GetUser:input_type -> origincloud.iam.v1beta1.GetUserRequest
-	0, // 1: origincloud.iam.v1beta1.UserService.GetUser:output_type -> origincloud.iam.v1beta1.User
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	2, // 1: origincloud.iam.v1beta1.UserService.LookupUser:input_type -> origincloud.iam.v1beta1.LookupUserRequest
+	0, // 2: origincloud.iam.v1beta1.UserService.GetUser:output_type -> origincloud.iam.v1beta1.User
+	0, // 3: origincloud.iam.v1beta1.UserService.LookupUser:output_type -> origincloud.iam.v1beta1.User
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -220,7 +286,7 @@ func file_origincloud_iam_v1beta1_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_origincloud_iam_v1beta1_user_proto_rawDesc), len(file_origincloud_iam_v1beta1_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
