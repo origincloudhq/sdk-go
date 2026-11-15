@@ -6,6 +6,7 @@ package computev1beta1
 import (
 	context "context"
 	core "go.origincloud.eu/sdk/core"
+	proto "google.golang.org/protobuf/proto"
 	http "net/http"
 )
 
@@ -31,9 +32,17 @@ func (c *InstanceTypeClient) Service() *core.Service {
 
 // GetInstanceType returns an instance type.
 func (c *InstanceTypeClient) GetInstanceType(ctx context.Context, req *GetInstanceTypeRequest) (*InstanceType, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "instanceTypes/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "compute")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "instanceTypes/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetInstanceTypeRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -94,9 +103,17 @@ func (c *ImageFamilyClient) Service() *core.Service {
 
 // GetImageFamily returns an image family.
 func (c *ImageFamilyClient) GetImageFamily(ctx context.Context, req *GetImageFamilyRequest) (*ImageFamily, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "imageFamilies/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "compute")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "imageFamilies/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetImageFamilyRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

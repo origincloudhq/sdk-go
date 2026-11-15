@@ -35,9 +35,17 @@ func (c *KeyPairClient) Service() *core.Service {
 
 // GetKeyPair returns a key pair, its public key only.
 func (c *KeyPairClient) GetKeyPair(ctx context.Context, req *GetKeyPairRequest) (*KeyPair, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/keyPairs/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "compute")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/keyPairs/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetKeyPairRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -57,9 +65,17 @@ func (c *KeyPairClient) GetKeyPair(ctx context.Context, req *GetKeyPairRequest) 
 
 // ListKeyPairs lists a project's key pairs, oldest first.
 func (c *KeyPairClient) ListKeyPairs(ctx context.Context, req *ListKeyPairsRequest) (*ListKeyPairsResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListKeyPairsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -113,9 +129,17 @@ func (c *KeyPairClient) CreateKeyPair(ctx context.Context, req *CreateKeyPairReq
 		req = proto.Clone(req).(*CreateKeyPairRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateKeyPairRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "keyPair")
 	if err != nil {
@@ -136,9 +160,17 @@ func (c *KeyPairClient) CreateKeyPair(ctx context.Context, req *CreateKeyPairReq
 
 // UpdateKeyPair changes a key pair's tags.
 func (c *KeyPairClient) UpdateKeyPair(ctx context.Context, req *UpdateKeyPairRequest) (*KeyPair, error) {
-	p1, err := c.service.PathValue("keyPair.name", req.GetKeyPair().GetName(), "projects/*/keyPairs/*")
+	n1, err := c.service.RelativeName("keyPair.name", req.GetKeyPair().GetName(), "compute")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("keyPair.name", n1, "projects/*/keyPairs/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetKeyPair().GetName() {
+		req = proto.Clone(req).(*UpdateKeyPairRequest)
+		req.KeyPair.Name = n1
 	}
 	query, err := core.Query(req, "keyPair.name", "keyPair")
 	if err != nil {
@@ -158,9 +190,17 @@ func (c *KeyPairClient) UpdateKeyPair(ctx context.Context, req *UpdateKeyPairReq
 
 // DeleteKeyPair deletes a key pair. Instances launched with it keep the key installed.
 func (c *KeyPairClient) DeleteKeyPair(ctx context.Context, req *DeleteKeyPairRequest) (*emptypb.Empty, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/keyPairs/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "compute")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/keyPairs/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteKeyPairRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

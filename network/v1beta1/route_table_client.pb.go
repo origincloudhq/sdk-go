@@ -35,9 +35,17 @@ func (c *RouteTableClient) Service() *core.Service {
 
 // GetRouteTable returns a route table.
 func (c *RouteTableClient) GetRouteTable(ctx context.Context, req *GetRouteTableRequest) (*RouteTable, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/routeTables/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/routeTables/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetRouteTableRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -57,9 +65,17 @@ func (c *RouteTableClient) GetRouteTable(ctx context.Context, req *GetRouteTable
 
 // ListRouteTables lists the route tables in a region, oldest first.
 func (c *RouteTableClient) ListRouteTables(ctx context.Context, req *ListRouteTablesRequest) (*ListRouteTablesResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/regions/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListRouteTablesRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -111,9 +127,17 @@ func (c *RouteTableClient) CreateRouteTable(ctx context.Context, req *CreateRout
 		req = proto.Clone(req).(*CreateRouteTableRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/regions/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateRouteTableRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "routeTable")
 	if err != nil {
@@ -141,9 +165,17 @@ func (c *RouteTableClient) UpdateRouteTable(ctx context.Context, req *UpdateRout
 		req = proto.Clone(req).(*UpdateRouteTableRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("routeTable.name", req.GetRouteTable().GetName(), "projects/*/regions/*/routeTables/*")
+	n1, err := c.service.RelativeName("routeTable.name", req.GetRouteTable().GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("routeTable.name", n1, "projects/*/regions/*/routeTables/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetRouteTable().GetName() {
+		req = proto.Clone(req).(*UpdateRouteTableRequest)
+		req.RouteTable.Name = n1
 	}
 	query, err := core.Query(req, "routeTable.name", "routeTable")
 	if err != nil {
@@ -173,9 +205,17 @@ func (c *RouteTableClient) DeleteRouteTable(ctx context.Context, req *DeleteRout
 		req = proto.Clone(req).(*DeleteRouteTableRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/routeTables/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/routeTables/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteRouteTableRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

@@ -39,9 +39,17 @@ func (c *AuditLogClient) Service() *core.Service {
 // GetAuditLogEntry returns an audit log entry. Needs `iam.audit_log.list` on the
 // organization.
 func (c *AuditLogClient) GetAuditLogEntry(ctx context.Context, req *GetAuditLogEntryRequest) (*AuditLogEntry, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/auditLogEntries/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "iam")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/auditLogEntries/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetAuditLogEntryRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -63,9 +71,17 @@ func (c *AuditLogClient) GetAuditLogEntry(ctx context.Context, req *GetAuditLogE
 // optionally only a project's, an actor's or an action's. Needs
 // `iam.audit_log.list` on the organization.
 func (c *AuditLogClient) ListAuditLogEntries(ctx context.Context, req *ListAuditLogEntriesRequest) (*ListAuditLogEntriesResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListAuditLogEntriesRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {

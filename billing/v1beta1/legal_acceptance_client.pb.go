@@ -36,9 +36,17 @@ func (c *LegalAcceptanceClient) Service() *core.Service {
 // ListLegalAcceptances lists a billing account's acceptances, the latest first. Needs
 // `admin.billing_account.get` on the organization.
 func (c *LegalAcceptanceClient) ListLegalAcceptances(ctx context.Context, req *ListLegalAcceptancesRequest) (*ListLegalAcceptancesResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*/billingAccounts/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*/billingAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListLegalAcceptancesRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -84,9 +92,17 @@ func (c *LegalAcceptanceClient) AllLegalAcceptances(ctx context.Context, req *Li
 // GetLegalAcceptance returns one of a billing account's acceptances. Needs
 // `admin.billing_account.get` on the organization.
 func (c *LegalAcceptanceClient) GetLegalAcceptance(ctx context.Context, req *GetLegalAcceptanceRequest) (*LegalAcceptance, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*/legalAcceptances/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/billingAccounts/*/legalAcceptances/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetLegalAcceptanceRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -111,9 +127,17 @@ func (c *LegalAcceptanceClient) GetLegalAcceptance(ctx context.Context, req *Get
 // `acts_as_business` must be true: the services are offered to businesses
 // only. Needs `admin.billing_account.update` on the organization.
 func (c *LegalAcceptanceClient) AcceptLegalDocuments(ctx context.Context, req *AcceptLegalDocumentsRequest) (*ListLegalAcceptancesResponse, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/billingAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*AcceptLegalDocumentsRequest)
+		req.Name = n1
 	}
 	out := new(ListLegalAcceptancesResponse)
 	if err := c.service.Call(ctx, core.Request{
@@ -133,9 +157,17 @@ func (c *LegalAcceptanceClient) AcceptLegalDocuments(ctx context.Context, req *A
 // account is refused. Running resources are never affected. Needs
 // `admin.billing_account.get` on the organization.
 func (c *LegalAcceptanceClient) QueryLegalRequirements(ctx context.Context, req *QueryLegalRequirementsRequest) (*QueryLegalRequirementsResponse, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/billingAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*QueryLegalRequirementsRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

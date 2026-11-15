@@ -38,9 +38,17 @@ func (c *ServiceAccountClient) Service() *core.Service {
 // GetServiceAccount returns a service account, deleted or not. Needs
 // `iam.service_account.list` on the organization.
 func (c *ServiceAccountClient) GetServiceAccount(ctx context.Context, req *GetServiceAccountRequest) (*ServiceAccount, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "iam")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/serviceAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetServiceAccountRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -62,9 +70,17 @@ func (c *ServiceAccountClient) GetServiceAccount(ctx context.Context, req *GetSe
 // are listed only when `show_deleted` is set. Needs
 // `iam.service_account.list` on the organization.
 func (c *ServiceAccountClient) ListServiceAccounts(ctx context.Context, req *ListServiceAccountsRequest) (*ListServiceAccountsResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListServiceAccountsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -116,9 +132,17 @@ func (c *ServiceAccountClient) CreateServiceAccount(ctx context.Context, req *Cr
 		req = proto.Clone(req).(*CreateServiceAccountRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateServiceAccountRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "serviceAccount")
 	if err != nil {
@@ -149,9 +173,17 @@ func (c *ServiceAccountClient) RotateServiceAccountSecret(ctx context.Context, r
 		req = proto.Clone(req).(*RotateServiceAccountSecretRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "iam")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/serviceAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*RotateServiceAccountSecretRequest)
+		req.Name = n1
 	}
 	out := new(ServiceAccount)
 	if err := c.service.Call(ctx, core.Request{
@@ -172,9 +204,17 @@ func (c *ServiceAccountClient) RotateServiceAccountSecret(ctx context.Context, r
 // account succeeds. Needs `iam.service_account.revoke` on the
 // organization.
 func (c *ServiceAccountClient) DeleteServiceAccount(ctx context.Context, req *DeleteServiceAccountRequest) (*emptypb.Empty, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "iam")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/serviceAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteServiceAccountRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

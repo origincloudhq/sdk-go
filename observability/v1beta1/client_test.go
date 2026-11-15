@@ -2,6 +2,7 @@ package observabilityv1beta1_test
 
 import (
 	"context"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -110,5 +111,50 @@ func TestTheTimeSeriesDecodeTheirPoints(t *testing.T) {
 	if series.GetMetric() != "oc_compute_instance_cpu_seconds_total" || series.GetResource() != instance || series.GetUnit() != "s/s" ||
 		len(points) != 2 || points[1].GetValue() != 0.5 || !points[1].GetEndTime().AsTime().Equal(time.Date(2026, 11, 4, 9, 10, 0, 0, time.UTC)) {
 		t.Errorf("got %v", series)
+	}
+}
+
+// A query's parent is a project, resourcemanager's: its full name is sent
+// as its relative name, the same request as projects/p makes. A full name
+// on any other host is refused before sending, naming the host the field
+// takes: the client's own service's is no project's.
+func TestAParentTakesTheFullNameOfTheProjectItRefersTo(t *testing.T) {
+	rec := &recorder{body: `{}`}
+	metrics := newClient(t, rec)
+	ctx := context.Background()
+
+	for _, parent := range []string{"projects/p", "//resourcemanager.origincloudapis.eu/projects/p"} {
+		req := query()
+		req.Parent = parent
+		if _, err := metrics.QueryTimeSeries(ctx, req); err != nil {
+			t.Fatalf("%s: %v", parent, err)
+		}
+		if req.GetParent() != parent {
+			t.Errorf("the caller's request was changed: %q", req.GetParent())
+		}
+	}
+	if len(rec.urls) != 2 || rec.urls[0].String() != rec.urls[1].String() || rec.urls[1].EscapedPath() != "/v1beta1/projects/p/timeSeries:query" {
+		t.Fatalf("sent %v", rec.urls)
+	}
+
+	for _, parent := range []string{
+		"//pvs.origincloudapis.eu/projects/p",
+		"//observability.origincloudapis.eu/projects/p",
+		"//resourcemanager.eu-central1.origincloudapis.eu/projects/p",
+	} {
+		req := query()
+		req.Parent = parent
+		_, err := metrics.QueryTimeSeries(ctx, req)
+		if err == nil || !strings.Contains(err.Error(), "parent must be a name on resourcemanager.origincloudapis.eu") {
+			t.Errorf("%s: %v", parent, err)
+		}
+	}
+	req := query()
+	req.Parent = "//pvs.origincloudapis.eu/projects/p"
+	if _, err := metrics.QueryTimeSeries(ctx, req); !errors.Is(err, core.ErrOtherService) {
+		t.Errorf("pvs: %v", err)
+	}
+	if len(rec.urls) != 2 {
+		t.Fatalf("sent %d calls", len(rec.urls))
 	}
 }

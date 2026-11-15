@@ -6,6 +6,7 @@ package billingv1beta1
 import (
 	context "context"
 	core "go.origincloud.eu/sdk/core"
+	proto "google.golang.org/protobuf/proto"
 	http "net/http"
 )
 
@@ -35,9 +36,17 @@ func (c *SpendLimitClient) Service() *core.Service {
 // GetSpendLimit returns a billing account's spend limit; one that has none has no
 // `limit`. Needs `admin.spend_limit.get` on the organization.
 func (c *SpendLimitClient) GetSpendLimit(ctx context.Context, req *GetSpendLimitRequest) (*SpendLimit, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*/spendLimit")
+	n1, err := c.service.RelativeName("name", req.GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/billingAccounts/*/spendLimit")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetSpendLimitRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -60,9 +69,17 @@ func (c *SpendLimitClient) GetSpendLimit(ctx context.Context, req *GetSpendLimit
 // without a `limit` is removed, with its thresholds and recipients. Needs
 // `admin.spend_limit.update` on the organization.
 func (c *SpendLimitClient) UpdateSpendLimit(ctx context.Context, req *UpdateSpendLimitRequest) (*SpendLimit, error) {
-	p1, err := c.service.PathValue("spendLimit.name", req.GetSpendLimit().GetName(), "organizations/*/billingAccounts/*/spendLimit")
+	n1, err := c.service.RelativeName("spendLimit.name", req.GetSpendLimit().GetName(), "billing")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("spendLimit.name", n1, "organizations/*/billingAccounts/*/spendLimit")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetSpendLimit().GetName() {
+		req = proto.Clone(req).(*UpdateSpendLimitRequest)
+		req.SpendLimit.Name = n1
 	}
 	query, err := core.Query(req, "spendLimit.name", "spendLimit")
 	if err != nil {

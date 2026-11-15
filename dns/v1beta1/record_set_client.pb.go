@@ -40,9 +40,17 @@ func (c *RecordSetClient) Service() *core.Service {
 
 // GetRecordSet returns a record set.
 func (c *RecordSetClient) GetRecordSet(ctx context.Context, req *GetRecordSetRequest) (*RecordSet, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/hostedZones/*/recordSets/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "dns")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/hostedZones/*/recordSets/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetRecordSetRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -62,9 +70,17 @@ func (c *RecordSetClient) GetRecordSet(ctx context.Context, req *GetRecordSetReq
 
 // ListRecordSets lists a zone's record sets by `dns_name`, then by `type`.
 func (c *RecordSetClient) ListRecordSets(ctx context.Context, req *ListRecordSetsRequest) (*ListRecordSetsResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "dns")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/hostedZones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListRecordSetsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -119,9 +135,17 @@ func (c *RecordSetClient) CreateRecordSet(ctx context.Context, req *CreateRecord
 		req = proto.Clone(req).(*CreateRecordSetRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "dns")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/hostedZones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateRecordSetRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "recordSet")
 	if err != nil {
@@ -150,9 +174,17 @@ func (c *RecordSetClient) UpdateRecordSet(ctx context.Context, req *UpdateRecord
 		req = proto.Clone(req).(*UpdateRecordSetRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("recordSet.name", req.GetRecordSet().GetName(), "projects/*/hostedZones/*/recordSets/*")
+	n1, err := c.service.RelativeName("recordSet.name", req.GetRecordSet().GetName(), "dns")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("recordSet.name", n1, "projects/*/hostedZones/*/recordSets/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetRecordSet().GetName() {
+		req = proto.Clone(req).(*UpdateRecordSetRequest)
+		req.RecordSet.Name = n1
 	}
 	query, err := core.Query(req, "recordSet.name", "recordSet")
 	if err != nil {
@@ -177,9 +209,17 @@ func (c *RecordSetClient) DeleteRecordSet(ctx context.Context, req *DeleteRecord
 		req = proto.Clone(req).(*DeleteRecordSetRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/hostedZones/*/recordSets/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "dns")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/hostedZones/*/recordSets/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteRecordSetRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -209,9 +249,17 @@ func (c *RecordSetClient) BatchChangeRecordSets(ctx context.Context, req *BatchC
 		req = proto.Clone(req).(*BatchChangeRecordSetsRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "dns")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/hostedZones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*BatchChangeRecordSetsRequest)
+		req.Parent = n1
 	}
 	out := new(BatchChangeRecordSetsResponse)
 	if err := c.service.Call(ctx, core.Request{

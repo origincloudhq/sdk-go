@@ -34,9 +34,17 @@ func (c *SnapshotClient) Service() *core.Service {
 
 // GetSnapshot returns a snapshot.
 func (c *SnapshotClient) GetSnapshot(ctx context.Context, req *GetSnapshotRequest) (*Snapshot, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/snapshots/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/snapshots/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetSnapshotRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -59,9 +67,17 @@ func (c *SnapshotClient) GetSnapshot(ctx context.Context, req *GetSnapshotReques
 // `pvs` with the location service (`location.origincloudapis.eu`), then
 // each zone's snapshots.
 func (c *SnapshotClient) ListSnapshots(ctx context.Context, req *ListSnapshotsRequest) (*ListSnapshotsResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListSnapshotsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -113,9 +129,17 @@ func (c *SnapshotClient) CreateSnapshot(ctx context.Context, req *CreateSnapshot
 		req = proto.Clone(req).(*CreateSnapshotRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateSnapshotRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "snapshot")
 	if err != nil {
@@ -136,9 +160,17 @@ func (c *SnapshotClient) CreateSnapshot(ctx context.Context, req *CreateSnapshot
 
 // UpdateSnapshot changes a snapshot's tags.
 func (c *SnapshotClient) UpdateSnapshot(ctx context.Context, req *UpdateSnapshotRequest) (*Snapshot, error) {
-	p1, err := c.service.PathValue("snapshot.name", req.GetSnapshot().GetName(), "projects/*/zones/*/snapshots/*")
+	n1, err := c.service.RelativeName("snapshot.name", req.GetSnapshot().GetName(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("snapshot.name", n1, "projects/*/zones/*/snapshots/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetSnapshot().GetName() {
+		req = proto.Clone(req).(*UpdateSnapshotRequest)
+		req.Snapshot.Name = n1
 	}
 	query, err := core.Query(req, "snapshot.name", "snapshot")
 	if err != nil {
@@ -165,9 +197,17 @@ func (c *SnapshotClient) DeleteSnapshot(ctx context.Context, req *DeleteSnapshot
 		req = proto.Clone(req).(*DeleteSnapshotRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/snapshots/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/snapshots/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteSnapshotRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -194,9 +234,17 @@ func (c *SnapshotClient) ProtectSnapshot(ctx context.Context, req *ProtectSnapsh
 		req = proto.Clone(req).(*ProtectSnapshotRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/snapshots/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/snapshots/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*ProtectSnapshotRequest)
+		req.Name = n1
 	}
 	out := new(longrunningpb.Operation)
 	if err := c.service.Call(ctx, core.Request{
@@ -221,9 +269,17 @@ func (c *SnapshotClient) UnprotectSnapshot(ctx context.Context, req *UnprotectSn
 		req = proto.Clone(req).(*UnprotectSnapshotRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/snapshots/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "pvs")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/snapshots/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*UnprotectSnapshotRequest)
+		req.Name = n1
 	}
 	out := new(longrunningpb.Operation)
 	if err := c.service.Call(ctx, core.Request{

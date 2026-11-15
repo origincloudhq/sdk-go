@@ -38,9 +38,17 @@ func (c *KeyClient) Service() *core.Service {
 
 // GetKey returns a key, deleted or not. Needs `kms.key.get` on the project.
 func (c *KeyClient) GetKey(ctx context.Context, req *GetKeyRequest) (*Key, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "kms")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/keys/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetKeyRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -63,9 +71,17 @@ func (c *KeyClient) GetKey(ctx context.Context, req *GetKeyRequest) (*Key, error
 // than `page_size` and still be followed by another. Needs `kms.key.list`
 // on the project.
 func (c *KeyClient) ListKeys(ctx context.Context, req *ListKeysRequest) (*ListKeysResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "kms")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/regions/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListKeysRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -116,9 +132,17 @@ func (c *KeyClient) CreateKey(ctx context.Context, req *CreateKeyRequest) (*Key,
 		req = proto.Clone(req).(*CreateKeyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "kms")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/regions/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateKeyRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "key")
 	if err != nil {
@@ -150,9 +174,17 @@ func (c *KeyClient) UpdateKey(ctx context.Context, req *UpdateKeyRequest) (*Key,
 		req = proto.Clone(req).(*UpdateKeyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("key.name", req.GetKey().GetName(), "projects/*/regions/*/keys/*")
+	n1, err := c.service.RelativeName("key.name", req.GetKey().GetName(), "kms")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("key.name", n1, "projects/*/regions/*/keys/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetKey().GetName() {
+		req = proto.Clone(req).(*UpdateKeyRequest)
+		req.Key.Name = n1
 	}
 	query, err := core.Query(req, "key.name", "key")
 	if err != nil {
@@ -182,9 +214,17 @@ func (c *KeyClient) DeleteKey(ctx context.Context, req *DeleteKeyRequest) (*Key,
 		req = proto.Clone(req).(*DeleteKeyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "kms")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/keys/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteKeyRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -212,9 +252,17 @@ func (c *KeyClient) UndeleteKey(ctx context.Context, req *UndeleteKeyRequest) (*
 		req = proto.Clone(req).(*UndeleteKeyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "kms")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/keys/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*UndeleteKeyRequest)
+		req.Name = n1
 	}
 	out := new(Key)
 	if err := c.service.Call(ctx, core.Request{
@@ -238,9 +286,17 @@ func (c *KeyClient) RotateKey(ctx context.Context, req *RotateKeyRequest) (*Key,
 		req = proto.Clone(req).(*RotateKeyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "kms")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/keys/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*RotateKeyRequest)
+		req.Name = n1
 	}
 	out := new(Key)
 	if err := c.service.Call(ctx, core.Request{
@@ -260,9 +316,17 @@ func (c *KeyClient) RotateKey(ctx context.Context, req *RotateKeyRequest) (*Key,
 // that isn't enabled, and with `BAD_REQUEST` for a signing key. Needs
 // `kms.key.encrypt` on the project.
 func (c *KeyClient) Encrypt(ctx context.Context, req *EncryptRequest) (*EncryptResponse, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "kms")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/keys/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*EncryptRequest)
+		req.Name = n1
 	}
 	out := new(EncryptResponse)
 	if err := c.service.Call(ctx, core.Request{
@@ -281,9 +345,17 @@ func (c *KeyClient) Encrypt(ctx context.Context, req *EncryptRequest) (*EncryptR
 // `CONFLICT` for a key that isn't enabled. Needs `kms.key.decrypt` on the
 // project.
 func (c *KeyClient) Decrypt(ctx context.Context, req *DecryptRequest) (*DecryptResponse, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "kms")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/keys/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DecryptRequest)
+		req.Name = n1
 	}
 	out := new(DecryptResponse)
 	if err := c.service.Call(ctx, core.Request{
@@ -302,9 +374,17 @@ func (c *KeyClient) Decrypt(ctx context.Context, req *DecryptRequest) (*DecryptR
 // it, and recover the data key with Decrypt when you need it. Needs
 // `kms.key.generate_data_key` on the project.
 func (c *KeyClient) GenerateDataKey(ctx context.Context, req *GenerateDataKeyRequest) (*GenerateDataKeyResponse, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "kms")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/keys/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GenerateDataKeyRequest)
+		req.Name = n1
 	}
 	out := new(GenerateDataKeyResponse)
 	if err := c.service.Call(ctx, core.Request{
@@ -323,9 +403,17 @@ func (c *KeyClient) GenerateDataKey(ctx context.Context, req *GenerateDataKeyReq
 // `CONFLICT` for a key that isn't enabled, and with `BAD_REQUEST` for an
 // `ENCRYPT_DECRYPT` key. Needs `kms.key.sign` on the project.
 func (c *KeyClient) Sign(ctx context.Context, req *SignRequest) (*SignResponse, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "kms")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/keys/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*SignRequest)
+		req.Name = n1
 	}
 	out := new(SignResponse)
 	if err := c.service.Call(ctx, core.Request{
@@ -343,9 +431,17 @@ func (c *KeyClient) Sign(ctx context.Context, req *SignRequest) (*SignResponse, 
 // destroyed. Refused with `BAD_REQUEST` for an `ENCRYPT_DECRYPT` key.
 // Needs `kms.key.get_public_key` on the project.
 func (c *KeyClient) GetPublicKey(ctx context.Context, req *GetPublicKeyRequest) (*PublicKey, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*/versions/*/publicKey")
+	n1, err := c.service.RelativeName("name", req.GetName(), "kms")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/keys/*/versions/*/publicKey")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetPublicKeyRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

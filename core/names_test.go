@@ -309,7 +309,7 @@ func TestAPathNameIsTheRelativeNameOfTheClientsOwnService(t *testing.T) {
 		"projects/p 1/zones/z": "projects/p 1/zones/z",
 		"":                     "",
 	} {
-		if got, err := pathName("pvs", "name", value); err != nil || got != sent {
+		if got, err := pathName("pvs", nil, "name", value); err != nil || got != sent {
 			t.Errorf("%q: %q, %v", value, got, err)
 		}
 	}
@@ -321,7 +321,7 @@ func TestAPathNameOfAnotherHostOrNoFullNameIsRefused(t *testing.T) {
 		reason error
 		says   string
 	}{
-		{"//compute.origincloudapis.eu/projects/p/zones/z/instances/i", ErrOtherService, "name must be a name on pvs.origincloudapis.eu, the host this client calls"},
+		{"//compute.origincloudapis.eu/projects/p/zones/z/instances/i", ErrOtherService, "name must be a name on pvs.origincloudapis.eu, got"},
 		{"//resourcemanager.origincloudapis.eu/projects/p", ErrOtherService, "a name on resourcemanager.origincloudapis.eu"},
 		{"//pvs.eu-central1-az1.origincloudapis.eu/projects/p/zones/z/volumes/v", ErrNotGlobalHost, "the service's global host, pvs.origincloudapis.eu"},
 		{"//pvs.eu-central1.origincloudapis.eu/projects/p/zones/z/volumes/v", ErrNotGlobalHost, "the service's global host"},
@@ -332,13 +332,47 @@ func TestAPathNameOfAnotherHostOrNoFullNameIsRefused(t *testing.T) {
 		{"//pvs.origincloudapis.eu/projects/p q/zones/z/volumes/v", ErrInvalidSegment, "has the segment"},
 		{"//example.com/projects/p", ErrUnknownService, "is not the host of one of the platform's APIs"},
 	} {
-		_, err := pathName("pvs", "name", c.value)
+		_, err := pathName("pvs", nil, "name", c.value)
 		if !errors.Is(err, c.reason) || !strings.HasPrefix(err.Error(), "origincloud: name") || !strings.Contains(err.Error(), c.says) {
 			t.Errorf("%q: %v", c.value, err)
 		}
 	}
 	// A service with no resources takes no full name at all.
-	if _, err := pathName("observability", "parent", "//observability.origincloudapis.eu/projects/p"); err == nil {
+	if _, err := pathName("observability", nil, "parent", "//observability.origincloudapis.eu/projects/p"); err == nil {
 		t.Error("observability took a full name")
+	}
+}
+
+// A path field referring to another service's type takes that service's
+// full names, and no other's.
+func TestAPathNameIsCheckedAgainstTheTypeTheFieldRefersTo(t *testing.T) {
+	const project = "//resourcemanager.origincloudapis.eu/projects/p"
+	for _, own := range []string{"billing", "observability"} {
+		for _, value := range []string{project, "projects/p"} {
+			if got, err := pathName(own, []string{"resourcemanager"}, "parent", value); err != nil || got != "projects/p" {
+				t.Errorf("%s %s: %q, %v", own, value, got, err)
+			}
+		}
+		_, err := pathName(own, []string{"resourcemanager"}, "parent", "//pvs.origincloudapis.eu/projects/p")
+		if !errors.Is(err, ErrOtherService) || !strings.Contains(err.Error(), "parent must be a name on resourcemanager.origincloudapis.eu, got") {
+			t.Errorf("%s pvs: %v", own, err)
+		}
+		// The client's own host isn't one the field takes.
+		_, err = pathName(own, []string{"resourcemanager"}, "parent", "//"+own+".origincloudapis.eu/projects/p")
+		if err == nil || !strings.HasPrefix(err.Error(), "origincloud: parent must be a name on resourcemanager.origincloudapis.eu") {
+			t.Errorf("%s own: %v", own, err)
+		}
+	}
+	_, err := pathName("iam", []string{"compute", "location"}, "parent", "//pvs.origincloudapis.eu/zones/z")
+	if err == nil || !strings.Contains(err.Error(), "must be a name on one of compute.origincloudapis.eu, location.origincloudapis.eu") {
+		t.Errorf("several: %v", err)
+	}
+	for _, value := range []string{volumeName, project} {
+		if _, err := pathName("iam", []string{AnyService}, "resource", value); err != nil {
+			t.Errorf("any %s: %v", value, err)
+		}
+	}
+	if _, err := pathName("iam", []string{AnyService}, "resource", "//sts.origincloudapis.eu/x/y"); !errors.Is(err, ErrUnknownService) {
+		t.Errorf("any sts: %v", err)
 	}
 }

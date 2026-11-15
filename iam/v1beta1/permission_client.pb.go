@@ -6,6 +6,7 @@ package iamv1beta1
 import (
 	context "context"
 	core "go.origincloud.eu/sdk/core"
+	proto "google.golang.org/protobuf/proto"
 	http "net/http"
 )
 
@@ -32,9 +33,17 @@ func (c *PermissionClient) Service() *core.Service {
 
 // GetPermission returns a permission.
 func (c *PermissionClient) GetPermission(ctx context.Context, req *GetPermissionRequest) (*Permission, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "permissions/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "iam")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "permissions/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetPermissionRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -79,9 +88,17 @@ func (c *PermissionClient) ListPermissions(ctx context.Context, req *ListPermiss
 // the project answers for each of its resources. A permission the
 // catalog doesn't name is never held.
 func (c *PermissionClient) TestIamPermissions(ctx context.Context, req *TestIamPermissionsRequest) (*TestIamPermissionsResponse, error) {
-	p1, err := c.service.PathValue("resource", req.GetResource(), "*/*")
+	n1, err := c.service.RelativeName("resource", req.GetResource(), "*")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("resource", n1, "*/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetResource() {
+		req = proto.Clone(req).(*TestIamPermissionsRequest)
+		req.Resource = n1
 	}
 	out := new(TestIamPermissionsResponse)
 	if err := c.service.Call(ctx, core.Request{

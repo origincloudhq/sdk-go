@@ -6,6 +6,7 @@ package locationv1beta1
 import (
 	context "context"
 	core "go.origincloud.eu/sdk/core"
+	proto "google.golang.org/protobuf/proto"
 	http "net/http"
 )
 
@@ -32,9 +33,17 @@ func (c *LocationClient) Service() *core.Service {
 
 // GetRegion returns a region.
 func (c *LocationClient) GetRegion(ctx context.Context, req *GetRegionRequest) (*Region, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "regions/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "location")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "regions/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetRegionRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -72,9 +81,17 @@ func (c *LocationClient) ListRegions(ctx context.Context, req *ListRegionsReques
 
 // GetZone returns a zone.
 func (c *LocationClient) GetZone(ctx context.Context, req *GetZoneRequest) (*Zone, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "zones/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "location")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetZoneRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

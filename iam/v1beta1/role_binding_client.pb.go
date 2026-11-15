@@ -57,9 +57,17 @@ func (c *RoleBindingClient) Service() *core.Service {
 
 // GetRoleBinding returns a role binding. Needs `iam.member.list` on the organization.
 func (c *RoleBindingClient) GetRoleBinding(ctx context.Context, req *GetRoleBindingRequest) (*RoleBinding, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/roleBindings/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "iam")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/roleBindings/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetRoleBindingRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -83,9 +91,17 @@ func (c *RoleBindingClient) GetRoleBinding(ctx context.Context, req *GetRoleBind
 // every organization and needs no permission; `member` must be empty
 // there.
 func (c *RoleBindingClient) ListRoleBindings(ctx context.Context, req *ListRoleBindingsRequest) (*ListRoleBindingsResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListRoleBindingsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -143,9 +159,17 @@ func (c *RoleBindingClient) CreateRoleBinding(ctx context.Context, req *CreateRo
 		req = proto.Clone(req).(*CreateRoleBindingRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateRoleBindingRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "roleBinding")
 	if err != nil {
@@ -174,9 +198,17 @@ func (c *RoleBindingClient) DeleteRoleBinding(ctx context.Context, req *DeleteRo
 		req = proto.Clone(req).(*DeleteRoleBindingRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/roleBindings/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "iam")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/roleBindings/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteRoleBindingRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

@@ -7,6 +7,7 @@ import (
 	longrunningpb "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	context "context"
 	core "go.origincloud.eu/sdk/core"
+	proto "google.golang.org/protobuf/proto"
 	http "net/http"
 )
 
@@ -32,9 +33,17 @@ func NewOperationClient(service *core.Service) *OperationClient {
 
 // GetOperation returns an operation as it is now.
 func (c *OperationClient) GetOperation(ctx context.Context, req *GetOperationRequest) (*longrunningpb.Operation, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/operations/*")
+	n1, err := c.service.RelativeName("name", req.GetName())
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/operations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetOperationRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -56,9 +65,17 @@ func (c *OperationClient) GetOperation(ctx context.Context, req *GetOperationReq
 // comes first, and returns it as it is then. It only reads, so a client
 // may repeat it after a transport error.
 func (c *OperationClient) WaitOperation(ctx context.Context, req *WaitOperationRequest) (*longrunningpb.Operation, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/operations/*")
+	n1, err := c.service.RelativeName("name", req.GetName())
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/operations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*WaitOperationRequest)
+		req.Name = n1
 	}
 	out := new(longrunningpb.Operation)
 	if err := c.service.Call(ctx, core.Request{

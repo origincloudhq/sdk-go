@@ -35,9 +35,17 @@ func (c *SubnetClient) Service() *core.Service {
 
 // GetSubnet returns a subnet.
 func (c *SubnetClient) GetSubnet(ctx context.Context, req *GetSubnetRequest) (*Subnet, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/subnets/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/subnets/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetSubnetRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -59,9 +67,17 @@ func (c *SubnetClient) GetSubnet(ctx context.Context, req *GetSubnetRequest) (*S
 // list the zones whose `services` name `network` with the location
 // service (`location.origincloudapis.eu`), then each zone's subnets.
 func (c *SubnetClient) ListSubnets(ctx context.Context, req *ListSubnetsRequest) (*ListSubnetsResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListSubnetsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -115,9 +131,17 @@ func (c *SubnetClient) CreateSubnet(ctx context.Context, req *CreateSubnetReques
 		req = proto.Clone(req).(*CreateSubnetRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateSubnetRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "subnet")
 	if err != nil {
@@ -146,9 +170,17 @@ func (c *SubnetClient) UpdateSubnet(ctx context.Context, req *UpdateSubnetReques
 		req = proto.Clone(req).(*UpdateSubnetRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("subnet.name", req.GetSubnet().GetName(), "projects/*/zones/*/subnets/*")
+	n1, err := c.service.RelativeName("subnet.name", req.GetSubnet().GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("subnet.name", n1, "projects/*/zones/*/subnets/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetSubnet().GetName() {
+		req = proto.Clone(req).(*UpdateSubnetRequest)
+		req.Subnet.Name = n1
 	}
 	query, err := core.Query(req, "subnet.name", "subnet")
 	if err != nil {
@@ -178,9 +210,17 @@ func (c *SubnetClient) DeleteSubnet(ctx context.Context, req *DeleteSubnetReques
 		req = proto.Clone(req).(*DeleteSubnetRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/subnets/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/subnets/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteSubnetRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

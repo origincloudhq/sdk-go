@@ -36,9 +36,17 @@ func (c *VpcClient) Service() *core.Service {
 
 // GetVpc returns a VPC.
 func (c *VpcClient) GetVpc(ctx context.Context, req *GetVpcRequest) (*Vpc, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/vpcs/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/vpcs/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetVpcRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -58,9 +66,17 @@ func (c *VpcClient) GetVpc(ctx context.Context, req *GetVpcRequest) (*Vpc, error
 
 // ListVpcs lists the VPCs in a region, oldest first.
 func (c *VpcClient) ListVpcs(ctx context.Context, req *ListVpcsRequest) (*ListVpcsResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/regions/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListVpcsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -114,9 +130,17 @@ func (c *VpcClient) CreateVpc(ctx context.Context, req *CreateVpcRequest) (*core
 		req = proto.Clone(req).(*CreateVpcRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/regions/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateVpcRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "vpc")
 	if err != nil {
@@ -144,9 +168,17 @@ func (c *VpcClient) UpdateVpc(ctx context.Context, req *UpdateVpcRequest) (*core
 		req = proto.Clone(req).(*UpdateVpcRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("vpc.name", req.GetVpc().GetName(), "projects/*/regions/*/vpcs/*")
+	n1, err := c.service.RelativeName("vpc.name", req.GetVpc().GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("vpc.name", n1, "projects/*/regions/*/vpcs/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetVpc().GetName() {
+		req = proto.Clone(req).(*UpdateVpcRequest)
+		req.Vpc.Name = n1
 	}
 	query, err := core.Query(req, "vpc.name", "vpc")
 	if err != nil {
@@ -177,9 +209,17 @@ func (c *VpcClient) DeleteVpc(ctx context.Context, req *DeleteVpcRequest) (*core
 		req = proto.Clone(req).(*DeleteVpcRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/vpcs/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/vpcs/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteVpcRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

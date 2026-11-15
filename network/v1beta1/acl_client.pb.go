@@ -38,9 +38,17 @@ func (c *AclClient) Service() *core.Service {
 
 // GetAcl returns an ACL.
 func (c *AclClient) GetAcl(ctx context.Context, req *GetAclRequest) (*Acl, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/acls/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/acls/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetAclRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -60,9 +68,17 @@ func (c *AclClient) GetAcl(ctx context.Context, req *GetAclRequest) (*Acl, error
 
 // ListAcls lists the ACLs in a region, oldest first.
 func (c *AclClient) ListAcls(ctx context.Context, req *ListAclsRequest) (*ListAclsResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/regions/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListAclsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -114,9 +130,17 @@ func (c *AclClient) CreateAcl(ctx context.Context, req *CreateAclRequest) (*core
 		req = proto.Clone(req).(*CreateAclRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/regions/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateAclRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "acl")
 	if err != nil {
@@ -144,9 +168,17 @@ func (c *AclClient) UpdateAcl(ctx context.Context, req *UpdateAclRequest) (*core
 		req = proto.Clone(req).(*UpdateAclRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("acl.name", req.GetAcl().GetName(), "projects/*/regions/*/acls/*")
+	n1, err := c.service.RelativeName("acl.name", req.GetAcl().GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("acl.name", n1, "projects/*/regions/*/acls/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetAcl().GetName() {
+		req = proto.Clone(req).(*UpdateAclRequest)
+		req.Acl.Name = n1
 	}
 	query, err := core.Query(req, "acl.name", "acl")
 	if err != nil {
@@ -176,9 +208,17 @@ func (c *AclClient) DeleteAcl(ctx context.Context, req *DeleteAclRequest) (*core
 		req = proto.Clone(req).(*DeleteAclRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/acls/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/acls/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteAclRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

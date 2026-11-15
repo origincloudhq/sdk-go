@@ -34,9 +34,17 @@ func (c *OrganizationClient) Service() *core.Service {
 
 // GetOrganization returns an organization.
 func (c *OrganizationClient) GetOrganization(ctx context.Context, req *GetOrganizationRequest) (*Organization, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetOrganizationRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -127,9 +135,17 @@ func (c *OrganizationClient) CreateOrganization(ctx context.Context, req *Create
 
 // UpdateOrganization renames an organization.
 func (c *OrganizationClient) UpdateOrganization(ctx context.Context, req *UpdateOrganizationRequest) (*Organization, error) {
-	p1, err := c.service.PathValue("organization.name", req.GetOrganization().GetName(), "organizations/*")
+	n1, err := c.service.RelativeName("organization.name", req.GetOrganization().GetName(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("organization.name", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetOrganization().GetName() {
+		req = proto.Clone(req).(*UpdateOrganizationRequest)
+		req.Organization.Name = n1
 	}
 	query, err := core.Query(req, "organization.name", "organization")
 	if err != nil {
@@ -154,9 +170,17 @@ func (c *OrganizationClient) UpdateOrganization(ctx context.Context, req *Update
 // billing accounts stay, with their spend limits, so the last period can
 // still be invoiced.
 func (c *OrganizationClient) DeleteOrganization(ctx context.Context, req *DeleteOrganizationRequest) (*emptypb.Empty, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteOrganizationRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -177,9 +201,17 @@ func (c *OrganizationClient) DeleteOrganization(ctx context.Context, req *Delete
 // projects may hold together, and how much of it they use. The limits are
 // set by the platform; ask support to raise one.
 func (c *OrganizationClient) GetOrganizationQuota(ctx context.Context, req *GetOrganizationQuotaRequest) (*OrganizationQuota, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/quota")
+	n1, err := c.service.RelativeName("name", req.GetName(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/quota")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetOrganizationQuotaRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

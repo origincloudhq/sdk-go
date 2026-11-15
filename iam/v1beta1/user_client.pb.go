@@ -6,6 +6,7 @@ package iamv1beta1
 import (
 	context "context"
 	core "go.origincloud.eu/sdk/core"
+	proto "google.golang.org/protobuf/proto"
 	http "net/http"
 )
 
@@ -33,9 +34,17 @@ func (c *UserClient) Service() *core.Service {
 // service account caller is refused with `BAD_REQUEST`, having no
 // profile.
 func (c *UserClient) GetUser(ctx context.Context, req *GetUserRequest) (*User, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "users/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "iam")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "users/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetUserRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

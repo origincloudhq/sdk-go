@@ -36,9 +36,17 @@ func (c *NatGatewayClient) Service() *core.Service {
 
 // GetNatGateway returns a NAT gateway.
 func (c *NatGatewayClient) GetNatGateway(ctx context.Context, req *GetNatGatewayRequest) (*NatGateway, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/natGateways/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/natGateways/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetNatGatewayRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -58,9 +66,17 @@ func (c *NatGatewayClient) GetNatGateway(ctx context.Context, req *GetNatGateway
 
 // ListNatGateways lists the NAT gateways in a zone, oldest first.
 func (c *NatGatewayClient) ListNatGateways(ctx context.Context, req *ListNatGatewaysRequest) (*ListNatGatewaysResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListNatGatewaysRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -115,9 +131,17 @@ func (c *NatGatewayClient) CreateNatGateway(ctx context.Context, req *CreateNatG
 		req = proto.Clone(req).(*CreateNatGatewayRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateNatGatewayRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "natGateway")
 	if err != nil {
@@ -145,9 +169,17 @@ func (c *NatGatewayClient) UpdateNatGateway(ctx context.Context, req *UpdateNatG
 		req = proto.Clone(req).(*UpdateNatGatewayRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("natGateway.name", req.GetNatGateway().GetName(), "projects/*/zones/*/natGateways/*")
+	n1, err := c.service.RelativeName("natGateway.name", req.GetNatGateway().GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("natGateway.name", n1, "projects/*/zones/*/natGateways/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetNatGateway().GetName() {
+		req = proto.Clone(req).(*UpdateNatGatewayRequest)
+		req.NatGateway.Name = n1
 	}
 	query, err := core.Query(req, "natGateway.name", "natGateway")
 	if err != nil {
@@ -176,9 +208,17 @@ func (c *NatGatewayClient) DeleteNatGateway(ctx context.Context, req *DeleteNatG
 		req = proto.Clone(req).(*DeleteNatGatewayRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/natGateways/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "network")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/zones/*/natGateways/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteNatGatewayRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

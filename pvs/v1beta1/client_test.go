@@ -163,6 +163,41 @@ func TestAFullNameOfTheServiceIsSentAsItsRelativeName(t *testing.T) {
 	}
 }
 
+// A full name in a path field that the body also carries, as an update's
+// resource does, is sent as the relative name in both, and the caller's
+// request is left as it was.
+func TestAFullNameInTheBodysResourceIsSentAsItsRelativeName(t *testing.T) {
+	volumes, calls := recordingClient(t)
+	ctx := context.Background()
+	relative := zone + "/volumes/vol-1"
+
+	for _, prefix := range []string{"", "//pvs.origincloudapis.eu/"} {
+		update := &pvsv1beta1.UpdateVolumeRequest{Volume: &pvsv1beta1.Volume{Name: prefix + relative, SizeGib: 2}, RequestId: "given"}
+		if _, err := volumes.UpdateVolume(ctx, update); err != nil {
+			t.Fatal(err)
+		}
+		if update.GetVolume().GetName() != prefix+relative {
+			t.Errorf("the caller's request was changed: %q", update.GetVolume().GetName())
+		}
+		if _, err := volumes.ImportVolume(ctx, &pvsv1beta1.ImportVolumeRequest{Parent: prefix + zone, RequestId: "given"}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	c := *calls
+	if len(c) != 4 {
+		t.Fatalf("sent %d calls", len(c))
+	}
+	for i := range 2 {
+		a, b := c[i], c[i+2]
+		if a.method != b.method || a.path != b.path || !reflect.DeepEqual(a.query, b.query) || !sameJSON(a.body, b.body) {
+			t.Errorf("relative %+v, full %+v", a, b)
+		}
+	}
+	if !sameJSON(c[2].body, `{"name":"`+relative+`","sizeGib":2}`) {
+		t.Errorf("update body %s", c[2].body)
+	}
+}
+
 // A full name of another service, or one that isn't a valid full name, is
 // refused before anything is sent, naming the field and the host the
 // client calls.
@@ -171,7 +206,7 @@ func TestANameOfAnotherServiceIsRefusedBeforeSending(t *testing.T) {
 	ctx := context.Background()
 
 	for name, says := range map[string]string{
-		"//compute.origincloudapis.eu/projects/p/zones/z/volumes/vol-1":             "name must be a name on pvs.origincloudapis.eu, the host this client calls",
+		"//compute.origincloudapis.eu/projects/p/zones/z/volumes/vol-1":             "name must be a name on pvs.origincloudapis.eu, got",
 		"//pvs.eu-central1-az1.origincloudapis.eu/projects/p/zones/z/volumes/vol-1": "the service's global host, pvs.origincloudapis.eu",
 		"//pvs.origincloudapis.eu/v1beta1/projects/p/zones/z/volumes/vol-1":         `carries the API version "v1beta1"`,
 		"urn:origincloud:storage:o:p:volume:vol-1":                                  "is a URN",

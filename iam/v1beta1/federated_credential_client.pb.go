@@ -39,9 +39,17 @@ func (c *FederatedCredentialClient) Service() *core.Service {
 // GetFederatedCredential returns a federated credential, deleted or not. Needs
 // `iam.service_account.list` on the organization.
 func (c *FederatedCredentialClient) GetFederatedCredential(ctx context.Context, req *GetFederatedCredentialRequest) (*FederatedCredential, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*/federatedCredentials/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "iam")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/serviceAccounts/*/federatedCredentials/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetFederatedCredentialRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -63,9 +71,17 @@ func (c *FederatedCredentialClient) GetFederatedCredential(ctx context.Context, 
 // ones are listed only when `show_deleted` is set. Needs
 // `iam.service_account.list` on the organization.
 func (c *FederatedCredentialClient) ListFederatedCredentials(ctx context.Context, req *ListFederatedCredentialsRequest) (*ListFederatedCredentialsResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*/serviceAccounts/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "iam")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*/serviceAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListFederatedCredentialsRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -122,9 +138,17 @@ func (c *FederatedCredentialClient) CreateFederatedCredential(ctx context.Contex
 		req = proto.Clone(req).(*CreateFederatedCredentialRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*/serviceAccounts/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "iam")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*/serviceAccounts/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateFederatedCredentialRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "federatedCredential")
 	if err != nil {
@@ -148,9 +172,17 @@ func (c *FederatedCredentialClient) CreateFederatedCredential(ctx context.Contex
 // next request. It stays readable as `DELETED`. Deleting a deleted one
 // succeeds. Needs `iam.service_account.revoke` on the organization.
 func (c *FederatedCredentialClient) DeleteFederatedCredential(ctx context.Context, req *DeleteFederatedCredentialRequest) (*emptypb.Empty, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*/federatedCredentials/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "iam")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/serviceAccounts/*/federatedCredentials/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteFederatedCredentialRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {

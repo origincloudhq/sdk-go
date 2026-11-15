@@ -32,9 +32,17 @@ func (c *CaseClient) Service() *core.Service {
 
 // GetCase returns a case. Needs `admin.support_case.get` on the organization.
 func (c *CaseClient) GetCase(ctx context.Context, req *GetCaseRequest) (*Case, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/cases/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "support")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/cases/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*GetCaseRequest)
+		req.Name = n1
 	}
 	query, err := core.Query(req, "name")
 	if err != nil {
@@ -55,9 +63,17 @@ func (c *CaseClient) GetCase(ctx context.Context, req *GetCaseRequest) (*Case, e
 // ListCases lists an organization's cases, newest first. Needs
 // `admin.support_case.list` on the organization.
 func (c *CaseClient) ListCases(ctx context.Context, req *ListCasesRequest) (*ListCasesResponse, error) {
-	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*ListCasesRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent")
 	if err != nil {
@@ -107,9 +123,17 @@ func (c *CaseClient) CreateCase(ctx context.Context, req *CreateCaseRequest) (*C
 		req = proto.Clone(req).(*CreateCaseRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "organizations/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*CreateCaseRequest)
+		req.Parent = n1
 	}
 	query, err := core.Query(req, "parent", "case")
 	if err != nil {
@@ -132,9 +156,17 @@ func (c *CaseClient) CreateCase(ctx context.Context, req *CreateCaseRequest) (*C
 // notified. Closing a closed case succeeds and changes nothing. Needs
 // `admin.support_case.update` on the organization.
 func (c *CaseClient) CloseCase(ctx context.Context, req *CloseCaseRequest) (*Case, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/cases/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "support")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/cases/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*CloseCaseRequest)
+		req.Name = n1
 	}
 	out := new(Case)
 	if err := c.service.Call(ctx, core.Request{
@@ -152,9 +184,17 @@ func (c *CaseClient) CloseCase(ctx context.Context, req *CloseCaseRequest) (*Cas
 // `IN_PROGRESS` succeeds and changes nothing. Needs
 // `admin.support_case.update` on the organization.
 func (c *CaseClient) ReopenCase(ctx context.Context, req *ReopenCaseRequest) (*Case, error) {
-	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/cases/*")
+	n1, err := c.service.RelativeName("name", req.GetName(), "support")
 	if err != nil {
 		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "organizations/*/cases/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*ReopenCaseRequest)
+		req.Name = n1
 	}
 	out := new(Case)
 	if err := c.service.Call(ctx, core.Request{

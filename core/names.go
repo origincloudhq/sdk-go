@@ -393,31 +393,60 @@ func isVersion(segment string) bool {
 	return true
 }
 
+// AnyService is, among the services a path field takes, every resource
+// service: a field referring to any type (google.api.resource_reference's
+// type "*").
+const AnyService = "*"
+
 // pathName returns the relative name to send in a request's path for
 // value, the path field field of a call to the service own (a short
-// code): value as it is when it isn't a full name, its relative name when
-// it is one of own's, and an error when it is another service's, a URN, a
-// URL or no valid full name.
-func pathName(own, field, value string) (string, error) {
-	inField := func(err error) error {
+// code), which takes full names of services: the services of the type it
+// refers to, [AnyService] for any, or none for own.
+//
+// value is sent as it is when it isn't a full name, and as its relative
+// name when it is one of those services'. A full name of another service,
+// a URN, a URL or no valid full name is an error naming the hosts the field
+// takes.
+func pathName(own string, services []string, field, value string) (string, error) {
+	if len(services) == 0 {
+		services = []string{own}
+	}
+	refused := func(err error) error {
 		var e *FullNameError
 		if errors.As(err, &e) {
-			return &FullNameError{Value: e.Value, Reason: e.Reason, detail: field + ": " + e.detail}
+			return &FullNameError{Value: e.Value, Reason: e.Reason, detail: field + " must be a name on " + hostsOf(services) + ": " + e.detail}
 		}
 		return err
 	}
 	if !strings.HasPrefix(value, "//") {
 		if err := notFull(value); errors.Is(err, ErrURN) || errors.Is(err, ErrScheme) {
-			return "", inField(err)
+			return "", refused(err)
 		}
 		return value, nil
 	}
 	name, err := ParseFullName(value)
 	if err != nil {
-		return "", inField(err)
+		return "", refused(err)
 	}
-	if name.Service() != own {
-		return "", nameError(value, ErrOtherService, "%s must be a name on %s.%s, the host this client calls, got %q, a name on %s", field, own, Domain, value, name.Host())
+	if !slices.Contains(services, AnyService) && !slices.Contains(services, name.Service()) {
+		return "", nameError(value, ErrOtherService, "%s must be a name on %s, got %q, a name on %s", field, hostsOf(services), value, name.Host())
 	}
 	return name.Relative(), nil
+}
+
+// hostsOf returns the hosts of services, for an error:
+// "a.origincloudapis.eu", "one of a.origincloudapis.eu, b.origincloudapis.eu",
+// or any API's for [AnyService].
+func hostsOf(services []string) string {
+	if slices.Contains(services, AnyService) {
+		return "the host of one of the platform's APIs"
+	}
+	hosts := make([]string, len(services))
+	for i, s := range services {
+		hosts[i] = s + "." + Domain
+	}
+	if len(hosts) == 1 {
+		return hosts[0]
+	}
+	return "one of " + strings.Join(hosts, ", ")
 }

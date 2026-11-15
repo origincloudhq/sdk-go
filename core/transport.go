@@ -231,18 +231,29 @@ func Query(m proto.Message, skip ...string) (url.Values, error) {
 	return queryFromJSON(encoded, skip)
 }
 
-// PathValue returns value, the path field field of a call to the
-// service, as the path segments of the request, checked against pattern as
-// the function [PathValue] checks it. Generated clients call it.
+// RelativeName returns the relative name value, the path field field of a
+// call to the service, stands for: value itself, or the relative name of a
+// full resource name it is. Generated clients call it, and send the
+// relative name in the path and in the body alike.
 //
-// A full resource name of the service, such as
-// "//pvs.origincloudapis.eu/projects/p/zones/z/volumes/vol-1" given to a
-// PVS client, is sent as its relative name, the path every call takes. A
-// full name of another service, one with a regional or zonal host or an API
-// version, a URN, a URL or a malformed full name is refused before
-// anything is sent, with a [*FullNameError].
-func (s *Service) PathValue(field, value, pattern string) (string, error) {
-	relative, err := pathName(s.shortcode, field, value)
+// services are the short codes of the services whose full names the field
+// takes: the service of the type the field refers to, such as
+// "resourcemanager" for a billing account's parent (organizations/*),
+// [AnyService] for a field referring to any type, or none for the
+// service's own. A full name of one of them, such as
+// "//resourcemanager.origincloudapis.eu/organizations/o", stands for its
+// relative name. A full name of another service, one with a regional or
+// zonal host or an API version, a URN, a URL or a malformed full name is
+// refused with a [*FullNameError] naming the hosts the field takes.
+func (s *Service) RelativeName(field, value string, services ...string) (string, error) {
+	return pathName(s.shortcode, services, field, value)
+}
+
+// PathValue returns value, the path field field of a call to the service,
+// as the path segments of the request: its [Service.RelativeName], checked
+// against pattern and escaped as the function [PathValue] does.
+func (s *Service) PathValue(field, value, pattern string, services ...string) (string, error) {
+	relative, err := s.RelativeName(field, value, services...)
 	if err != nil {
 		return "", err
 	}
