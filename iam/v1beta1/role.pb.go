@@ -28,14 +28,12 @@ type Role struct {
 	// The role's resource name, such as `roles/owner`, `roles/viewer` or
 	// `roles/billing.administrator`. A role binding names its role by it.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The role's URN, the identifier access policies and the audit log use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// The name the console shows, such as `Owner`.
 	DisplayName string `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
 	// What holding the role allows, in a sentence.
 	Description string `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	// The permissions the role grants, `permissions/{permission}`, in
-	// catalog order.
+	// The full names of the permissions the role grants,
+	// `//iam.origincloudapis.eu/permissions/{permission}`, in catalog order.
 	IncludedPermissions []string `protobuf:"bytes,5,rep,name=included_permissions,json=includedPermissions,proto3" json:"included_permissions,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache
@@ -74,13 +72,6 @@ func (*Role) Descriptor() ([]byte, []int) {
 func (x *Role) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *Role) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -251,10 +242,9 @@ var File_origincloud_iam_v1beta1_role_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_role_proto_rawDesc = "" +
 	"\n" +
-	"\"origincloud/iam/v1beta1/role.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\"\xa5\x02\n" +
+	"\"origincloud/iam/v1beta1/role.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\"\x8d\x02\n" +
 	"\x04Role\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12'\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12'\n" +
 	"\fdisplay_name\x18\x03 \x01(\tB\x04\xe2A\x01\x03R\vdisplayName\x12&\n" +
 	"\vdescription\x18\x04 \x01(\tB\x04\xe2A\x01\x03R\vdescription\x12]\n" +
 	"\x14included_permissions\x18\x05 \x03(\tB*\xe2A\x01\x03\xfaA#\n" +

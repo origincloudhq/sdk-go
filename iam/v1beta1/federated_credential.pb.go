@@ -99,8 +99,11 @@ type FederatedCredential struct {
 	Conditions map[string]string `protobuf:"bytes,5,rep,name=conditions,proto3" json:"conditions,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	// Where the federated credential is in its lifecycle.
 	State FederatedCredential_State `protobuf:"varint,6,opt,name=state,proto3,enum=origincloud.iam.v1beta1.FederatedCredential_State" json:"state,omitempty"`
-	// Who created the federated credential, written as a role binding's
-	// member is.
+	// The full name of who created the federated credential: `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// `//iam.origincloudapis.eu/serviceAgents/{service_agent}` for a platform
+	// service agent, or `//iam.origincloudapis.eu/services/{service}` for a
+	// change the platform made itself.
 	Creator string `protobuf:"bytes,7,opt,name=creator,proto3" json:"creator,omitempty"`
 	// When the federated credential was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
@@ -498,7 +501,7 @@ var File_origincloud_iam_v1beta1_federated_credential_proto protoreflect.FileDes
 
 const file_origincloud_iam_v1beta1_federated_credential_proto_rawDesc = "" +
 	"\n" +
-	"2origincloud/iam/v1beta1/federated_credential.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb8\x06\n" +
+	"2origincloud/iam/v1beta1/federated_credential.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbe\x06\n" +
 	"\x13FederatedCredential\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12(\n" +
 	"\fdisplay_name\x18\x02 \x01(\tB\x05\xe2A\x02\x02\x05R\vdisplayName\x12\x1d\n" +
@@ -507,8 +510,10 @@ const file_origincloud_iam_v1beta1_federated_credential_proto_rawDesc = "" +
 	"\n" +
 	"conditions\x18\x05 \x03(\v2<.origincloud.iam.v1beta1.FederatedCredential.ConditionsEntryB\x05\xe2A\x02\x02\x05R\n" +
 	"conditions\x12N\n" +
-	"\x05state\x18\x06 \x01(\x0e22.origincloud.iam.v1beta1.FederatedCredential.StateB\x04\xe2A\x01\x03R\x05state\x12\x1e\n" +
-	"\acreator\x18\a \x01(\tB\x04\xe2A\x01\x03R\acreator\x12A\n" +
+	"\x05state\x18\x06 \x01(\x0e22.origincloud.iam.v1beta1.FederatedCredential.StateB\x04\xe2A\x01\x03R\x05state\x12$\n" +
+	"\acreator\x18\a \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12A\n" +
 	"\vcreate_time\x18\b \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime\x12A\n" +
 	"\vdelete_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
