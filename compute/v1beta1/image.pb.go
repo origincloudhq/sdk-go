@@ -177,8 +177,6 @@ type Image struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The image's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The image's URN, the identifier access policies and the audit log use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// What the image holds, as you describe it.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// The account an instance launched from the image logs in as, unless the
@@ -197,7 +195,10 @@ type Image struct {
 	Platform Image_Platform `protobuf:"varint,8,opt,name=platform,proto3,enum=origincloud.compute.v1beta1.Image_Platform" json:"platform,omitempty"`
 	// Where it is in its lifecycle.
 	State Image_State `protobuf:"varint,9,opt,name=state,proto3,enum=origincloud.compute.v1beta1.Image_State" json:"state,omitempty"`
-	// The principal that created the image, such as `user:<id>`.
+	// The principal that created the image, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator string `protobuf:"bytes,10,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Labels of your own, at most 50. The `origin:name` tag is the name the
 	// console shows.
@@ -239,13 +240,6 @@ func (*Image) Descriptor() ([]byte, []int) {
 func (x *Image) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *Image) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -321,8 +315,8 @@ type ImageBlockDevice struct {
 	Device string `protobuf:"bytes,1,opt,name=device,proto3" json:"device,omitempty"`
 	// The disk's size in GiB, at least the snapshot's.
 	SizeGib int32 `protobuf:"varint,2,opt,name=size_gib,json=sizeGib,proto3" json:"size_gib,omitempty"`
-	// The protected snapshot the disk is created from, in the image's
-	// project and zone; an empty disk when left empty.
+	// The full name of the protected snapshot the disk is created from, in
+	// the image's project and zone; an empty disk when left empty.
 	SourceSnapshot string `protobuf:"bytes,3,opt,name=source_snapshot,json=sourceSnapshot,proto3" json:"source_snapshot,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -716,10 +710,9 @@ var File_origincloud_compute_v1beta1_image_proto protoreflect.FileDescriptor
 
 const file_origincloud_compute_v1beta1_image_proto_rawDesc = "" +
 	"\n" +
-	"'origincloud/compute/v1beta1/image.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\"\xa4\a\n" +
+	"'origincloud/compute/v1beta1/image.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\"\x92\a\n" +
 	"\x05Image\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12&\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12&\n" +
 	"\vdescription\x18\x03 \x01(\tB\x04\xe2A\x01\x02R\vdescription\x12(\n" +
 	"\fdefault_user\x18\x04 \x01(\tB\x05\xe2A\x02\x05\x01R\vdefaultUser\x12&\n" +
 	"\vroot_device\x18\x05 \x01(\tB\x05\xe2A\x02\x02\x05R\n" +
@@ -727,9 +720,11 @@ const file_origincloud_compute_v1beta1_image_proto_rawDesc = "" +
 	"\rblock_devices\x18\x06 \x03(\v2-.origincloud.compute.v1beta1.ImageBlockDeviceB\x05\xe2A\x02\x02\x05R\fblockDevices\x12Y\n" +
 	"\farchitecture\x18\a \x01(\x0e2/.origincloud.compute.v1beta1.Image.ArchitectureB\x04\xe2A\x01\x03R\farchitecture\x12M\n" +
 	"\bplatform\x18\b \x01(\x0e2+.origincloud.compute.v1beta1.Image.PlatformB\x04\xe2A\x01\x03R\bplatform\x12D\n" +
-	"\x05state\x18\t \x01(\x0e2(.origincloud.compute.v1beta1.Image.StateB\x04\xe2A\x01\x03R\x05state\x12\x1e\n" +
+	"\x05state\x18\t \x01(\x0e2(.origincloud.compute.v1beta1.Image.StateB\x04\xe2A\x01\x03R\x05state\x12$\n" +
 	"\acreator\x18\n" +
-	" \x01(\tB\x04\xe2A\x01\x03R\acreator\x12F\n" +
+	" \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12F\n" +
 	"\x04tags\x18\v \x03(\v2,.origincloud.compute.v1beta1.Image.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
