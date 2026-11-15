@@ -30,7 +30,8 @@ type Region struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The name the console shows, such as `EU Central 1`.
 	DisplayName string `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
-	// The region's zones, `zones/{zone}`, in catalog order.
+	// The full names of the region's zones,
+	// `//location.origincloudapis.eu/zones/{zone}`, in catalog order.
 	Zones         []string `protobuf:"bytes,2,rep,name=zones,proto3" json:"zones,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -97,7 +98,8 @@ type Zone struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The name the console shows, such as `EU Central 1, zone 1`.
 	DisplayName string `protobuf:"bytes,4,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
-	// The region the zone is in, `regions/{region}`.
+	// The full name of the region the zone is in,
+	// `//location.origincloudapis.eu/regions/{region}`.
 	Region string `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
 	// The services whose zonal resources the zone holds, by the name of their
 	// API, such as `pvs`: the host `{service}.origincloudapis.eu` serves them.

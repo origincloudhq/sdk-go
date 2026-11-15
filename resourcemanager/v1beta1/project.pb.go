@@ -40,17 +40,17 @@ type Project struct {
 	// the project is created, is unique across the platform and never used
 	// again, not even after the project is deleted.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The project's URN, the identifier access policies and the audit log
-	// use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
-	// The organization the project belongs to, `organizations/{organization}`.
+	// The full name of the organization the project belongs to,
+	// `//resourcemanager.origincloudapis.eu/organizations/{organization}`.
 	Organization string `protobuf:"bytes,3,opt,name=organization,proto3" json:"organization,omitempty"`
 	// The name the console shows. Not empty.
 	DisplayName string `protobuf:"bytes,4,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
 	// When the project was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
-	// The principal that created the project, such as `user:<id>` or
-	// `service_account:<id>`.
+	// The principal that created the project, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator       string `protobuf:"bytes,6,opt,name=creator,proto3" json:"creator,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -89,13 +89,6 @@ func (*Project) Descriptor() ([]byte, []int) {
 func (x *Project) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *Project) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -177,7 +170,8 @@ func (x *GetProjectRequest) GetName() string {
 // The request for ListProjects.
 type ListProjectsRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The organization whose projects to list, `organizations/{organization}`.
+	// The full name of the organization whose projects to list,
+	// `//resourcemanager.origincloudapis.eu/organizations/{organization}`.
 	//
 	// (-- api-linter: core::0132::request-required-fields=disabled
 	//
@@ -577,16 +571,17 @@ var File_origincloud_resourcemanager_v1beta1_project_proto protoreflect.FileDesc
 
 const file_origincloud_resourcemanager_v1beta1_project_proto_rawDesc = "" +
 	"\n" +
-	"1origincloud/resourcemanager/v1beta1/project.proto\x12#origincloud.resourcemanager.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a/origincloud/resourcemanager/v1beta1/quota.proto\"\xfe\x02\n" +
+	"1origincloud/resourcemanager/v1beta1/project.proto\x12#origincloud.resourcemanager.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a/origincloud/resourcemanager/v1beta1/quota.proto\"\xec\x02\n" +
 	"\aProject\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12]\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12]\n" +
 	"\forganization\x18\x03 \x01(\tB9\xe2A\x02\x02\x05\xfaA1\n" +
 	"/resourcemanager.origincloudapis.eu/OrganizationR\forganization\x12'\n" +
 	"\fdisplay_name\x18\x04 \x01(\tB\x04\xe2A\x01\x02R\vdisplayName\x12A\n" +
 	"\vcreate_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"createTime\x12\x1e\n" +
-	"\acreator\x18\x06 \x01(\tB\x04\xe2A\x01\x03R\acreator:V\xeaAS\n" +
+	"createTime\x12$\n" +
+	"\acreator\x18\x06 \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator:V\xeaAS\n" +
 	"*resourcemanager.origincloudapis.eu/Project\x12\x12projects/{project}*\bprojects2\aproject\"\\\n" +
 	"\x11GetProjectRequest\x12G\n" +
 	"\x04name\x18\x01 \x01(\tB3\xe2A\x01\x02\xfaA,\n" +
