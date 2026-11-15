@@ -465,25 +465,27 @@ var File_origincloud_iam_v1beta1_role_binding_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\n" +
-	"*origincloud/iam/v1beta1/role_binding.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9b\x03\n" +
+	"*origincloud/iam/v1beta1/role_binding.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xca\x03\n" +
 	"\vRoleBinding\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
 	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12\x1d\n" +
 	"\x06member\x18\x03 \x01(\tB\x05\xe2A\x02\x02\x05R\x06member\x129\n" +
 	"\x04role\x18\x04 \x01(\tB%\xe2A\x02\x02\x05\xfaA\x1d\n" +
-	"\x1biam.origincloudapis.eu/RoleR\x04role\x12\x1f\n" +
-	"\aproject\x18\x05 \x01(\tB\x05\xe2A\x02\x01\x05R\aproject\x12\x1e\n" +
+	"\x1biam.origincloudapis.eu/RoleR\x04role\x12N\n" +
+	"\aproject\x18\x05 \x01(\tB4\xe2A\x02\x01\x05\xfaA,\n" +
+	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12\x1e\n" +
 	"\acreator\x18\x06 \x01(\tB\x04\xe2A\x01\x03R\acreator\x12A\n" +
 	"\vcreate_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime:|\xeaAy\n" +
 	"\"iam.origincloudapis.eu/RoleBinding\x128organizations/{organization}/roleBindings/{role_binding}*\froleBindings2\vroleBinding\"X\n" +
 	"\x15GetRoleBindingRequest\x12?\n" +
 	"\x04name\x18\x01 \x01(\tB+\xe2A\x01\x02\xfaA$\n" +
-	"\"iam.origincloudapis.eu/RoleBindingR\x04name\"\xe4\x01\n" +
+	"\"iam.origincloudapis.eu/RoleBindingR\x04name\"\x93\x02\n" +
 	"\x17ListRoleBindingsRequest\x12C\n" +
 	"\x06parent\x18\x01 \x01(\tB+\xe2A\x01\x02\xfaA$\x12\"iam.origincloudapis.eu/RoleBindingR\x06parent\x12\x1c\n" +
-	"\x06member\x18\x02 \x01(\tB\x04\xe2A\x01\x01R\x06member\x12\x1e\n" +
-	"\aproject\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\aproject\x12!\n" +
+	"\x06member\x18\x02 \x01(\tB\x04\xe2A\x01\x01R\x06member\x12M\n" +
+	"\aproject\x18\x03 \x01(\tB3\xe2A\x01\x01\xfaA,\n" +
+	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12!\n" +
 	"\tpage_size\x18\x04 \x01(\x05B\x04\xe2A\x01\x01R\bpageSize\x12#\n" +
 	"\n" +
 	"page_token\x18\x05 \x01(\tB\x04\xe2A\x01\x01R\tpageToken\"\x8d\x01\n" +

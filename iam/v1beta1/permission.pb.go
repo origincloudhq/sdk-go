@@ -371,9 +371,11 @@ const file_origincloud_iam_v1beta1_permission_proto_rawDesc = "" +
 	"!iam.origincloudapis.eu/PermissionR\x04name\"\x18\n" +
 	"\x16ListPermissionsRequest\"`\n" +
 	"\x17ListPermissionsResponse\x12E\n" +
-	"\vpermissions\x18\x01 \x03(\v2#.origincloud.iam.v1beta1.PermissionR\vpermissions\"e\n" +
-	"\x19TestIamPermissionsRequest\x12 \n" +
-	"\bresource\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\bresource\x12&\n" +
+	"\vpermissions\x18\x01 \x03(\v2#.origincloud.iam.v1beta1.PermissionR\vpermissions\"k\n" +
+	"\x19TestIamPermissionsRequest\x12&\n" +
+	"\bresource\x18\x01 \x01(\tB\n" +
+	"\xe2A\x01\x02\xfaA\x03\n" +
+	"\x01*R\bresource\x12&\n" +
 	"\vpermissions\x18\x02 \x03(\tB\x04\xe2A\x01\x02R\vpermissions\">\n" +
 	"\x1aTestIamPermissionsResponse\x12 \n" +
 	"\vpermissions\x18\x01 \x03(\tR\vpermissions2\x91\x04\n" +

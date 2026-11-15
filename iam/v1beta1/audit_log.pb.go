@@ -428,10 +428,11 @@ var File_origincloud_iam_v1beta1_audit_log_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_audit_log_proto_rawDesc = "" +
 	"\n" +
-	"'origincloud/iam/v1beta1/audit_log.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9b\x05\n" +
+	"'origincloud/iam/v1beta1/audit_log.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xca\x05\n" +
 	"\rAuditLogEntry\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x1e\n" +
-	"\aproject\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\aproject\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12M\n" +
+	"\aproject\x18\x02 \x01(\tB3\xe2A\x01\x03\xfaA,\n" +
+	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12\x1a\n" +
 	"\x05actor\x18\x03 \x01(\tB\x04\xe2A\x01\x03R\x05actor\x12\x1c\n" +
 	"\x06action\x18\x04 \x01(\tB\x04\xe2A\x01\x03R\x06action\x12\x1c\n" +
 	"\x06target\x18\x05 \x01(\tB\x04\xe2A\x01\x03R\x06target\x12N\n" +
@@ -452,10 +453,11 @@ const file_origincloud_iam_v1beta1_audit_log_proto_rawDesc = "" +
 	"$iam.origincloudapis.eu/AuditLogEntry\x12>organizations/{organization}/auditLogEntries/{audit_log_entry}*\x0fauditLogEntries2\rauditLogEntry\"\\\n" +
 	"\x17GetAuditLogEntryRequest\x12A\n" +
 	"\x04name\x18\x01 \x01(\tB-\xe2A\x01\x02\xfaA&\n" +
-	"$iam.origincloudapis.eu/AuditLogEntryR\x04name\"\x85\x02\n" +
+	"$iam.origincloudapis.eu/AuditLogEntryR\x04name\"\xb4\x02\n" +
 	"\x1aListAuditLogEntriesRequest\x12E\n" +
-	"\x06parent\x18\x01 \x01(\tB-\xe2A\x01\x02\xfaA&\x12$iam.origincloudapis.eu/AuditLogEntryR\x06parent\x12\x1e\n" +
-	"\aproject\x18\x02 \x01(\tB\x04\xe2A\x01\x01R\aproject\x12\x1a\n" +
+	"\x06parent\x18\x01 \x01(\tB-\xe2A\x01\x02\xfaA&\x12$iam.origincloudapis.eu/AuditLogEntryR\x06parent\x12M\n" +
+	"\aproject\x18\x02 \x01(\tB3\xe2A\x01\x01\xfaA,\n" +
+	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12\x1a\n" +
 	"\x05actor\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\x05actor\x12\x1c\n" +
 	"\x06action\x18\x04 \x01(\tB\x04\xe2A\x01\x01R\x06action\x12!\n" +
 	"\tpage_size\x18\x05 \x01(\x05B\x04\xe2A\x01\x01R\bpageSize\x12#\n" +
