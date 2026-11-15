@@ -31,15 +31,15 @@ type InternetGateway struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The gateway's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The gateway's URN, the identifier access policies and the audit log
-	// use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
-	// The VPC the gateway connects, in the same project and region.
+	// The full name of the VPC the gateway connects, in the same project and
+	// region.
 	Vpc string `protobuf:"bytes,3,opt,name=vpc,proto3" json:"vpc,omitempty"`
 	// When the internet gateway was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
-	// The principal that created the internet gateway, such as `user:<id>`
-	// or `service_account:<id>`; empty for one the platform created.
+	// The principal that created the internet gateway, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator string `protobuf:"bytes,5,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Labels of your own, at most 50. The `origin:name` tag is the name the
 	// console shows.
@@ -81,13 +81,6 @@ func (*InternetGateway) Descriptor() ([]byte, []int) {
 func (x *InternetGateway) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *InternetGateway) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -177,7 +170,7 @@ type ListInternetGatewaysRequest struct {
 	PageSize int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A previous response's `next_page_token`, for the page after it.
 	PageToken string `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	// Only the gateway of this VPC, when set.
+	// Only the gateway of this VPC, by its full name, when set.
 	//
 	// (-- api-linter: core::0132::request-unknown-fields=disabled
 	//
@@ -491,15 +484,16 @@ var File_origincloud_network_v1beta1_internet_gateway_proto protoreflect.FileDes
 
 const file_origincloud_network_v1beta1_internet_gateway_proto_rawDesc = "" +
 	"\n" +
-	"2origincloud/network/v1beta1/internet_gateway.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x8c\x04\n" +
+	"2origincloud/network/v1beta1/internet_gateway.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xfa\x03\n" +
 	"\x0fInternetGateway\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12:\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12:\n" +
 	"\x03vpc\x18\x03 \x01(\tB(\xe2A\x02\x02\x05\xfaA \n" +
 	"\x1enetwork.origincloudapis.eu/VpcR\x03vpc\x12A\n" +
 	"\vcreate_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"createTime\x12\x1e\n" +
-	"\acreator\x18\x05 \x01(\tB\x04\xe2A\x01\x03R\acreator\x12P\n" +
+	"createTime\x12$\n" +
+	"\acreator\x18\x05 \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12P\n" +
 	"\x04tags\x18\x06 \x03(\v26.origincloud.network.v1beta1.InternetGateway.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +

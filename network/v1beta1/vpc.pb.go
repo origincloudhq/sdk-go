@@ -42,8 +42,6 @@ type Vpc struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The VPC's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The VPC's URN, the identifier access policies and the audit log use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// The private IPv4 range (RFC 1918), from `/16` to `/28`. A free `/16`
 	// of the `172.16` private block when left empty. Subnets are carved from
 	// it in equal sizes.
@@ -55,12 +53,13 @@ type Vpc struct {
 	SubnetIpv4PrefixLength int32 `protobuf:"varint,5,opt,name=subnet_ipv4_prefix_length,json=subnetIpv4PrefixLength,proto3" json:"subnet_ipv4_prefix_length,omitempty"`
 	// How many more subnets the VPC's address space holds.
 	AvailableSubnetCount int32 `protobuf:"varint,6,opt,name=available_subnet_count,json=availableSubnetCount,proto3" json:"available_subnet_count,omitempty"`
-	// The DNS policy the VPC's resolver relays through, as the VPC's DNS
+	// The full name of the DNS policy the VPC's resolver relays through, as
+	// the VPC's DNS
 	// policy association (a `DnsPolicyAssociation`) sets it. Empty while it
 	// has none: the VPC then relays through the project's default DNS policy
 	// in its region.
 	DnsPolicy string `protobuf:"bytes,7,opt,name=dns_policy,json=dnsPolicy,proto3" json:"dns_policy,omitempty"`
-	// The VPC's internet gateway; empty while it has none.
+	// The full name of the VPC's internet gateway; empty while it has none.
 	InternetGateway string `protobuf:"bytes,8,opt,name=internet_gateway,json=internetGateway,proto3" json:"internet_gateway,omitempty"`
 	// Whether this is the project's default VPC. Unlike a VPC you create, the
 	// platform creates it with defaults: an internet gateway, and a security
@@ -69,8 +68,10 @@ type Vpc struct {
 	ProjectDefault bool `protobuf:"varint,9,opt,name=project_default,json=projectDefault,proto3" json:"project_default,omitempty"`
 	// When the VPC was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
-	// The principal that created the VPC, such as `user:<id>` or
-	// `service_account:<id>`; empty for one the platform created.
+	// The principal that created the VPC, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator string `protobuf:"bytes,11,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Labels of your own, at most 50. The `origin:name` tag is the name the
 	// console shows.
@@ -112,13 +113,6 @@ func (*Vpc) Descriptor() ([]byte, []int) {
 func (x *Vpc) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *Vpc) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -549,10 +543,9 @@ var File_origincloud_network_v1beta1_vpc_proto protoreflect.FileDescriptor
 
 const file_origincloud_network_v1beta1_vpc_proto_rawDesc = "" +
 	"\n" +
-	"%origincloud/network/v1beta1/vpc.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xb0\x06\n" +
+	"%origincloud/network/v1beta1/vpc.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x9e\x06\n" +
 	"\x03Vpc\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12-\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12-\n" +
 	"\x0fipv4_cidr_block\x18\x03 \x01(\tB\x05\xe2A\x02\x05\x01R\ripv4CidrBlock\x12,\n" +
 	"\x0fipv6_cidr_block\x18\x04 \x01(\tB\x04\xe2A\x01\x03R\ripv6CidrBlock\x12?\n" +
 	"\x19subnet_ipv4_prefix_length\x18\x05 \x01(\x05B\x04\xe2A\x01\x03R\x16subnetIpv4PrefixLength\x12:\n" +
@@ -565,8 +558,10 @@ const file_origincloud_network_v1beta1_vpc_proto_rawDesc = "" +
 	"\x0fproject_default\x18\t \x01(\bB\x04\xe2A\x01\x03R\x0eprojectDefault\x12A\n" +
 	"\vcreate_time\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"createTime\x12\x1e\n" +
-	"\acreator\x18\v \x01(\tB\x04\xe2A\x01\x03R\acreator\x12D\n" +
+	"createTime\x12$\n" +
+	"\acreator\x18\v \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12D\n" +
 	"\x04tags\x18\f \x03(\v2*.origincloud.network.v1beta1.Vpc.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +

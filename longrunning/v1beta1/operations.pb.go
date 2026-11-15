@@ -134,7 +134,7 @@ func (x *WaitOperationRequest) GetTimeout() *durationpb.Duration {
 // What an operation is about.
 type OperationMetadata struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The resource the operation acts on.
+	// The full name of the resource the operation acts on.
 	Target string `protobuf:"bytes,1,opt,name=target,proto3" json:"target,omitempty"`
 	// What it does, as the method that started it names it: for example
 	// `create`, `update` or `delete`.
@@ -209,14 +209,16 @@ var File_origincloud_longrunning_v1beta1_operations_proto protoreflect.FileDescr
 
 const file_origincloud_longrunning_v1beta1_operations_proto_rawDesc = "" +
 	"\n" +
-	"0origincloud/longrunning/v1beta1/operations.proto\x12\x1forigincloud.longrunning.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a#google/longrunning/operations.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"/\n" +
+	"0origincloud/longrunning/v1beta1/operations.proto\x12\x1forigincloud.longrunning.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"/\n" +
 	"\x13GetOperationRequest\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\x04name\"k\n" +
 	"\x14WaitOperationRequest\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\x04name\x129\n" +
-	"\atimeout\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\x04\xe2A\x01\x01R\atimeout\"\xcb\x01\n" +
-	"\x11OperationMetadata\x12\x1c\n" +
-	"\x06target\x18\x01 \x01(\tB\x04\xe2A\x01\x03R\x06target\x12\x18\n" +
+	"\atimeout\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\x04\xe2A\x01\x01R\atimeout\"\xd1\x01\n" +
+	"\x11OperationMetadata\x12\"\n" +
+	"\x06target\x18\x01 \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\x06target\x12\x18\n" +
 	"\x04verb\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x04verb\x12A\n" +
 	"\vcreate_time\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime\x12;\n" +

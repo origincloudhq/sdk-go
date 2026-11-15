@@ -32,9 +32,8 @@ type Acl struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The ACL's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The ACL's URN, the identifier access policies and the audit log use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
-	// The VPC the ACL belongs to, in the same project and region.
+	// The full name of the VPC the ACL belongs to, in the same project and
+	// region.
 	Vpc string `protobuf:"bytes,3,opt,name=vpc,proto3" json:"vpc,omitempty"`
 	// Whether the platform created the ACL with the VPC. Only the project's
 	// default VPC has such resources. It can't be deleted, and goes with its
@@ -42,8 +41,10 @@ type Acl struct {
 	VpcDefault bool `protobuf:"varint,4,opt,name=vpc_default,json=vpcDefault,proto3" json:"vpc_default,omitempty"`
 	// When the ACL was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
-	// The principal that created the ACL, such as `user:<id>` or
-	// `service_account:<id>`; empty for one the platform created.
+	// The principal that created the ACL, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator string `protobuf:"bytes,6,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Labels of your own, at most 50. The `origin:name` tag is the name the
 	// console shows.
@@ -85,13 +86,6 @@ func (*Acl) Descriptor() ([]byte, []int) {
 func (x *Acl) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *Acl) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -187,7 +181,7 @@ type ListAclsRequest struct {
 	PageSize int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A previous response's `next_page_token`, for the page after it.
 	PageToken string `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	// Only the ACLs of this VPC, when set.
+	// Only the ACLs of this VPC, by its full name, when set.
 	//
 	// (-- api-linter: core::0132::request-unknown-fields=disabled
 	//
@@ -500,17 +494,18 @@ var File_origincloud_network_v1beta1_acl_proto protoreflect.FileDescriptor
 
 const file_origincloud_network_v1beta1_acl_proto_rawDesc = "" +
 	"\n" +
-	"%origincloud/network/v1beta1/acl.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xdc\x03\n" +
+	"%origincloud/network/v1beta1/acl.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xca\x03\n" +
 	"\x03Acl\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12:\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12:\n" +
 	"\x03vpc\x18\x03 \x01(\tB(\xe2A\x02\x02\x05\xfaA \n" +
 	"\x1enetwork.origincloudapis.eu/VpcR\x03vpc\x12%\n" +
 	"\vvpc_default\x18\x04 \x01(\bB\x04\xe2A\x01\x03R\n" +
 	"vpcDefault\x12A\n" +
 	"\vcreate_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"createTime\x12\x1e\n" +
-	"\acreator\x18\x06 \x01(\tB\x04\xe2A\x01\x03R\acreator\x12D\n" +
+	"createTime\x12$\n" +
+	"\acreator\x18\x06 \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12D\n" +
 	"\x04tags\x18\a \x03(\v2*.origincloud.network.v1beta1.Acl.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +

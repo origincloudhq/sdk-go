@@ -30,7 +30,7 @@ type RouteTableAssociation struct {
 	// The association's resource name. Its last segment is the route
 	// table's id.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The route table the subnet uses, in the subnet's VPC.
+	// The full name of the route table the subnet uses, in the subnet's VPC.
 	RouteTable    string `protobuf:"bytes,2,opt,name=route_table,json=routeTable,proto3" json:"route_table,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

@@ -34,9 +34,11 @@ type Route struct {
 	// address and prefix length 0, or the IPv6 one, `::/0`. A route table
 	// decides only where traffic to the internet goes.
 	Destination string `protobuf:"bytes,2,opt,name=destination,proto3" json:"destination,omitempty"`
-	// The internet gateway of the table's VPC to send the traffic to.
+	// The full name of the internet gateway of the table's VPC to send the
+	// traffic to.
 	InternetGateway string `protobuf:"bytes,3,opt,name=internet_gateway,json=internetGateway,proto3" json:"internet_gateway,omitempty"`
-	// The NAT gateway in the table's VPC to send the traffic to, for the
+	// The full name of the NAT gateway in the table's VPC to send the traffic
+	// to, for the
 	// IPv4 default route only: a NAT gateway translates IPv4 only. Named in
 	// the gateway's own zone; a name with another zone is refused with
 	// `INVALID_ARGUMENT`.
