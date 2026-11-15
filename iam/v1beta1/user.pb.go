@@ -28,8 +28,8 @@ type User struct {
 	// The user's resource name, `users/{user}`, with their id; never
 	// `users/me`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// How a role binding shows the user: `user:{email}` once `email` is
-	// verified, `userId:{user}` until then.
+	// The user's full name, `//iam.origincloudapis.eu/users/{user}`, which a
+	// role binding names them by as a member.
 	Member string `protobuf:"bytes,2,opt,name=member,proto3" json:"member,omitempty"`
 	// The email address the user signs in with.
 	Email string `protobuf:"bytes,3,opt,name=email,proto3" json:"email,omitempty"`
@@ -167,8 +167,9 @@ type LookupUserRequest struct {
 	// The email address the user's account has verified, matched exactly,
 	// case aside.
 	Email string `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	// The organization the caller looks the user up for, where it needs
-	// `iam.role.assign`: `organizations/{organization}`, or its full name.
+	// The full name of the organization the caller looks the user up for,
+	// where it needs `iam.role.assign`:
+	// `//resourcemanager.origincloudapis.eu/organizations/{organization}`.
 	Organization  string `protobuf:"bytes,2,opt,name=organization,proto3" json:"organization,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -222,10 +223,11 @@ var File_origincloud_iam_v1beta1_user_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_user_proto_rawDesc = "" +
 	"\n" +
-	"\"origincloud/iam/v1beta1/user.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\"\x90\x02\n" +
+	"\"origincloud/iam/v1beta1/user.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\"\xb0\x02\n" +
 	"\x04User\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x1c\n" +
-	"\x06member\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x06member\x12\x1a\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12<\n" +
+	"\x06member\x18\x02 \x01(\tB$\xe2A\x01\x03\xfaA\x1d\n" +
+	"\x1biam.origincloudapis.eu/UserR\x06member\x12\x1a\n" +
 	"\x05email\x18\x03 \x01(\tB\x04\xe2A\x01\x03R\x05email\x12+\n" +
 	"\x0eemail_verified\x18\x04 \x01(\bB\x04\xe2A\x01\x03R\remailVerified\x12#\n" +
 	"\n" +

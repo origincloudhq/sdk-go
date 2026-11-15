@@ -65,9 +65,8 @@ func (c *UserClient) GetUser(ctx context.Context, req *GetUserRequest) (*User, e
 }
 
 // LookupUser looks up the user whose account has verified an email address, and
-// answers them with their `name`: their full name is
-// `//iam.origincloudapis.eu/` followed by it, which is how a role
-// binding names them as a member. Needs `iam.role.assign` on
+// answers them with their `name` and their full name, `member`, which is
+// how a role binding names them. Needs `iam.role.assign` on
 // `organization`, the permission a binding of the user needs anyway.
 // Refused with `NOT_FOUND` when no enabled account has verified the
 // address, and with `CONFLICT` when more than one has. The answer leaves

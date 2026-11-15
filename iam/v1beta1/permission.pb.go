@@ -28,9 +28,6 @@ type Permission struct {
 	// The permission's resource name, `permissions/{service}.{resource}.{action}`,
 	// such as `permissions/pvs.volume.create`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The permission's URN, the identifier access policies and the audit log
-	// use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// The service whose API checks it, such as `pvs`.
 	Service string `protobuf:"bytes,3,opt,name=service,proto3" json:"service,omitempty"`
 	// The kind of resource it applies to, such as `volume`.
@@ -74,13 +71,6 @@ func (*Permission) Descriptor() ([]byte, []int) {
 func (x *Permission) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *Permission) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -356,11 +346,10 @@ var File_origincloud_iam_v1beta1_permission_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_permission_proto_rawDesc = "" +
 	"\n" +
-	"(origincloud/iam/v1beta1/permission.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\"\x82\x02\n" +
+	"(origincloud/iam/v1beta1/permission.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\"\xea\x01\n" +
 	"\n" +
 	"Permission\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12\x1e\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x1e\n" +
 	"\aservice\x18\x03 \x01(\tB\x04\xe2A\x01\x03R\aservice\x12)\n" +
 	"\rresource_type\x18\x04 \x01(\tB\x04\xe2A\x01\x03R\fresourceType\x12\x1c\n" +
 	"\x06action\x18\x05 \x01(\tB\x04\xe2A\x01\x03R\x06action:Y\xeaAV\n" +

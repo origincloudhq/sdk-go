@@ -143,8 +143,9 @@ type ServiceAccount struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// A name of your own, shown in the console; at most 100 characters.
 	DisplayName string `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
-	// The member a role binding names it by,
-	// `serviceAccount:{service_account}`.
+	// The service account's full name,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// which a role binding names it by as a member.
 	Member string `protobuf:"bytes,3,opt,name=member,proto3" json:"member,omitempty"`
 	// The OAuth 2.0 client id it authenticates with; empty for a `WORKLOAD`
 	// service account.
@@ -155,8 +156,11 @@ type ServiceAccount struct {
 	ClientSecret string `protobuf:"bytes,5,opt,name=client_secret,json=clientSecret,proto3" json:"client_secret,omitempty"`
 	// Where the service account is in its lifecycle.
 	State ServiceAccount_State `protobuf:"varint,6,opt,name=state,proto3,enum=origincloud.iam.v1beta1.ServiceAccount_State" json:"state,omitempty"`
-	// Who created the service account, written as a role binding's member
-	// is.
+	// The full name of who created the service account: `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// `//iam.origincloudapis.eu/serviceAgents/{service_agent}` for a platform
+	// service agent, or `//iam.origincloudapis.eu/services/{service}` for a
+	// change the platform made itself.
 	Creator string `protobuf:"bytes,7,opt,name=creator,proto3" json:"creator,omitempty"`
 	// When the service account was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
@@ -662,15 +666,18 @@ var File_origincloud_iam_v1beta1_service_account_proto protoreflect.FileDescript
 
 const file_origincloud_iam_v1beta1_service_account_proto_rawDesc = "" +
 	"\n" +
-	"-origincloud/iam/v1beta1/service_account.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xcc\x06\n" +
+	"-origincloud/iam/v1beta1/service_account.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfc\x06\n" +
 	"\x0eServiceAccount\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12(\n" +
-	"\fdisplay_name\x18\x02 \x01(\tB\x05\xe2A\x02\x02\x05R\vdisplayName\x12\x1c\n" +
-	"\x06member\x18\x03 \x01(\tB\x04\xe2A\x01\x03R\x06member\x12!\n" +
+	"\fdisplay_name\x18\x02 \x01(\tB\x05\xe2A\x02\x02\x05R\vdisplayName\x12F\n" +
+	"\x06member\x18\x03 \x01(\tB.\xe2A\x01\x03\xfaA'\n" +
+	"%iam.origincloudapis.eu/ServiceAccountR\x06member\x12!\n" +
 	"\tclient_id\x18\x04 \x01(\tB\x04\xe2A\x01\x03R\bclientId\x12)\n" +
 	"\rclient_secret\x18\x05 \x01(\tB\x04\xe2A\x01\x03R\fclientSecret\x12I\n" +
-	"\x05state\x18\x06 \x01(\x0e2-.origincloud.iam.v1beta1.ServiceAccount.StateB\x04\xe2A\x01\x03R\x05state\x12\x1e\n" +
-	"\acreator\x18\a \x01(\tB\x04\xe2A\x01\x03R\acreator\x12A\n" +
+	"\x05state\x18\x06 \x01(\x0e2-.origincloud.iam.v1beta1.ServiceAccount.StateB\x04\xe2A\x01\x03R\x05state\x12$\n" +
+	"\acreator\x18\a \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12A\n" +
 	"\vcreate_time\x18\b \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime\x12A\n" +
 	"\vdelete_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
