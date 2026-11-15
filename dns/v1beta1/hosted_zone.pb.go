@@ -266,8 +266,6 @@ type HostedZone struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The zone's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The zone's URN, the identifier access policies and the audit log use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// The domain, such as `example.com`, without the final dot; answered in
 	// lowercase. A public zone's has at least two labels and at most 235
 	// characters, so its challenge name fits, and isn't a special-use domain
@@ -297,8 +295,10 @@ type HostedZone struct {
 	Challenge *OwnershipChallenge `protobuf:"bytes,7,opt,name=challenge,proto3" json:"challenge,omitempty"`
 	// When the zone was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
-	// The principal that created the zone, such as `user:<id>` or
-	// `service_account:<id>`.
+	// The principal that created the zone, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator string `protobuf:"bytes,9,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Labels of your own, at most 50. The `origin:name` tag is the name the
 	// console shows.
@@ -340,13 +340,6 @@ func (*HostedZone) Descriptor() ([]byte, []int) {
 func (x *HostedZone) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *HostedZone) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -938,11 +931,10 @@ var File_origincloud_dns_v1beta1_hosted_zone_proto protoreflect.FileDescriptor
 
 const file_origincloud_dns_v1beta1_hosted_zone_proto_rawDesc = "" +
 	"\n" +
-	")origincloud/dns/v1beta1/hosted_zone.proto\x12\x17origincloud.dns.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe4\x06\n" +
+	")origincloud/dns/v1beta1/hosted_zone.proto\x12\x17origincloud.dns.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd2\x06\n" +
 	"\n" +
 	"HostedZone\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12 \n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12 \n" +
 	"\bdns_name\x18\x03 \x01(\tB\x05\xe2A\x02\x02\x05R\adnsName\x12U\n" +
 	"\n" +
 	"visibility\x18\x04 \x01(\x0e2..origincloud.dns.v1beta1.HostedZone.VisibilityB\x05\xe2A\x02\x02\x05R\n" +
@@ -951,8 +943,10 @@ const file_origincloud_dns_v1beta1_hosted_zone_proto_rawDesc = "" +
 	"\fname_servers\x18\x06 \x03(\tB\x04\xe2A\x01\x03R\vnameServers\x12O\n" +
 	"\tchallenge\x18\a \x01(\v2+.origincloud.dns.v1beta1.OwnershipChallengeB\x04\xe2A\x01\x03R\tchallenge\x12A\n" +
 	"\vcreate_time\x18\b \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"createTime\x12\x1e\n" +
-	"\acreator\x18\t \x01(\tB\x04\xe2A\x01\x03R\acreator\x12G\n" +
+	"createTime\x12$\n" +
+	"\acreator\x18\t \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12G\n" +
 	"\x04tags\x18\n" +
 	" \x03(\v2-.origincloud.dns.v1beta1.HostedZone.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
