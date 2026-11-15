@@ -259,9 +259,9 @@ type ListAuditLogEntriesRequest struct {
 	//
 	//	aip.dev/not-precedent: a typed filter, in place of a filter string. --)
 	Project string `protobuf:"bytes,2,opt,name=project,proto3" json:"project,omitempty"`
-	// Only the entries of changes made by this member's account,
-	// `user:{email}`, `serviceAccount:{service_account}` or
-	// `serviceAgent:{service_agent}`. Every actor's when empty.
+	// Only the entries of changes made by this member, named by its full
+	// name as a role binding's member is, or as an entry's `actor` shows it.
+	// Every actor's when empty.
 	//
 	// (-- api-linter: core::0132::request-unknown-fields=disabled
 	//
@@ -453,12 +453,14 @@ const file_origincloud_iam_v1beta1_audit_log_proto_rawDesc = "" +
 	"$iam.origincloudapis.eu/AuditLogEntry\x12>organizations/{organization}/auditLogEntries/{audit_log_entry}*\x0fauditLogEntries2\rauditLogEntry\"\\\n" +
 	"\x17GetAuditLogEntryRequest\x12A\n" +
 	"\x04name\x18\x01 \x01(\tB-\xe2A\x01\x02\xfaA&\n" +
-	"$iam.origincloudapis.eu/AuditLogEntryR\x04name\"\xb4\x02\n" +
+	"$iam.origincloudapis.eu/AuditLogEntryR\x04name\"\xba\x02\n" +
 	"\x1aListAuditLogEntriesRequest\x12E\n" +
 	"\x06parent\x18\x01 \x01(\tB-\xe2A\x01\x02\xfaA&\x12$iam.origincloudapis.eu/AuditLogEntryR\x06parent\x12M\n" +
 	"\aproject\x18\x02 \x01(\tB3\xe2A\x01\x01\xfaA,\n" +
-	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12\x1a\n" +
-	"\x05actor\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\x05actor\x12\x1c\n" +
+	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12 \n" +
+	"\x05actor\x18\x03 \x01(\tB\n" +
+	"\xe2A\x01\x01\xfaA\x03\n" +
+	"\x01*R\x05actor\x12\x1c\n" +
 	"\x06action\x18\x04 \x01(\tB\x04\xe2A\x01\x01R\x06action\x12!\n" +
 	"\tpage_size\x18\x05 \x01(\x05B\x04\xe2A\x01\x01R\bpageSize\x12#\n" +
 	"\n" +

@@ -40,10 +40,12 @@ type RoleBinding struct {
 	// The binding's URN, the identifier access policies and the audit log
 	// use.
 	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
-	// Who holds the role: `user:{email}`, `serviceAccount:{service_account}`
-	// or `serviceAgent:{service_agent}`. A user is shown with their
-	// account's current verified address, as `userId:{user}` when it has
-	// none, or as `deleted:user:{user}` once the account is gone.
+	// Who holds the role: given as a member's full name, such as
+	// `//iam.origincloudapis.eu/users/{user}`, or in the form shown here.
+	// Shown as `user:{email}`, `serviceAccount:{service_account}` or
+	// `serviceAgent:{service_agent}`: a user with their account's current
+	// verified address, as `userId:{user}` when it has none, or as
+	// `deleted:user:{user}` once the account is gone.
 	Member string `protobuf:"bytes,3,opt,name=member,proto3" json:"member,omitempty"`
 	// The role granted, `roles/{role}`.
 	Role string `protobuf:"bytes,4,opt,name=role,proto3" json:"role,omitempty"`
@@ -193,9 +195,9 @@ type ListRoleBindingsRequest struct {
 	// or `organizations/-` for the caller's own bindings in every
 	// organization.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
-	// Only the bindings of this member, `user:{email}`,
-	// `serviceAccount:{service_account}` or `serviceAgent:{service_agent}`.
-	// Every member's when empty.
+	// Only the bindings of this member, by its full name, such as
+	// `//iam.origincloudapis.eu/users/{user}`, or as a binding's `member`
+	// shows it. Every member's when empty.
 	//
 	// (-- api-linter: core::0132::request-unknown-fields=disabled
 	//
@@ -465,11 +467,12 @@ var File_origincloud_iam_v1beta1_role_binding_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\n" +
-	"*origincloud/iam/v1beta1/role_binding.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xca\x03\n" +
+	"*origincloud/iam/v1beta1/role_binding.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd0\x03\n" +
 	"\vRoleBinding\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12\x1d\n" +
-	"\x06member\x18\x03 \x01(\tB\x05\xe2A\x02\x02\x05R\x06member\x129\n" +
+	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12#\n" +
+	"\x06member\x18\x03 \x01(\tB\v\xe2A\x02\x02\x05\xfaA\x03\n" +
+	"\x01*R\x06member\x129\n" +
 	"\x04role\x18\x04 \x01(\tB%\xe2A\x02\x02\x05\xfaA\x1d\n" +
 	"\x1biam.origincloudapis.eu/RoleR\x04role\x12N\n" +
 	"\aproject\x18\x05 \x01(\tB4\xe2A\x02\x01\x05\xfaA,\n" +
@@ -480,10 +483,12 @@ const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\"iam.origincloudapis.eu/RoleBinding\x128organizations/{organization}/roleBindings/{role_binding}*\froleBindings2\vroleBinding\"X\n" +
 	"\x15GetRoleBindingRequest\x12?\n" +
 	"\x04name\x18\x01 \x01(\tB+\xe2A\x01\x02\xfaA$\n" +
-	"\"iam.origincloudapis.eu/RoleBindingR\x04name\"\x93\x02\n" +
+	"\"iam.origincloudapis.eu/RoleBindingR\x04name\"\x99\x02\n" +
 	"\x17ListRoleBindingsRequest\x12C\n" +
-	"\x06parent\x18\x01 \x01(\tB+\xe2A\x01\x02\xfaA$\x12\"iam.origincloudapis.eu/RoleBindingR\x06parent\x12\x1c\n" +
-	"\x06member\x18\x02 \x01(\tB\x04\xe2A\x01\x01R\x06member\x12M\n" +
+	"\x06parent\x18\x01 \x01(\tB+\xe2A\x01\x02\xfaA$\x12\"iam.origincloudapis.eu/RoleBindingR\x06parent\x12\"\n" +
+	"\x06member\x18\x02 \x01(\tB\n" +
+	"\xe2A\x01\x01\xfaA\x03\n" +
+	"\x01*R\x06member\x12M\n" +
 	"\aproject\x18\x03 \x01(\tB3\xe2A\x01\x01\xfaA,\n" +
 	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12!\n" +
 	"\tpage_size\x18\x04 \x01(\x05B\x04\xe2A\x01\x01R\bpageSize\x12#\n" +
