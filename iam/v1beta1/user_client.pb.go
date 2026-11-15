@@ -12,9 +12,11 @@ import (
 
 // UserClient calls UserService.
 //
-// The signed-in user. Each user can read only their own profile, by the
-// name `users/me` or by their own id; the role bindings they hold are
-// listed by ListRoleBindings with the parent `organizations/-`.
+// Users. Each user can read only their own profile, by the name `users/me`
+// or by their own id; the role bindings they hold are listed by
+// ListRoleBindings with the parent `organizations/-`. Anyone who may grant
+// roles in an organization can look a user up by email address, to name
+// them in a role binding.
 type UserClient struct {
 	service *core.Service
 }
@@ -54,6 +56,31 @@ func (c *UserClient) GetUser(ctx context.Context, req *GetUserRequest) (*User, e
 	if err := c.service.Call(ctx, core.Request{
 		Method:     http.MethodGet,
 		Path:       "/v1beta1/" + p1,
+		Query:      query,
+		Idempotent: true,
+	}, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// LookupUser looks up the user whose account has verified an email address, and
+// answers them with their `name`: their full name is
+// `//iam.origincloudapis.eu/` followed by it, which is how a role
+// binding names them as a member. Needs `iam.role.assign` on
+// `organization`, the permission a binding of the user needs anyway.
+// Refused with `NOT_FOUND` when no enabled account has verified the
+// address, and with `CONFLICT` when more than one has. The answer leaves
+// `given_name` and `family_name` empty: only the user reads those.
+func (c *UserClient) LookupUser(ctx context.Context, req *LookupUserRequest) (*User, error) {
+	query, err := core.Query(req)
+	if err != nil {
+		return nil, err
+	}
+	out := new(User)
+	if err := c.service.Call(ctx, core.Request{
+		Method:     http.MethodGet,
+		Path:       "/v1beta1/users:lookup",
 		Query:      query,
 		Idempotent: true,
 	}, out); err != nil {
