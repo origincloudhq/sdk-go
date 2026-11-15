@@ -35,8 +35,6 @@ type PublicImage struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The image's resource name, `zones/{zone}/images/{image}`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The image's URN, the identifier access policies and the audit log use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// What the image holds.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
 	// The account an instance launched from the image logs in as, unless the
@@ -52,8 +50,9 @@ type PublicImage struct {
 	Platform Image_Platform `protobuf:"varint,8,opt,name=platform,proto3,enum=origincloud.compute.v1beta1.Image_Platform" json:"platform,omitempty"`
 	// Where it is in its lifecycle.
 	State Image_State `protobuf:"varint,9,opt,name=state,proto3,enum=origincloud.compute.v1beta1.Image_State" json:"state,omitempty"`
-	// The family the image belongs to, `imageFamilies/{image_family}`; empty
-	// for an image of none.
+	// The full name of the family the image belongs to,
+	// `//compute.origincloudapis.eu/imageFamilies/{image_family}`; empty for
+	// an image of none.
 	ImageFamily string `protobuf:"bytes,10,opt,name=image_family,json=imageFamily,proto3" json:"image_family,omitempty"`
 	// Whether `image_family` launches this image now.
 	FamilyCurrent bool `protobuf:"varint,11,opt,name=family_current,json=familyCurrent,proto3" json:"family_current,omitempty"`
@@ -94,13 +93,6 @@ func (*PublicImage) Descriptor() ([]byte, []int) {
 func (x *PublicImage) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *PublicImage) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -394,10 +386,9 @@ var File_origincloud_compute_v1beta1_public_image_proto protoreflect.FileDescrip
 
 const file_origincloud_compute_v1beta1_public_image_proto_rawDesc = "" +
 	"\n" +
-	".origincloud/compute/v1beta1/public_image.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a'origincloud/compute/v1beta1/image.proto\"\xed\x05\n" +
+	".origincloud/compute/v1beta1/public_image.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a'origincloud/compute/v1beta1/image.proto\"\xd5\x05\n" +
 	"\vPublicImage\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12&\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12&\n" +
 	"\vdescription\x18\x03 \x01(\tB\x04\xe2A\x01\x03R\vdescription\x12'\n" +
 	"\fdefault_user\x18\x04 \x01(\tB\x04\xe2A\x01\x03R\vdefaultUser\x12%\n" +
 	"\vroot_device\x18\x05 \x01(\tB\x04\xe2A\x01\x03R\n" +

@@ -103,10 +103,7 @@ type VolumeAttachment struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The attachment's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The attachment's URN, the identifier access policies and the audit log
-	// use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
-	// The volume, in the instance's project and zone.
+	// The volume's full name, in the instance's project and zone.
 	Volume string `protobuf:"bytes,3,opt,name=volume,proto3" json:"volume,omitempty"`
 	// The device name the guest sees the volume under, `vda` to `vdz`. The
 	// first free one when left empty.
@@ -153,13 +150,6 @@ func (*VolumeAttachment) Descriptor() ([]byte, []int) {
 func (x *VolumeAttachment) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *VolumeAttachment) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -250,7 +240,8 @@ type ListVolumeAttachmentsRequest struct {
 	PageSize int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A previous response's `next_page_token`, for the page after it.
 	PageToken string `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	// Only the attachments of this volume; every volume's when left empty.
+	// Only the attachments of this volume, by its full name; every volume's
+	// when left empty.
 	//
 	// (-- api-linter: core::0132::request-unknown-fields=disabled
 	//
@@ -499,10 +490,9 @@ var File_origincloud_compute_v1beta1_volume_attachment_proto protoreflect.FileDe
 
 const file_origincloud_compute_v1beta1_volume_attachment_proto_rawDesc = "" +
 	"\n" +
-	"3origincloud/compute/v1beta1/volume_attachment.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xd1\x04\n" +
+	"3origincloud/compute/v1beta1/volume_attachment.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xb9\x04\n" +
 	"\x10VolumeAttachment\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12?\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12?\n" +
 	"\x06volume\x18\x03 \x01(\tB'\xe2A\x02\x02\x05\xfaA\x1f\n" +
 	"\x1dpvs.origincloudapis.eu/VolumeR\x06volume\x12\x1d\n" +
 	"\x06device\x18\x04 \x01(\tB\x05\xe2A\x02\x05\x01R\x06device\x12\x18\n" +

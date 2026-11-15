@@ -360,25 +360,25 @@ type Instance struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The instance's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The instance's URN, the identifier access policies and the audit log
-	// use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
-	// The instance type, `instanceTypes/{instance_type}`, such as
-	// `instanceTypes/gp1.core.2`: one whose `available` is true. Changing it
+	// The instance type by its full name,
+	// `//compute.origincloudapis.eu/instanceTypes/{instance_type}`, such as
+	// `//compute.origincloudapis.eu/instanceTypes/gp1.core.2`: one whose
+	// `available` is true. Changing it
 	// needs the instance `STOPPED`.
 	InstanceType string `protobuf:"bytes,3,opt,name=instance_type,json=instanceType,proto3" json:"instance_type,omitempty"`
-	// The image the boot volume is created from, in the instance's zone: one
-	// of the project's own, `projects/{project}/zones/{zone}/images/{image}`,
-	// or a public one, `zones/{zone}/images/{image}`. Set exactly one of
+	// The full name of the image the boot volume is created from, in the
+	// instance's zone: one of the project's own,
+	// `//compute.origincloudapis.eu/projects/{project}/zones/{zone}/images/{image}`,
+	// or a public one, `//compute.origincloudapis.eu/zones/{zone}/images/{image}`. Set exactly one of
 	// `image` and `image_family`; launched from a family, this is the public
 	// image the family resolved to.
 	Image string `protobuf:"bytes,4,opt,name=image,proto3" json:"image,omitempty"`
-	// The image family to launch the current public image of,
-	// `imageFamilies/{image_family}`. Set exactly one of `image` and
+	// The full name of the image family to launch the current public image
+	// of, `//compute.origincloudapis.eu/imageFamilies/{image_family}`. Set exactly one of `image` and
 	// `image_family`. Empty when the instance was launched from an image.
 	ImageFamily string `protobuf:"bytes,5,opt,name=image_family,json=imageFamily,proto3" json:"image_family,omitempty"`
-	// The key pair whose public key is installed for `login_user`, in the
-	// instance's project.
+	// The full name of the key pair whose public key is installed for
+	// `login_user`, in the instance's project.
 	KeyPair string `protobuf:"bytes,6,opt,name=key_pair,json=keyPair,proto3" json:"key_pair,omitempty"`
 	// The account to log in as: a user created at first boot that holds the
 	// key pair. A POSIX user name of at most 32 lowercase letters, digits,
@@ -388,8 +388,8 @@ type Instance struct {
 	// The boot volume: its size and storage class at launch, and the volume.
 	// The image's size on the default storage class when left out.
 	BootVolume *BootVolume `protobuf:"bytes,8,opt,name=boot_volume,json=bootVolume,proto3" json:"boot_volume,omitempty"`
-	// The network interfaces, in device order, the boot interface first;
-	// exactly one today. Each is an existing interface in the instance's
+	// The network interfaces' full names, in device order, the boot
+	// interface first; exactly one today. Each is an existing interface in the instance's
 	// project and zone that nothing else holds, created with the network
 	// service: its subnet and security groups are the instance's.
 	// Terminating the instance releases it, and it stays. An instance
@@ -407,8 +407,10 @@ type Instance struct {
 	Health *InstanceHealth `protobuf:"bytes,12,opt,name=health,proto3" json:"health,omitempty"`
 	// When the instance was launched.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
-	// The principal that launched the instance, such as `user:<id>` or
-	// `service_account:<id>`.
+	// The principal that launched the instance, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator string `protobuf:"bytes,14,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Labels of your own, at most 50. The `origin:name` tag is the name the
 	// console shows.
@@ -416,8 +418,8 @@ type Instance struct {
 	// Each network interface's private addresses, in the order of
 	// `network_interfaces`; an interface not attached yet has none.
 	InterfaceAddresses []*InterfaceAddresses `protobuf:"bytes,16,rep,name=interface_addresses,json=interfaceAddresses,proto3" json:"interface_addresses,omitempty"`
-	// The service account the instance runs as,
-	// `organizations/{organization}/serviceAccounts/{service_account}`: a
+	// The full name of the service account the instance runs as,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`: a
 	// `WORKLOAD` service account of the instance's organization that isn't
 	// deleted. Launching with one, or updating the instance to one, needs
 	// `iam.service_account.act_as` on the organization as well; an update
@@ -461,13 +463,6 @@ func (*Instance) Descriptor() ([]byte, []int) {
 func (x *Instance) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *Instance) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -584,10 +579,11 @@ type BootVolume struct {
 	// size; the image's size when left at 0. Grow the volume itself to
 	// resize it; this keeps the size at launch.
 	SizeGib int32 `protobuf:"varint,1,opt,name=size_gib,json=sizeGib,proto3" json:"size_gib,omitempty"`
-	// The storage class, `storageClasses/{storage_class}` of the persistent
-	// volume service; the default class when left empty.
+	// The storage class by its full name,
+	// `//pvs.origincloudapis.eu/storageClasses/{storage_class}`; the default
+	// class when left empty.
 	StorageClass string `protobuf:"bytes,2,opt,name=storage_class,json=storageClass,proto3" json:"storage_class,omitempty"`
-	// The volume, in the instance's project and zone.
+	// The volume's full name, in the instance's project and zone.
 	Volume        string `protobuf:"bytes,3,opt,name=volume,proto3" json:"volume,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -647,7 +643,7 @@ func (x *BootVolume) GetVolume() string {
 // The private addresses of one of an instance's network interfaces.
 type InterfaceAddresses struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The network interface.
+	// The network interface's full name.
 	NetworkInterface string `protobuf:"bytes,1,opt,name=network_interface,json=networkInterface,proto3" json:"network_interface,omitempty"`
 	// Its private IPv4 address.
 	Ipv4Address string `protobuf:"bytes,2,opt,name=ipv4_address,json=ipv4Address,proto3" json:"ipv4_address,omitempty"`
@@ -1311,10 +1307,9 @@ var File_origincloud_compute_v1beta1_instance_proto protoreflect.FileDescriptor
 
 const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"\n" +
-	"*origincloud/compute/v1beta1/instance.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xc1\v\n" +
+	"*origincloud/compute/v1beta1/instance.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xaf\v\n" +
 	"\bInstance\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12U\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12U\n" +
 	"\rinstance_type\x18\x03 \x01(\tB0\xe2A\x01\x02\xfaA)\n" +
 	"'compute.origincloudapis.eu/InstanceTypeR\finstanceType\x12@\n" +
 	"\x05image\x18\x04 \x01(\tB*\xe2A\x02\x05\x01\xfaA\"\n" +
@@ -1334,8 +1329,10 @@ const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"\fstate_reason\x18\v \x01(\tB\x04\xe2A\x01\x03R\vstateReason\x12I\n" +
 	"\x06health\x18\f \x01(\v2+.origincloud.compute.v1beta1.InstanceHealthB\x04\xe2A\x01\x03R\x06health\x12A\n" +
 	"\vcreate_time\x18\r \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"createTime\x12\x1e\n" +
-	"\acreator\x18\x0e \x01(\tB\x04\xe2A\x01\x03R\acreator\x12I\n" +
+	"createTime\x12$\n" +
+	"\acreator\x18\x0e \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12I\n" +
 	"\x04tags\x18\x0f \x03(\v2/.origincloud.compute.v1beta1.Instance.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x12f\n" +
 	"\x13interface_addresses\x18\x10 \x03(\v2/.origincloud.compute.v1beta1.InterfaceAddressesB\x04\xe2A\x01\x03R\x12interfaceAddresses\x12W\n" +
 	"\x0fservice_account\x18\x11 \x01(\tB.\xe2A\x01\x01\xfaA'\n" +
