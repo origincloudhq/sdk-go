@@ -36,7 +36,7 @@ func (c *LegalAcceptanceClient) Service() *core.Service {
 // ListLegalAcceptances lists a billing account's acceptances, the latest first. Needs
 // `admin.billing_account.get` on the organization.
 func (c *LegalAcceptanceClient) ListLegalAcceptances(ctx context.Context, req *ListLegalAcceptancesRequest) (*ListLegalAcceptancesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*/billingAccounts/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*/billingAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +84,7 @@ func (c *LegalAcceptanceClient) AllLegalAcceptances(ctx context.Context, req *Li
 // GetLegalAcceptance returns one of a billing account's acceptances. Needs
 // `admin.billing_account.get` on the organization.
 func (c *LegalAcceptanceClient) GetLegalAcceptance(ctx context.Context, req *GetLegalAcceptanceRequest) (*LegalAcceptance, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*/legalAcceptances/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*/legalAcceptances/*")
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (c *LegalAcceptanceClient) GetLegalAcceptance(ctx context.Context, req *Get
 // `acts_as_business` must be true: the services are offered to businesses
 // only. Needs `admin.billing_account.update` on the organization.
 func (c *LegalAcceptanceClient) AcceptLegalDocuments(ctx context.Context, req *AcceptLegalDocumentsRequest) (*ListLegalAcceptancesResponse, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (c *LegalAcceptanceClient) AcceptLegalDocuments(ctx context.Context, req *A
 // account is refused. Running resources are never affected. Needs
 // `admin.billing_account.get` on the organization.
 func (c *LegalAcceptanceClient) QueryLegalRequirements(ctx context.Context, req *QueryLegalRequirementsRequest) (*QueryLegalRequirementsResponse, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
 	if err != nil {
 		return nil, err
 	}

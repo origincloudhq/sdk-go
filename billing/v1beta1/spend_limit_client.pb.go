@@ -35,7 +35,7 @@ func (c *SpendLimitClient) Service() *core.Service {
 // GetSpendLimit returns a billing account's spend limit; one that has none has no
 // `limit`. Needs `admin.spend_limit.get` on the organization.
 func (c *SpendLimitClient) GetSpendLimit(ctx context.Context, req *GetSpendLimitRequest) (*SpendLimit, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*/spendLimit")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*/spendLimit")
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *SpendLimitClient) GetSpendLimit(ctx context.Context, req *GetSpendLimit
 // without a `limit` is removed, with its thresholds and recipients. Needs
 // `admin.spend_limit.update` on the organization.
 func (c *SpendLimitClient) UpdateSpendLimit(ctx context.Context, req *UpdateSpendLimitRequest) (*SpendLimit, error) {
-	p1, err := core.PathValue("spendLimit.name", req.GetSpendLimit().GetName(), "organizations/*/billingAccounts/*/spendLimit")
+	p1, err := c.service.PathValue("spendLimit.name", req.GetSpendLimit().GetName(), "organizations/*/billingAccounts/*/spendLimit")
 	if err != nil {
 		return nil, err
 	}

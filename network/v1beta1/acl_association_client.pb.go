@@ -38,7 +38,7 @@ func (c *AclAssociationClient) Service() *core.Service {
 
 // GetAclAssociation returns an ACL association.
 func (c *AclAssociationClient) GetAclAssociation(ctx context.Context, req *GetAclAssociationRequest) (*AclAssociation, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/subnets/*/aclAssociations/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/subnets/*/aclAssociations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *AclAssociationClient) GetAclAssociation(ctx context.Context, req *GetAc
 
 // ListAclAssociations lists a subnet's ACL associations: none or one.
 func (c *AclAssociationClient) ListAclAssociations(ctx context.Context, req *ListAclAssociationsRequest) (*ListAclAssociationsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*/subnets/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*/subnets/*")
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (c *AclAssociationClient) CreateAclAssociation(ctx context.Context, req *Cr
 		req = proto.Clone(req).(*CreateAclAssociationRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*/subnets/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*/subnets/*")
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (c *AclAssociationClient) DeleteAclAssociation(ctx context.Context, req *De
 		req = proto.Clone(req).(*DeleteAclAssociationRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/subnets/*/aclAssociations/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/subnets/*/aclAssociations/*")
 	if err != nil {
 		return nil, err
 	}

@@ -86,7 +86,7 @@ func (c *LegalDocumentClient) AllLegalDocuments(ctx context.Context, req *ListLe
 // one published. Fails with `NOT_FOUND` for a document with no published
 // version.
 func (c *LegalDocumentClient) GetLegalDocument(ctx context.Context, req *GetLegalDocumentRequest) (*LegalDocument, error) {
-	p1, err := core.PathValue("name", req.GetName(), "legalDocuments/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "legalDocuments/*")
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +108,7 @@ func (c *LegalDocumentClient) GetLegalDocument(ctx context.Context, req *GetLega
 
 // ListLegalDocumentVersions lists a legal document's published versions, the latest first.
 func (c *LegalDocumentClient) ListLegalDocumentVersions(ctx context.Context, req *ListLegalDocumentVersionsRequest) (*ListLegalDocumentVersionsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "legalDocuments/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "legalDocuments/*")
 	if err != nil {
 		return nil, err
 	}
@@ -155,7 +155,7 @@ func (c *LegalDocumentClient) AllLegalDocumentVersions(ctx context.Context, req 
 
 // GetLegalDocumentVersion returns one published version of a legal document, its text included.
 func (c *LegalDocumentClient) GetLegalDocumentVersion(ctx context.Context, req *GetLegalDocumentVersionRequest) (*LegalDocumentVersion, error) {
-	p1, err := core.PathValue("name", req.GetName(), "legalDocuments/*/versions/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "legalDocuments/*/versions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func (c *LegalDocumentClient) GetLegalDocumentVersion(ctx context.Context, req *
 // It returns the file the API answers with as it is: its bytes in Data,
 // their media type in ContentType.
 func (c *LegalDocumentClient) DownloadLegalDocumentVersion(ctx context.Context, req *DownloadLegalDocumentVersionRequest) (*httpbody.HttpBody, error) {
-	p1, err := core.PathValue("name", req.GetName(), "legalDocuments/*/versions/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "legalDocuments/*/versions/*")
 	if err != nil {
 		return nil, err
 	}

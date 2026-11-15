@@ -37,7 +37,7 @@ func (c *SecurityGroupRuleClient) Service() *core.Service {
 
 // GetSecurityGroupRule returns a security group rule.
 func (c *SecurityGroupRuleClient) GetSecurityGroupRule(ctx context.Context, req *GetSecurityGroupRuleRequest) (*SecurityGroupRule, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/securityGroups/*/rules/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/securityGroups/*/rules/*")
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (c *SecurityGroupRuleClient) GetSecurityGroupRule(ctx context.Context, req 
 
 // ListSecurityGroupRules lists a security group's rules of both directions, oldest first.
 func (c *SecurityGroupRuleClient) ListSecurityGroupRules(ctx context.Context, req *ListSecurityGroupRulesRequest) (*ListSecurityGroupRulesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*/securityGroups/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*/securityGroups/*")
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *SecurityGroupRuleClient) CreateSecurityGroupRule(ctx context.Context, r
 		req = proto.Clone(req).(*CreateSecurityGroupRuleRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*/securityGroups/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*/securityGroups/*")
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (c *SecurityGroupRuleClient) DeleteSecurityGroupRule(ctx context.Context, r
 		req = proto.Clone(req).(*DeleteSecurityGroupRuleRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/securityGroups/*/rules/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/securityGroups/*/rules/*")
 	if err != nil {
 		return nil, err
 	}

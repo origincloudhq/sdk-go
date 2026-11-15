@@ -38,7 +38,7 @@ func (c *CostClient) Service() *core.Service {
 // QueryProjectCost returns a project's cost in a period, by service and product, in hourly
 // or daily buckets. Needs `admin.usage.list` on the organization.
 func (c *CostClient) QueryProjectCost(ctx context.Context, req *QueryProjectCostRequest) (*CostReport, error) {
-	p1, err := core.PathValue("project", req.GetProject(), "projects/*")
+	p1, err := c.service.PathValue("project", req.GetProject(), "projects/*")
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *CostClient) QueryProjectCost(ctx context.Context, req *QueryProjectCost
 // `admin.usage.list` on the organization, which reads every project's
 // cost in it.
 func (c *CostClient) QueryOrganizationCost(ctx context.Context, req *QueryOrganizationCostRequest) (*OrganizationCostReport, error) {
-	p1, err := core.PathValue("organization", req.GetOrganization(), "organizations/*")
+	p1, err := c.service.PathValue("organization", req.GetOrganization(), "organizations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +89,7 @@ func (c *CostClient) QueryOrganizationCost(ctx context.Context, req *QueryOrgani
 // later cost. Its spend limit compares the calendar month's total with
 // `limit`. Needs `admin.spend_limit.get` on the organization.
 func (c *CostClient) QueryBillingAccountCost(ctx context.Context, req *QueryBillingAccountCostRequest) (*CostReport, error) {
-	p1, err := core.PathValue("billingAccount", req.GetBillingAccount(), "organizations/*/billingAccounts/*")
+	p1, err := c.service.PathValue("billingAccount", req.GetBillingAccount(), "organizations/*/billingAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (c *CostClient) QueryBillingAccountCost(ctx context.Context, req *QueryBill
 // input its cost is priced from, oldest first. Needs `admin.usage.list`
 // on the organization.
 func (c *CostClient) QueryProjectUsage(ctx context.Context, req *QueryProjectUsageRequest) (*QueryProjectUsageResponse, error) {
-	p1, err := core.PathValue("project", req.GetProject(), "projects/*")
+	p1, err := c.service.PathValue("project", req.GetProject(), "projects/*")
 	if err != nil {
 		return nil, err
 	}

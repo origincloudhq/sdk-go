@@ -41,7 +41,7 @@ func (c *GrantClient) Service() *core.Service {
 // retryable, until its zone's change arrives. Needs `kms.grant.get` on
 // the project.
 func (c *GrantClient) GetGrant(ctx context.Context, req *GetGrantRequest) (*Grant, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*/grants/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*/grants/*")
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +65,7 @@ func (c *GrantClient) GetGrant(ctx context.Context, req *GetGrantRequest) (*Gran
 // name. A grant made moments ago may be missing from the list until its
 // zone's change arrives. Needs `kms.grant.list` on the project.
 func (c *GrantClient) ListGrants(ctx context.Context, req *ListGrantsRequest) (*ListGrantsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*/keys/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*/keys/*")
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (c *GrantClient) CreateGrant(ctx context.Context, req *CreateGrantRequest) 
 		req = proto.Clone(req).(*CreateGrantRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*/keys/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*/keys/*")
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (c *GrantClient) CreateGrant(ctx context.Context, req *CreateGrantRequest) 
 // grant isn't renewed: `CONFLICT`, and a new one is made instead. Needs
 // `kms.grant.update` on the project.
 func (c *GrantClient) RenewGrant(ctx context.Context, req *RenewGrantRequest) (*Grant, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*/grants/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*/grants/*")
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (c *GrantClient) RenewGrant(ctx context.Context, req *RenewGrantRequest) (*
 // DeleteGrant ends a grant before it expires: from then on it opens nothing. Needs
 // `kms.grant.delete` on the project.
 func (c *GrantClient) DeleteGrant(ctx context.Context, req *DeleteGrantRequest) (*emptypb.Empty, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*/grants/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*/grants/*")
 	if err != nil {
 		return nil, err
 	}

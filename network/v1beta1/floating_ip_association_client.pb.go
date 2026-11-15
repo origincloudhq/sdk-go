@@ -38,7 +38,7 @@ func (c *FloatingIpAssociationClient) Service() *core.Service {
 
 // GetFloatingIpAssociation returns a floating IP association.
 func (c *FloatingIpAssociationClient) GetFloatingIpAssociation(ctx context.Context, req *GetFloatingIpAssociationRequest) (*FloatingIpAssociation, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/floatingIps/*/associations/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/floatingIps/*/associations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *FloatingIpAssociationClient) GetFloatingIpAssociation(ctx context.Conte
 
 // ListFloatingIpAssociations lists a floating IP's associations: none or one.
 func (c *FloatingIpAssociationClient) ListFloatingIpAssociations(ctx context.Context, req *ListFloatingIpAssociationsRequest) (*ListFloatingIpAssociationsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*/floatingIps/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*/floatingIps/*")
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *FloatingIpAssociationClient) CreateFloatingIpAssociation(ctx context.Co
 		req = proto.Clone(req).(*CreateFloatingIpAssociationRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*/floatingIps/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*/floatingIps/*")
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (c *FloatingIpAssociationClient) DeleteFloatingIpAssociation(ctx context.Co
 		req = proto.Clone(req).(*DeleteFloatingIpAssociationRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/floatingIps/*/associations/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/floatingIps/*/associations/*")
 	if err != nil {
 		return nil, err
 	}

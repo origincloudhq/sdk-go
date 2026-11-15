@@ -32,7 +32,7 @@ func (c *RoleClient) Service() *core.Service {
 
 // GetRole returns a role.
 func (c *RoleClient) GetRole(ctx context.Context, req *GetRoleRequest) (*Role, error) {
-	p1, err := core.PathValue("name", req.GetName(), "roles/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "roles/*")
 	if err != nil {
 		return nil, err
 	}

@@ -38,7 +38,7 @@ func (c *KeyClient) Service() *core.Service {
 
 // GetKey returns a key, deleted or not. Needs `kms.key.get` on the project.
 func (c *KeyClient) GetKey(ctx context.Context, req *GetKeyRequest) (*Key, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *KeyClient) GetKey(ctx context.Context, req *GetKeyRequest) (*Key, error
 // than `page_size` and still be followed by another. Needs `kms.key.list`
 // on the project.
 func (c *KeyClient) ListKeys(ctx context.Context, req *ListKeysRequest) (*ListKeysResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *KeyClient) CreateKey(ctx context.Context, req *CreateKeyRequest) (*Key,
 		req = proto.Clone(req).(*CreateKeyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (c *KeyClient) UpdateKey(ctx context.Context, req *UpdateKeyRequest) (*Key,
 		req = proto.Clone(req).(*UpdateKeyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("key.name", req.GetKey().GetName(), "projects/*/regions/*/keys/*")
+	p1, err := c.service.PathValue("key.name", req.GetKey().GetName(), "projects/*/regions/*/keys/*")
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +182,7 @@ func (c *KeyClient) DeleteKey(ctx context.Context, req *DeleteKeyRequest) (*Key,
 		req = proto.Clone(req).(*DeleteKeyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
 	if err != nil {
 		return nil, err
 	}
@@ -212,7 +212,7 @@ func (c *KeyClient) UndeleteKey(ctx context.Context, req *UndeleteKeyRequest) (*
 		req = proto.Clone(req).(*UndeleteKeyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +238,7 @@ func (c *KeyClient) RotateKey(ctx context.Context, req *RotateKeyRequest) (*Key,
 		req = proto.Clone(req).(*RotateKeyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
 	if err != nil {
 		return nil, err
 	}
@@ -260,7 +260,7 @@ func (c *KeyClient) RotateKey(ctx context.Context, req *RotateKeyRequest) (*Key,
 // that isn't enabled, and with `BAD_REQUEST` for a signing key. Needs
 // `kms.key.encrypt` on the project.
 func (c *KeyClient) Encrypt(ctx context.Context, req *EncryptRequest) (*EncryptResponse, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
 	if err != nil {
 		return nil, err
 	}
@@ -281,7 +281,7 @@ func (c *KeyClient) Encrypt(ctx context.Context, req *EncryptRequest) (*EncryptR
 // `CONFLICT` for a key that isn't enabled. Needs `kms.key.decrypt` on the
 // project.
 func (c *KeyClient) Decrypt(ctx context.Context, req *DecryptRequest) (*DecryptResponse, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
 	if err != nil {
 		return nil, err
 	}
@@ -302,7 +302,7 @@ func (c *KeyClient) Decrypt(ctx context.Context, req *DecryptRequest) (*DecryptR
 // it, and recover the data key with Decrypt when you need it. Needs
 // `kms.key.generate_data_key` on the project.
 func (c *KeyClient) GenerateDataKey(ctx context.Context, req *GenerateDataKeyRequest) (*GenerateDataKeyResponse, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
 	if err != nil {
 		return nil, err
 	}
@@ -323,7 +323,7 @@ func (c *KeyClient) GenerateDataKey(ctx context.Context, req *GenerateDataKeyReq
 // `CONFLICT` for a key that isn't enabled, and with `BAD_REQUEST` for an
 // `ENCRYPT_DECRYPT` key. Needs `kms.key.sign` on the project.
 func (c *KeyClient) Sign(ctx context.Context, req *SignRequest) (*SignResponse, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*")
 	if err != nil {
 		return nil, err
 	}
@@ -343,7 +343,7 @@ func (c *KeyClient) Sign(ctx context.Context, req *SignRequest) (*SignResponse, 
 // destroyed. Refused with `BAD_REQUEST` for an `ENCRYPT_DECRYPT` key.
 // Needs `kms.key.get_public_key` on the project.
 func (c *KeyClient) GetPublicKey(ctx context.Context, req *GetPublicKeyRequest) (*PublicKey, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*/versions/*/publicKey")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/keys/*/versions/*/publicKey")
 	if err != nil {
 		return nil, err
 	}

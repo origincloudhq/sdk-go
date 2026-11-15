@@ -35,7 +35,7 @@ func (c *KeyPairClient) Service() *core.Service {
 
 // GetKeyPair returns a key pair, its public key only.
 func (c *KeyPairClient) GetKeyPair(ctx context.Context, req *GetKeyPairRequest) (*KeyPair, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/keyPairs/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/keyPairs/*")
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *KeyPairClient) GetKeyPair(ctx context.Context, req *GetKeyPairRequest) 
 
 // ListKeyPairs lists a project's key pairs, oldest first.
 func (c *KeyPairClient) ListKeyPairs(ctx context.Context, req *ListKeyPairsRequest) (*ListKeyPairsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*")
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (c *KeyPairClient) CreateKeyPair(ctx context.Context, req *CreateKeyPairReq
 		req = proto.Clone(req).(*CreateKeyPairRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*")
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func (c *KeyPairClient) CreateKeyPair(ctx context.Context, req *CreateKeyPairReq
 
 // UpdateKeyPair changes a key pair's tags.
 func (c *KeyPairClient) UpdateKeyPair(ctx context.Context, req *UpdateKeyPairRequest) (*KeyPair, error) {
-	p1, err := core.PathValue("keyPair.name", req.GetKeyPair().GetName(), "projects/*/keyPairs/*")
+	p1, err := c.service.PathValue("keyPair.name", req.GetKeyPair().GetName(), "projects/*/keyPairs/*")
 	if err != nil {
 		return nil, err
 	}
@@ -158,7 +158,7 @@ func (c *KeyPairClient) UpdateKeyPair(ctx context.Context, req *UpdateKeyPairReq
 
 // DeleteKeyPair deletes a key pair. Instances launched with it keep the key installed.
 func (c *KeyPairClient) DeleteKeyPair(ctx context.Context, req *DeleteKeyPairRequest) (*emptypb.Empty, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/keyPairs/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/keyPairs/*")
 	if err != nil {
 		return nil, err
 	}

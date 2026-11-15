@@ -39,7 +39,7 @@ func (c *AuditLogClient) Service() *core.Service {
 // GetAuditLogEntry returns an audit log entry. Needs `iam.audit_log.list` on the
 // organization.
 func (c *AuditLogClient) GetAuditLogEntry(ctx context.Context, req *GetAuditLogEntryRequest) (*AuditLogEntry, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/auditLogEntries/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/auditLogEntries/*")
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *AuditLogClient) GetAuditLogEntry(ctx context.Context, req *GetAuditLogE
 // optionally only a project's, an actor's or an action's. Needs
 // `iam.audit_log.list` on the organization.
 func (c *AuditLogClient) ListAuditLogEntries(ctx context.Context, req *ListAuditLogEntriesRequest) (*ListAuditLogEntriesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
 	if err != nil {
 		return nil, err
 	}

@@ -31,7 +31,7 @@ func (c *StorageClassClient) Service() *core.Service {
 
 // GetStorageClass returns a storage class.
 func (c *StorageClassClient) GetStorageClass(ctx context.Context, req *GetStorageClassRequest) (*StorageClass, error) {
-	p1, err := core.PathValue("name", req.GetName(), "storageClasses/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "storageClasses/*")
 	if err != nil {
 		return nil, err
 	}

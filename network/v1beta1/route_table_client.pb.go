@@ -35,7 +35,7 @@ func (c *RouteTableClient) Service() *core.Service {
 
 // GetRouteTable returns a route table.
 func (c *RouteTableClient) GetRouteTable(ctx context.Context, req *GetRouteTableRequest) (*RouteTable, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/routeTables/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/routeTables/*")
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *RouteTableClient) GetRouteTable(ctx context.Context, req *GetRouteTable
 
 // ListRouteTables lists the route tables in a region, oldest first.
 func (c *RouteTableClient) ListRouteTables(ctx context.Context, req *ListRouteTablesRequest) (*ListRouteTablesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +111,7 @@ func (c *RouteTableClient) CreateRouteTable(ctx context.Context, req *CreateRout
 		req = proto.Clone(req).(*CreateRouteTableRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (c *RouteTableClient) UpdateRouteTable(ctx context.Context, req *UpdateRout
 		req = proto.Clone(req).(*UpdateRouteTableRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("routeTable.name", req.GetRouteTable().GetName(), "projects/*/regions/*/routeTables/*")
+	p1, err := c.service.PathValue("routeTable.name", req.GetRouteTable().GetName(), "projects/*/regions/*/routeTables/*")
 	if err != nil {
 		return nil, err
 	}
@@ -173,7 +173,7 @@ func (c *RouteTableClient) DeleteRouteTable(ctx context.Context, req *DeleteRout
 		req = proto.Clone(req).(*DeleteRouteTableRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/routeTables/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/routeTables/*")
 	if err != nil {
 		return nil, err
 	}

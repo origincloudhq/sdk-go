@@ -36,7 +36,7 @@ func (c *NetworkInterfaceClient) Service() *core.Service {
 
 // GetNetworkInterface returns a network interface.
 func (c *NetworkInterfaceClient) GetNetworkInterface(ctx context.Context, req *GetNetworkInterfaceRequest) (*NetworkInterface, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/networkInterfaces/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/networkInterfaces/*")
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (c *NetworkInterfaceClient) GetNetworkInterface(ctx context.Context, req *G
 
 // ListNetworkInterfaces lists the network interfaces in a zone, oldest first.
 func (c *NetworkInterfaceClient) ListNetworkInterfaces(ctx context.Context, req *ListNetworkInterfacesRequest) (*ListNetworkInterfacesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (c *NetworkInterfaceClient) CreateNetworkInterface(ctx context.Context, req
 		req = proto.Clone(req).(*CreateNetworkInterfaceRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (c *NetworkInterfaceClient) UpdateNetworkInterface(ctx context.Context, req
 		req = proto.Clone(req).(*UpdateNetworkInterfaceRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("networkInterface.name", req.GetNetworkInterface().GetName(), "projects/*/zones/*/networkInterfaces/*")
+	p1, err := c.service.PathValue("networkInterface.name", req.GetNetworkInterface().GetName(), "projects/*/zones/*/networkInterfaces/*")
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (c *NetworkInterfaceClient) DeleteNetworkInterface(ctx context.Context, req
 		req = proto.Clone(req).(*DeleteNetworkInterfaceRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/networkInterfaces/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/networkInterfaces/*")
 	if err != nil {
 		return nil, err
 	}

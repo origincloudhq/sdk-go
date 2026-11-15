@@ -38,7 +38,7 @@ func (c *ServiceAccountClient) Service() *core.Service {
 // GetServiceAccount returns a service account, deleted or not. Needs
 // `iam.service_account.list` on the organization.
 func (c *ServiceAccountClient) GetServiceAccount(ctx context.Context, req *GetServiceAccountRequest) (*ServiceAccount, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (c *ServiceAccountClient) GetServiceAccount(ctx context.Context, req *GetSe
 // are listed only when `show_deleted` is set. Needs
 // `iam.service_account.list` on the organization.
 func (c *ServiceAccountClient) ListServiceAccounts(ctx context.Context, req *ListServiceAccountsRequest) (*ListServiceAccountsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *ServiceAccountClient) CreateServiceAccount(ctx context.Context, req *Cr
 		req = proto.Clone(req).(*CreateServiceAccountRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (c *ServiceAccountClient) RotateServiceAccountSecret(ctx context.Context, r
 		req = proto.Clone(req).(*RotateServiceAccountSecretRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -172,7 +172,7 @@ func (c *ServiceAccountClient) RotateServiceAccountSecret(ctx context.Context, r
 // account succeeds. Needs `iam.service_account.revoke` on the
 // organization.
 func (c *ServiceAccountClient) DeleteServiceAccount(ctx context.Context, req *DeleteServiceAccountRequest) (*emptypb.Empty, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*")
 	if err != nil {
 		return nil, err
 	}

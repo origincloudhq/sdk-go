@@ -50,7 +50,9 @@ while read -r file; do
   opts+=",\"M${file}=${MODULE}/${rel};${rel//\//}\""
 done < <(cd "${tmp}/api" && find origincloud -name '*.proto' | LC_ALL=C sort)
 
-template="$(printf '{"version":"v2","plugins":[{"local":"%s","out":"%s","opt":[%s]},{"local":"%s","out":"%s","opt":[%s]}]}' \
+# The plugin runs once on every file of the API (strategy "all"), as core's
+# list of the services that have resources is drawn from all of them.
+template="$(printf '{"version":"v2","plugins":[{"local":"%s","out":"%s","opt":[%s]},{"local":"%s","out":"%s","opt":[%s],"strategy":"all"}]}' \
   "${tmp}/bin/protoc-gen-go" "${tmp}/gen" "${opts}" \
   "${tmp}/bin/protoc-gen-go-origincloud" "${tmp}/gen" "${opts}")"
 (cd "${ROOT}" && go run "${BUF}" generate "${tmp}/api" --template "${template}")

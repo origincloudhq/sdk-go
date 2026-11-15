@@ -36,7 +36,7 @@ func (c *InstanceClient) Service() *core.Service {
 // GetInstance returns an instance. A terminated instance can be read by name for a
 // day after it was terminated.
 func (c *InstanceClient) GetInstance(ctx context.Context, req *GetInstanceRequest) (*Instance, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/instances/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/instances/*")
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (c *InstanceClient) GetInstance(ctx context.Context, req *GetInstanceReques
 // location service (`location.origincloudapis.eu`), then each zone's
 // instances.
 func (c *InstanceClient) ListInstances(ctx context.Context, req *ListInstancesRequest) (*ListInstancesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func (c *InstanceClient) CreateInstance(ctx context.Context, req *CreateInstance
 		req = proto.Clone(req).(*CreateInstanceRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (c *InstanceClient) UpdateInstance(ctx context.Context, req *UpdateInstance
 		req = proto.Clone(req).(*UpdateInstanceRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("instance.name", req.GetInstance().GetName(), "projects/*/zones/*/instances/*")
+	p1, err := c.service.PathValue("instance.name", req.GetInstance().GetName(), "projects/*/zones/*/instances/*")
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +187,7 @@ func (c *InstanceClient) DeleteInstance(ctx context.Context, req *DeleteInstance
 		req = proto.Clone(req).(*DeleteInstanceRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/instances/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/instances/*")
 	if err != nil {
 		return nil, err
 	}
@@ -220,7 +220,7 @@ func (c *InstanceClient) StartInstance(ctx context.Context, req *StartInstanceRe
 		req = proto.Clone(req).(*StartInstanceRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/instances/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/instances/*")
 	if err != nil {
 		return nil, err
 	}
@@ -247,7 +247,7 @@ func (c *InstanceClient) StopInstance(ctx context.Context, req *StopInstanceRequ
 		req = proto.Clone(req).(*StopInstanceRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/instances/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/instances/*")
 	if err != nil {
 		return nil, err
 	}

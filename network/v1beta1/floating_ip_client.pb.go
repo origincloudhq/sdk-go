@@ -38,7 +38,7 @@ func (c *FloatingIpClient) Service() *core.Service {
 
 // GetFloatingIp returns a floating IP.
 func (c *FloatingIpClient) GetFloatingIp(ctx context.Context, req *GetFloatingIpRequest) (*FloatingIp, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/floatingIps/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/floatingIps/*")
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (c *FloatingIpClient) GetFloatingIp(ctx context.Context, req *GetFloatingIp
 // ListFloatingIps lists the floating IPs in a zone, oldest first, those the platform
 // assigned at launch included.
 func (c *FloatingIpClient) ListFloatingIps(ctx context.Context, req *ListFloatingIpsRequest) (*ListFloatingIpsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *FloatingIpClient) CreateFloatingIp(ctx context.Context, req *CreateFloa
 		req = proto.Clone(req).(*CreateFloatingIpRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (c *FloatingIpClient) UpdateFloatingIp(ctx context.Context, req *UpdateFloa
 		req = proto.Clone(req).(*UpdateFloatingIpRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("floatingIp.name", req.GetFloatingIp().GetName(), "projects/*/zones/*/floatingIps/*")
+	p1, err := c.service.PathValue("floatingIp.name", req.GetFloatingIp().GetName(), "projects/*/zones/*/floatingIps/*")
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (c *FloatingIpClient) DeleteFloatingIp(ctx context.Context, req *DeleteFloa
 		req = proto.Clone(req).(*DeleteFloatingIpRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/floatingIps/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/floatingIps/*")
 	if err != nil {
 		return nil, err
 	}

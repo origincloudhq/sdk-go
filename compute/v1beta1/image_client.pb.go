@@ -34,7 +34,7 @@ func (c *ImageClient) Service() *core.Service {
 
 // GetImage returns one of the project's own images.
 func (c *ImageClient) GetImage(ctx context.Context, req *GetImageRequest) (*Image, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/images/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/images/*")
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (c *ImageClient) GetImage(ctx context.Context, req *GetImageRequest) (*Imag
 // ListImages lists the project's own images in a zone, oldest first. The public
 // images are listed by `ListPublicImages`.
 func (c *ImageClient) ListImages(ctx context.Context, req *ListImagesRequest) (*ListImagesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -109,7 +109,7 @@ func (c *ImageClient) CreateImage(ctx context.Context, req *CreateImageRequest) 
 		req = proto.Clone(req).(*CreateImageRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (c *ImageClient) CreateImage(ctx context.Context, req *CreateImageRequest) 
 
 // UpdateImage changes an image's description or tags.
 func (c *ImageClient) UpdateImage(ctx context.Context, req *UpdateImageRequest) (*Image, error) {
-	p1, err := core.PathValue("image.name", req.GetImage().GetName(), "projects/*/zones/*/images/*")
+	p1, err := c.service.PathValue("image.name", req.GetImage().GetName(), "projects/*/zones/*/images/*")
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func (c *ImageClient) UpdateImage(ctx context.Context, req *UpdateImageRequest) 
 
 // DeleteImage deletes an image. Instances launched from it are unaffected.
 func (c *ImageClient) DeleteImage(ctx context.Context, req *DeleteImageRequest) (*emptypb.Empty, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/images/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/images/*")
 	if err != nil {
 		return nil, err
 	}

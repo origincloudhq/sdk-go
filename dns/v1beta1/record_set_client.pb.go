@@ -40,7 +40,7 @@ func (c *RecordSetClient) Service() *core.Service {
 
 // GetRecordSet returns a record set.
 func (c *RecordSetClient) GetRecordSet(ctx context.Context, req *GetRecordSetRequest) (*RecordSet, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/hostedZones/*/recordSets/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/hostedZones/*/recordSets/*")
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (c *RecordSetClient) GetRecordSet(ctx context.Context, req *GetRecordSetReq
 
 // ListRecordSets lists a zone's record sets by `dns_name`, then by `type`.
 func (c *RecordSetClient) ListRecordSets(ctx context.Context, req *ListRecordSetsRequest) (*ListRecordSetsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (c *RecordSetClient) CreateRecordSet(ctx context.Context, req *CreateRecord
 		req = proto.Clone(req).(*CreateRecordSetRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (c *RecordSetClient) UpdateRecordSet(ctx context.Context, req *UpdateRecord
 		req = proto.Clone(req).(*UpdateRecordSetRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("recordSet.name", req.GetRecordSet().GetName(), "projects/*/hostedZones/*/recordSets/*")
+	p1, err := c.service.PathValue("recordSet.name", req.GetRecordSet().GetName(), "projects/*/hostedZones/*/recordSets/*")
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (c *RecordSetClient) DeleteRecordSet(ctx context.Context, req *DeleteRecord
 		req = proto.Clone(req).(*DeleteRecordSetRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/hostedZones/*/recordSets/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/hostedZones/*/recordSets/*")
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +209,7 @@ func (c *RecordSetClient) BatchChangeRecordSets(ctx context.Context, req *BatchC
 		req = proto.Clone(req).(*BatchChangeRecordSetsRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
 	if err != nil {
 		return nil, err
 	}

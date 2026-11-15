@@ -50,7 +50,7 @@ func (c *MetricClient) Service() *core.Service {
 // Each query answered is billed as one request, however many series or
 // points it returns; a refused one isn't.
 func (c *MetricClient) QueryTimeSeries(ctx context.Context, req *QueryTimeSeriesRequest) (*QueryTimeSeriesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*")
 	if err != nil {
 		return nil, err
 	}

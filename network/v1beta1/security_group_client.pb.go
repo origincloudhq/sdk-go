@@ -38,7 +38,7 @@ func (c *SecurityGroupClient) Service() *core.Service {
 
 // GetSecurityGroup returns a security group.
 func (c *SecurityGroupClient) GetSecurityGroup(ctx context.Context, req *GetSecurityGroupRequest) (*SecurityGroup, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/securityGroups/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/securityGroups/*")
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *SecurityGroupClient) GetSecurityGroup(ctx context.Context, req *GetSecu
 
 // ListSecurityGroups lists the security groups in a region, oldest first.
 func (c *SecurityGroupClient) ListSecurityGroups(ctx context.Context, req *ListSecurityGroupsRequest) (*ListSecurityGroupsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (c *SecurityGroupClient) CreateSecurityGroup(ctx context.Context, req *Crea
 		req = proto.Clone(req).(*CreateSecurityGroupRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (c *SecurityGroupClient) UpdateSecurityGroup(ctx context.Context, req *Upda
 		req = proto.Clone(req).(*UpdateSecurityGroupRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("securityGroup.name", req.GetSecurityGroup().GetName(), "projects/*/regions/*/securityGroups/*")
+	p1, err := c.service.PathValue("securityGroup.name", req.GetSecurityGroup().GetName(), "projects/*/regions/*/securityGroups/*")
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (c *SecurityGroupClient) DeleteSecurityGroup(ctx context.Context, req *Dele
 		req = proto.Clone(req).(*DeleteSecurityGroupRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/securityGroups/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/securityGroups/*")
 	if err != nil {
 		return nil, err
 	}

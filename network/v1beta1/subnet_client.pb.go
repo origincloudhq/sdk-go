@@ -35,7 +35,7 @@ func (c *SubnetClient) Service() *core.Service {
 
 // GetSubnet returns a subnet.
 func (c *SubnetClient) GetSubnet(ctx context.Context, req *GetSubnetRequest) (*Subnet, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/subnets/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/subnets/*")
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (c *SubnetClient) GetSubnet(ctx context.Context, req *GetSubnetRequest) (*S
 // list the zones whose `services` name `network` with the location
 // service (`location.origincloudapis.eu`), then each zone's subnets.
 func (c *SubnetClient) ListSubnets(ctx context.Context, req *ListSubnetsRequest) (*ListSubnetsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (c *SubnetClient) CreateSubnet(ctx context.Context, req *CreateSubnetReques
 		req = proto.Clone(req).(*CreateSubnetRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +146,7 @@ func (c *SubnetClient) UpdateSubnet(ctx context.Context, req *UpdateSubnetReques
 		req = proto.Clone(req).(*UpdateSubnetRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("subnet.name", req.GetSubnet().GetName(), "projects/*/zones/*/subnets/*")
+	p1, err := c.service.PathValue("subnet.name", req.GetSubnet().GetName(), "projects/*/zones/*/subnets/*")
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +178,7 @@ func (c *SubnetClient) DeleteSubnet(ctx context.Context, req *DeleteSubnetReques
 		req = proto.Clone(req).(*DeleteSubnetRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/subnets/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/subnets/*")
 	if err != nil {
 		return nil, err
 	}

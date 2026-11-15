@@ -33,7 +33,7 @@ func (c *CaseMessageClient) Service() *core.Service {
 // GetCaseMessage returns one message of a case. Needs `admin.support_case.get` on the
 // organization.
 func (c *CaseMessageClient) GetCaseMessage(ctx context.Context, req *GetCaseMessageRequest) (*CaseMessage, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/cases/*/messages/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/cases/*/messages/*")
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *CaseMessageClient) GetCaseMessage(ctx context.Context, req *GetCaseMess
 // ListCaseMessages lists a case's messages, oldest first. Needs `admin.support_case.get`
 // on the organization.
 func (c *CaseMessageClient) ListCaseMessages(ctx context.Context, req *ListCaseMessagesRequest) (*ListCaseMessagesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*/cases/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*/cases/*")
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (c *CaseMessageClient) CreateCaseMessage(ctx context.Context, req *CreateCa
 		req = proto.Clone(req).(*CreateCaseMessageRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*/cases/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*/cases/*")
 	if err != nil {
 		return nil, err
 	}

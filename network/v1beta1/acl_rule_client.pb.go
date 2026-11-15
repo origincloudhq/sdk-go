@@ -38,7 +38,7 @@ func (c *AclRuleClient) Service() *core.Service {
 
 // GetAclRule returns an ACL rule.
 func (c *AclRuleClient) GetAclRule(ctx context.Context, req *GetAclRuleRequest) (*AclRule, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/acls/*/rules/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/acls/*/rules/*")
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *AclRuleClient) GetAclRule(ctx context.Context, req *GetAclRuleRequest) 
 
 // ListAclRules lists an ACL's rules of both directions, oldest first.
 func (c *AclRuleClient) ListAclRules(ctx context.Context, req *ListAclRulesRequest) (*ListAclRulesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*/acls/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*/acls/*")
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (c *AclRuleClient) CreateAclRule(ctx context.Context, req *CreateAclRuleReq
 		req = proto.Clone(req).(*CreateAclRuleRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*/acls/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*/acls/*")
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (c *AclRuleClient) DeleteAclRule(ctx context.Context, req *DeleteAclRuleReq
 		req = proto.Clone(req).(*DeleteAclRuleRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/acls/*/rules/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/acls/*/rules/*")
 	if err != nil {
 		return nil, err
 	}

@@ -32,7 +32,7 @@ func (c *LocationClient) Service() *core.Service {
 
 // GetRegion returns a region.
 func (c *LocationClient) GetRegion(ctx context.Context, req *GetRegionRequest) (*Region, error) {
-	p1, err := core.PathValue("name", req.GetName(), "regions/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (c *LocationClient) ListRegions(ctx context.Context, req *ListRegionsReques
 
 // GetZone returns a zone.
 func (c *LocationClient) GetZone(ctx context.Context, req *GetZoneRequest) (*Zone, error) {
-	p1, err := core.PathValue("name", req.GetName(), "zones/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "zones/*")
 	if err != nil {
 		return nil, err
 	}

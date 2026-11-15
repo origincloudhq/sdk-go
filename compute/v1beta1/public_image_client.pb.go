@@ -33,7 +33,7 @@ func (c *PublicImageClient) Service() *core.Service {
 
 // GetPublicImage returns a public image.
 func (c *PublicImageClient) GetPublicImage(ctx context.Context, req *GetPublicImageRequest) (*PublicImage, error) {
-	p1, err := core.PathValue("name", req.GetName(), "zones/*/images/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "zones/*/images/*")
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (c *PublicImageClient) GetPublicImage(ctx context.Context, req *GetPublicIm
 
 // ListPublicImages lists the public images in a zone, oldest first.
 func (c *PublicImageClient) ListPublicImages(ctx context.Context, req *ListPublicImagesRequest) (*ListPublicImagesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "zones/*")
 	if err != nil {
 		return nil, err
 	}

@@ -62,3 +62,26 @@ func TestOnlyTheSecurityTokenServiceIsUnauthenticated(t *testing.T) {
 		}
 	}
 }
+
+func TestAResourceTypeNamesItsService(t *testing.T) {
+	for resourceType, want := range map[string]string{
+		"pvs.origincloudapis.eu/Volume":              "pvs",
+		"resourcemanager.origincloudapis.eu/Project": "resourcemanager",
+		"kms.origincloudapis.eu/KeyVersion":          "kms",
+		"pvs.example.com/Volume":                     "",
+		"origincloudapis.eu/Volume":                  "",
+		"pvs.eu-central1.origincloudapis.eu/Volume":  "",
+		"pvs.origincloudapis.eu/volume":              "",
+		"pvs.origincloudapis.eu":                     "",
+		"pvs.origincloudapis.eu/Volume/x":            "",
+		"PVS.origincloudapis.eu/Volume":              "",
+	} {
+		got, err := serviceOfResourceType(resourceType)
+		if want == "" && err == nil {
+			t.Errorf("%s: %q, want an error", resourceType, got)
+		}
+		if want != "" && (err != nil || got != want) {
+			t.Errorf("%s: %q, %v; want %q", resourceType, got, err, want)
+		}
+	}
+}

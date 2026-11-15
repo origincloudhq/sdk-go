@@ -37,7 +37,7 @@ func (c *InternetGatewayClient) Service() *core.Service {
 
 // GetInternetGateway returns an internet gateway.
 func (c *InternetGatewayClient) GetInternetGateway(ctx context.Context, req *GetInternetGatewayRequest) (*InternetGateway, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/internetGateways/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/internetGateways/*")
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (c *InternetGatewayClient) GetInternetGateway(ctx context.Context, req *Get
 
 // ListInternetGateways lists the internet gateways in a region, oldest first.
 func (c *InternetGatewayClient) ListInternetGateways(ctx context.Context, req *ListInternetGatewaysRequest) (*ListInternetGatewaysResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (c *InternetGatewayClient) CreateInternetGateway(ctx context.Context, req *
 		req = proto.Clone(req).(*CreateInternetGatewayRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (c *InternetGatewayClient) UpdateInternetGateway(ctx context.Context, req *
 		req = proto.Clone(req).(*UpdateInternetGatewayRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("internetGateway.name", req.GetInternetGateway().GetName(), "projects/*/regions/*/internetGateways/*")
+	p1, err := c.service.PathValue("internetGateway.name", req.GetInternetGateway().GetName(), "projects/*/regions/*/internetGateways/*")
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func (c *InternetGatewayClient) DeleteInternetGateway(ctx context.Context, req *
 		req = proto.Clone(req).(*DeleteInternetGatewayRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/internetGateways/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/internetGateways/*")
 	if err != nil {
 		return nil, err
 	}

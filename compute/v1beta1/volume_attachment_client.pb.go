@@ -35,7 +35,7 @@ func (c *VolumeAttachmentClient) Service() *core.Service {
 
 // GetVolumeAttachment returns a volume attachment. A detached attachment isn't found.
 func (c *VolumeAttachmentClient) GetVolumeAttachment(ctx context.Context, req *GetVolumeAttachmentRequest) (*VolumeAttachment, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/instances/*/volumeAttachments/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/instances/*/volumeAttachments/*")
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *VolumeAttachmentClient) GetVolumeAttachment(ctx context.Context, req *G
 // zone, which with `volume` finds the instance holding a volume.
 // Detached attachments aren't listed.
 func (c *VolumeAttachmentClient) ListVolumeAttachments(ctx context.Context, req *ListVolumeAttachmentsRequest) (*ListVolumeAttachmentsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*/instances/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*/instances/*")
 	if err != nil {
 		return nil, err
 	}
@@ -117,7 +117,7 @@ func (c *VolumeAttachmentClient) CreateVolumeAttachment(ctx context.Context, req
 		req = proto.Clone(req).(*CreateVolumeAttachmentRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*/instances/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*/instances/*")
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +149,7 @@ func (c *VolumeAttachmentClient) DeleteVolumeAttachment(ctx context.Context, req
 		req = proto.Clone(req).(*DeleteVolumeAttachmentRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/instances/*/volumeAttachments/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/instances/*/volumeAttachments/*")
 	if err != nil {
 		return nil, err
 	}

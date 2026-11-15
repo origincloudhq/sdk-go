@@ -32,7 +32,7 @@ func (c *CaseClient) Service() *core.Service {
 
 // GetCase returns a case. Needs `admin.support_case.get` on the organization.
 func (c *CaseClient) GetCase(ctx context.Context, req *GetCaseRequest) (*Case, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/cases/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/cases/*")
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func (c *CaseClient) GetCase(ctx context.Context, req *GetCaseRequest) (*Case, e
 // ListCases lists an organization's cases, newest first. Needs
 // `admin.support_case.list` on the organization.
 func (c *CaseClient) ListCases(ctx context.Context, req *ListCasesRequest) (*ListCasesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func (c *CaseClient) CreateCase(ctx context.Context, req *CreateCaseRequest) (*C
 		req = proto.Clone(req).(*CreateCaseRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +132,7 @@ func (c *CaseClient) CreateCase(ctx context.Context, req *CreateCaseRequest) (*C
 // notified. Closing a closed case succeeds and changes nothing. Needs
 // `admin.support_case.update` on the organization.
 func (c *CaseClient) CloseCase(ctx context.Context, req *CloseCaseRequest) (*Case, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/cases/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/cases/*")
 	if err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func (c *CaseClient) CloseCase(ctx context.Context, req *CloseCaseRequest) (*Cas
 // `IN_PROGRESS` succeeds and changes nothing. Needs
 // `admin.support_case.update` on the organization.
 func (c *CaseClient) ReopenCase(ctx context.Context, req *ReopenCaseRequest) (*Case, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/cases/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/cases/*")
 	if err != nil {
 		return nil, err
 	}

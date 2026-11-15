@@ -33,7 +33,7 @@ func (c *BillingAccountClient) Service() *core.Service {
 // GetBillingAccount returns a billing account. Needs `admin.billing_account.get` on the
 // organization.
 func (c *BillingAccountClient) GetBillingAccount(ctx context.Context, req *GetBillingAccountRequest) (*BillingAccount, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *BillingAccountClient) GetBillingAccount(ctx context.Context, req *GetBi
 // ListBillingAccounts lists an organization's billing accounts, oldest first. Needs
 // `admin.billing_account.list` on the organization.
 func (c *BillingAccountClient) ListBillingAccounts(ctx context.Context, req *ListBillingAccountsRequest) (*ListBillingAccountsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (c *BillingAccountClient) CreateBillingAccount(ctx context.Context, req *Cr
 		req = proto.Clone(req).(*CreateBillingAccountRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -141,7 +141,7 @@ func (c *BillingAccountClient) CreateBillingAccount(ctx context.Context, req *Cr
 // for a billing address outside Germany), or the update is refused. Needs
 // `admin.billing_account.update` on the organization.
 func (c *BillingAccountClient) UpdateBillingAccount(ctx context.Context, req *UpdateBillingAccountRequest) (*BillingAccount, error) {
-	p1, err := core.PathValue("billingAccount.name", req.GetBillingAccount().GetName(), "organizations/*/billingAccounts/*")
+	p1, err := c.service.PathValue("billingAccount.name", req.GetBillingAccount().GetName(), "organizations/*/billingAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (c *BillingAccountClient) UpdateBillingAccount(ctx context.Context, req *Up
 // has a spend limit (remove it first). Needs
 // `admin.billing_account.delete` on the organization.
 func (c *BillingAccountClient) DeleteBillingAccount(ctx context.Context, req *DeleteBillingAccountRequest) (*emptypb.Empty, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +194,7 @@ func (c *BillingAccountClient) DeleteBillingAccount(ctx context.Context, req *De
 // `payment_method.state` is `NOT_REQUIRED`. Needs
 // `admin.billing_account.update` on the organization.
 func (c *BillingAccountClient) StartPaymentMethodSetup(ctx context.Context, req *StartPaymentMethodSetupRequest) (*StartPaymentMethodSetupResponse, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -220,7 +220,7 @@ func (c *BillingAccountClient) StartPaymentMethodSetup(ctx context.Context, req 
 // whether it did. Needs `admin.billing_account.update` on the
 // organization.
 func (c *BillingAccountClient) ConfirmPaymentMethodSetup(ctx context.Context, req *ConfirmPaymentMethodSetupRequest) (*BillingAccount, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +238,7 @@ func (c *BillingAccountClient) ConfirmPaymentMethodSetup(ctx context.Context, re
 // GetProjectBillingInfo returns which billing account pays for a project. Needs
 // `admin.project.get` on the project.
 func (c *BillingAccountClient) GetProjectBillingInfo(ctx context.Context, req *GetProjectBillingInfoRequest) (*ProjectBillingInfo, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/billingInfo")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/billingInfo")
 	if err != nil {
 		return nil, err
 	}
@@ -264,7 +264,7 @@ func (c *BillingAccountClient) GetProjectBillingInfo(ctx context.Context, req *G
 // account, so there is nothing to unlink. Needs `admin.project.attach`
 // on the project, which is separate from access to billing accounts.
 func (c *BillingAccountClient) UpdateProjectBillingInfo(ctx context.Context, req *UpdateProjectBillingInfoRequest) (*ProjectBillingInfo, error) {
-	p1, err := core.PathValue("projectBillingInfo.name", req.GetProjectBillingInfo().GetName(), "projects/*/billingInfo")
+	p1, err := c.service.PathValue("projectBillingInfo.name", req.GetProjectBillingInfo().GetName(), "projects/*/billingInfo")
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +287,7 @@ func (c *BillingAccountClient) UpdateProjectBillingInfo(ctx context.Context, req
 // ListProjectBillingInfo lists the projects a billing account pays for, oldest first. Needs
 // `admin.billing_account.get` on the organization.
 func (c *BillingAccountClient) ListProjectBillingInfo(ctx context.Context, req *ListProjectBillingInfoRequest) (*ListProjectBillingInfoResponse, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/billingAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -334,7 +334,7 @@ func (c *BillingAccountClient) AllProjectBillingInfos(ctx context.Context, req *
 
 // GetBillingCountry returns a country a billing address may be in.
 func (c *BillingAccountClient) GetBillingCountry(ctx context.Context, req *GetBillingCountryRequest) (*BillingCountry, error) {
-	p1, err := core.PathValue("name", req.GetName(), "billingCountries/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "billingCountries/*")
 	if err != nil {
 		return nil, err
 	}

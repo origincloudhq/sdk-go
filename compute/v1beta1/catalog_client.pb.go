@@ -31,7 +31,7 @@ func (c *InstanceTypeClient) Service() *core.Service {
 
 // GetInstanceType returns an instance type.
 func (c *InstanceTypeClient) GetInstanceType(ctx context.Context, req *GetInstanceTypeRequest) (*InstanceType, error) {
-	p1, err := core.PathValue("name", req.GetName(), "instanceTypes/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "instanceTypes/*")
 	if err != nil {
 		return nil, err
 	}
@@ -94,7 +94,7 @@ func (c *ImageFamilyClient) Service() *core.Service {
 
 // GetImageFamily returns an image family.
 func (c *ImageFamilyClient) GetImageFamily(ctx context.Context, req *GetImageFamilyRequest) (*ImageFamily, error) {
-	p1, err := core.PathValue("name", req.GetName(), "imageFamilies/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "imageFamilies/*")
 	if err != nil {
 		return nil, err
 	}

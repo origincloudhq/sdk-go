@@ -34,7 +34,7 @@ func (c *OrganizationClient) Service() *core.Service {
 
 // GetOrganization returns an organization.
 func (c *OrganizationClient) GetOrganization(ctx context.Context, req *GetOrganizationRequest) (*Organization, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +127,7 @@ func (c *OrganizationClient) CreateOrganization(ctx context.Context, req *Create
 
 // UpdateOrganization renames an organization.
 func (c *OrganizationClient) UpdateOrganization(ctx context.Context, req *UpdateOrganizationRequest) (*Organization, error) {
-	p1, err := core.PathValue("organization.name", req.GetOrganization().GetName(), "organizations/*")
+	p1, err := c.service.PathValue("organization.name", req.GetOrganization().GetName(), "organizations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func (c *OrganizationClient) UpdateOrganization(ctx context.Context, req *Update
 // billing accounts stay, with their spend limits, so the last period can
 // still be invoiced.
 func (c *OrganizationClient) DeleteOrganization(ctx context.Context, req *DeleteOrganizationRequest) (*emptypb.Empty, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +177,7 @@ func (c *OrganizationClient) DeleteOrganization(ctx context.Context, req *Delete
 // projects may hold together, and how much of it they use. The limits are
 // set by the platform; ask support to raise one.
 func (c *OrganizationClient) GetOrganizationQuota(ctx context.Context, req *GetOrganizationQuotaRequest) (*OrganizationQuota, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/quota")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/quota")
 	if err != nil {
 		return nil, err
 	}

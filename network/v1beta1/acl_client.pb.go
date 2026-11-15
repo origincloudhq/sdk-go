@@ -38,7 +38,7 @@ func (c *AclClient) Service() *core.Service {
 
 // GetAcl returns an ACL.
 func (c *AclClient) GetAcl(ctx context.Context, req *GetAclRequest) (*Acl, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/acls/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/acls/*")
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *AclClient) GetAcl(ctx context.Context, req *GetAclRequest) (*Acl, error
 
 // ListAcls lists the ACLs in a region, oldest first.
 func (c *AclClient) ListAcls(ctx context.Context, req *ListAclsRequest) (*ListAclsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (c *AclClient) CreateAcl(ctx context.Context, req *CreateAclRequest) (*core
 		req = proto.Clone(req).(*CreateAclRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func (c *AclClient) UpdateAcl(ctx context.Context, req *UpdateAclRequest) (*core
 		req = proto.Clone(req).(*UpdateAclRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("acl.name", req.GetAcl().GetName(), "projects/*/regions/*/acls/*")
+	p1, err := c.service.PathValue("acl.name", req.GetAcl().GetName(), "projects/*/regions/*/acls/*")
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (c *AclClient) DeleteAcl(ctx context.Context, req *DeleteAclRequest) (*core
 		req = proto.Clone(req).(*DeleteAclRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/acls/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/acls/*")
 	if err != nil {
 		return nil, err
 	}

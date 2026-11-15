@@ -36,7 +36,7 @@ func (c *NatGatewayClient) Service() *core.Service {
 
 // GetNatGateway returns a NAT gateway.
 func (c *NatGatewayClient) GetNatGateway(ctx context.Context, req *GetNatGatewayRequest) (*NatGateway, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/natGateways/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/natGateways/*")
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (c *NatGatewayClient) GetNatGateway(ctx context.Context, req *GetNatGateway
 
 // ListNatGateways lists the NAT gateways in a zone, oldest first.
 func (c *NatGatewayClient) ListNatGateways(ctx context.Context, req *ListNatGatewaysRequest) (*ListNatGatewaysResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (c *NatGatewayClient) CreateNatGateway(ctx context.Context, req *CreateNatG
 		req = proto.Clone(req).(*CreateNatGatewayRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (c *NatGatewayClient) UpdateNatGateway(ctx context.Context, req *UpdateNatG
 		req = proto.Clone(req).(*UpdateNatGatewayRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("natGateway.name", req.GetNatGateway().GetName(), "projects/*/zones/*/natGateways/*")
+	p1, err := c.service.PathValue("natGateway.name", req.GetNatGateway().GetName(), "projects/*/zones/*/natGateways/*")
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (c *NatGatewayClient) DeleteNatGateway(ctx context.Context, req *DeleteNatG
 		req = proto.Clone(req).(*DeleteNatGatewayRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/natGateways/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/natGateways/*")
 	if err != nil {
 		return nil, err
 	}

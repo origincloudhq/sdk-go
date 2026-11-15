@@ -34,7 +34,7 @@ func (c *ProjectClient) Service() *core.Service {
 
 // GetProject returns a project.
 func (c *ProjectClient) GetProject(ctx context.Context, req *GetProjectRequest) (*Project, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*")
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func (c *ProjectClient) CreateProject(ctx context.Context, req *CreateProjectReq
 
 // UpdateProject renames a project.
 func (c *ProjectClient) UpdateProject(ctx context.Context, req *UpdateProjectRequest) (*Project, error) {
-	p1, err := core.PathValue("project.name", req.GetProject().GetName(), "projects/*")
+	p1, err := c.service.PathValue("project.name", req.GetProject().GetName(), "projects/*")
 	if err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func (c *ProjectClient) UpdateProject(ctx context.Context, req *UpdateProjectReq
 // its quota and every role granted on it go with it; roles granted on the
 // organization stay.
 func (c *ProjectClient) DeleteProject(ctx context.Context, req *DeleteProjectRequest) (*emptypb.Empty, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*")
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (c *ProjectClient) DeleteProject(ctx context.Context, req *DeleteProjectReq
 // GetProjectQuota returns a project's quota: the budget of each kind of resource the
 // project may hold, if one is set, and how much of it the project uses.
 func (c *ProjectClient) GetProjectQuota(ctx context.Context, req *GetProjectQuotaRequest) (*ProjectQuota, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/quota")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/quota")
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +199,7 @@ func (c *ProjectClient) GetProjectQuota(ctx context.Context, req *GetProjectQuot
 // UpdateProjectQuota sets or removes a project's budgets. A budget named in `update_mask`
 // is set to the value given, or removed when the value is left out.
 func (c *ProjectClient) UpdateProjectQuota(ctx context.Context, req *UpdateProjectQuotaRequest) (*ProjectQuota, error) {
-	p1, err := core.PathValue("projectQuota.name", req.GetProjectQuota().GetName(), "projects/*/quota")
+	p1, err := c.service.PathValue("projectQuota.name", req.GetProjectQuota().GetName(), "projects/*/quota")
 	if err != nil {
 		return nil, err
 	}

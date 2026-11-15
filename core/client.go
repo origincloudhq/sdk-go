@@ -11,7 +11,7 @@ import (
 )
 
 // Version is this SDK's version, sent in the User-Agent header.
-const Version = "0.31.0"
+const Version = "0.32.0"
 
 const (
 	envRegion = "ORIGINCLOUD_REGION"
@@ -152,7 +152,7 @@ func (c *Client) Service(shortcode string, regional bool) *Service {
 		}
 		base = &url.URL{Scheme: "https", Host: host}
 	}
-	return &Service{client: c, base: base}
+	return &Service{client: c, base: base, shortcode: shortcode}
 }
 
 // ConsistencyToken returns the consistency token the client holds: the

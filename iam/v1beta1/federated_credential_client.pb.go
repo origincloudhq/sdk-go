@@ -39,7 +39,7 @@ func (c *FederatedCredentialClient) Service() *core.Service {
 // GetFederatedCredential returns a federated credential, deleted or not. Needs
 // `iam.service_account.list` on the organization.
 func (c *FederatedCredentialClient) GetFederatedCredential(ctx context.Context, req *GetFederatedCredentialRequest) (*FederatedCredential, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*/federatedCredentials/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*/federatedCredentials/*")
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *FederatedCredentialClient) GetFederatedCredential(ctx context.Context, 
 // ones are listed only when `show_deleted` is set. Needs
 // `iam.service_account.list` on the organization.
 func (c *FederatedCredentialClient) ListFederatedCredentials(ctx context.Context, req *ListFederatedCredentialsRequest) (*ListFederatedCredentialsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*/serviceAccounts/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*/serviceAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +122,7 @@ func (c *FederatedCredentialClient) CreateFederatedCredential(ctx context.Contex
 		req = proto.Clone(req).(*CreateFederatedCredentialRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "organizations/*/serviceAccounts/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "organizations/*/serviceAccounts/*")
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (c *FederatedCredentialClient) CreateFederatedCredential(ctx context.Contex
 // next request. It stays readable as `DELETED`. Deleting a deleted one
 // succeeds. Needs `iam.service_account.revoke` on the organization.
 func (c *FederatedCredentialClient) DeleteFederatedCredential(ctx context.Context, req *DeleteFederatedCredentialRequest) (*emptypb.Empty, error) {
-	p1, err := core.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*/federatedCredentials/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "organizations/*/serviceAccounts/*/federatedCredentials/*")
 	if err != nil {
 		return nil, err
 	}

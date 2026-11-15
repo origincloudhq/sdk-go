@@ -32,7 +32,7 @@ func NewOperationClient(service *core.Service) *OperationClient {
 
 // GetOperation returns an operation as it is now.
 func (c *OperationClient) GetOperation(ctx context.Context, req *GetOperationRequest) (*longrunningpb.Operation, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/operations/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/operations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (c *OperationClient) GetOperation(ctx context.Context, req *GetOperationReq
 // comes first, and returns it as it is then. It only reads, so a client
 // may repeat it after a transport error.
 func (c *OperationClient) WaitOperation(ctx context.Context, req *WaitOperationRequest) (*longrunningpb.Operation, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/operations/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/operations/*")
 	if err != nil {
 		return nil, err
 	}

@@ -57,7 +57,7 @@ func (c *HostedZoneClient) Service() *core.Service {
 
 // GetHostedZone returns a hosted zone.
 func (c *HostedZoneClient) GetHostedZone(ctx context.Context, req *GetHostedZoneRequest) (*HostedZone, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/hostedZones/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/hostedZones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (c *HostedZoneClient) GetHostedZone(ctx context.Context, req *GetHostedZone
 
 // ListHostedZones lists a project's hosted zones, oldest first.
 func (c *HostedZoneClient) ListHostedZones(ctx context.Context, req *ListHostedZonesRequest) (*ListHostedZonesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*")
 	if err != nil {
 		return nil, err
 	}
@@ -135,7 +135,7 @@ func (c *HostedZoneClient) CreateHostedZone(ctx context.Context, req *CreateHost
 		req = proto.Clone(req).(*CreateHostedZoneRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*")
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +162,7 @@ func (c *HostedZoneClient) UpdateHostedZone(ctx context.Context, req *UpdateHost
 		req = proto.Clone(req).(*UpdateHostedZoneRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("hostedZone.name", req.GetHostedZone().GetName(), "projects/*/hostedZones/*")
+	p1, err := c.service.PathValue("hostedZone.name", req.GetHostedZone().GetName(), "projects/*/hostedZones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +190,7 @@ func (c *HostedZoneClient) DeleteHostedZone(ctx context.Context, req *DeleteHost
 		req = proto.Clone(req).(*DeleteHostedZoneRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/hostedZones/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/hostedZones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -224,7 +224,7 @@ func (c *HostedZoneClient) DeleteHostedZone(ctx context.Context, req *DeleteHost
 // repeat the call; `NOT_FOUND` for one means its proof is lost, and the
 // daily checks suspend it unless the proof comes back.
 func (c *HostedZoneClient) VerifyHostedZone(ctx context.Context, req *VerifyHostedZoneRequest) (*HostedZone, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/hostedZones/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/hostedZones/*")
 	if err != nil {
 		return nil, err
 	}

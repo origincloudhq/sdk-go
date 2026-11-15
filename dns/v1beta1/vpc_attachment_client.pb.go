@@ -39,7 +39,7 @@ func (c *VpcAttachmentClient) Service() *core.Service {
 
 // GetVpcAttachment returns a VPC attachment.
 func (c *VpcAttachmentClient) GetVpcAttachment(ctx context.Context, req *GetVpcAttachmentRequest) (*VpcAttachment, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/hostedZones/*/vpcAttachments/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/hostedZones/*/vpcAttachments/*")
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (c *VpcAttachmentClient) GetVpcAttachment(ctx context.Context, req *GetVpcA
 // zone, lists every zone's in the project, which with `vpc` finds the
 // zones attached to a VPC.
 func (c *VpcAttachmentClient) ListVpcAttachments(ctx context.Context, req *ListVpcAttachmentsRequest) (*ListVpcAttachmentsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -120,7 +120,7 @@ func (c *VpcAttachmentClient) CreateVpcAttachment(ctx context.Context, req *Crea
 		req = proto.Clone(req).(*CreateVpcAttachmentRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/hostedZones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (c *VpcAttachmentClient) DeleteVpcAttachment(ctx context.Context, req *Dele
 		req = proto.Clone(req).(*DeleteVpcAttachmentRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/hostedZones/*/vpcAttachments/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/hostedZones/*/vpcAttachments/*")
 	if err != nil {
 		return nil, err
 	}

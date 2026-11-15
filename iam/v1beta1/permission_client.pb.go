@@ -32,7 +32,7 @@ func (c *PermissionClient) Service() *core.Service {
 
 // GetPermission returns a permission.
 func (c *PermissionClient) GetPermission(ctx context.Context, req *GetPermissionRequest) (*Permission, error) {
-	p1, err := core.PathValue("name", req.GetName(), "permissions/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "permissions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (c *PermissionClient) ListPermissions(ctx context.Context, req *ListPermiss
 // the project answers for each of its resources. A permission the
 // catalog doesn't name is never held.
 func (c *PermissionClient) TestIamPermissions(ctx context.Context, req *TestIamPermissionsRequest) (*TestIamPermissionsResponse, error) {
-	p1, err := core.PathValue("resource", req.GetResource(), "*/*")
+	p1, err := c.service.PathValue("resource", req.GetResource(), "*/*")
 	if err != nil {
 		return nil, err
 	}

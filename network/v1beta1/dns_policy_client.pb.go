@@ -36,7 +36,7 @@ func (c *DnsPolicyClient) Service() *core.Service {
 
 // GetDnsPolicy returns a DNS policy.
 func (c *DnsPolicyClient) GetDnsPolicy(ctx context.Context, req *GetDnsPolicyRequest) (*DnsPolicy, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/dnsPolicies/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/dnsPolicies/*")
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (c *DnsPolicyClient) GetDnsPolicy(ctx context.Context, req *GetDnsPolicyReq
 // ListDnsPolicies lists the DNS policies in a region, oldest first, the project's
 // default included.
 func (c *DnsPolicyClient) ListDnsPolicies(ctx context.Context, req *ListDnsPoliciesRequest) (*ListDnsPoliciesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +114,7 @@ func (c *DnsPolicyClient) CreateDnsPolicy(ctx context.Context, req *CreateDnsPol
 		req = proto.Clone(req).(*CreateDnsPolicyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*")
 	if err != nil {
 		return nil, err
 	}
@@ -145,7 +145,7 @@ func (c *DnsPolicyClient) UpdateDnsPolicy(ctx context.Context, req *UpdateDnsPol
 		req = proto.Clone(req).(*UpdateDnsPolicyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("dnsPolicy.name", req.GetDnsPolicy().GetName(), "projects/*/regions/*/dnsPolicies/*")
+	p1, err := c.service.PathValue("dnsPolicy.name", req.GetDnsPolicy().GetName(), "projects/*/regions/*/dnsPolicies/*")
 	if err != nil {
 		return nil, err
 	}
@@ -176,7 +176,7 @@ func (c *DnsPolicyClient) DeleteDnsPolicy(ctx context.Context, req *DeleteDnsPol
 		req = proto.Clone(req).(*DeleteDnsPolicyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/dnsPolicies/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/dnsPolicies/*")
 	if err != nil {
 		return nil, err
 	}
@@ -208,7 +208,7 @@ func (c *DnsPolicyClient) SetDefaultDnsPolicy(ctx context.Context, req *SetDefau
 		req = proto.Clone(req).(*SetDefaultDnsPolicyRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/dnsPolicies/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/dnsPolicies/*")
 	if err != nil {
 		return nil, err
 	}

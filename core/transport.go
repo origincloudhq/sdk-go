@@ -41,6 +41,9 @@ var (
 type Service struct {
 	client *Client
 	base   *url.URL
+	// The service's shortcode, such as "pvs": its host's first label, and
+	// the service a full resource name in a path field must name.
+	shortcode string
 }
 
 // Client returns the client the service's calls go through.
@@ -228,9 +231,28 @@ func Query(m proto.Message, skip ...string) (url.Values, error) {
 	return queryFromJSON(encoded, skip)
 }
 
-// PathValue returns value as the path segments of a request, checking it
-// has the form pattern, such as "projects/*/zones/*/volumes/*", gives it.
-// field names it in the error.
+// PathValue returns value, the path field field of a call to the
+// service, as the path segments of the request, checked against pattern as
+// the function [PathValue] checks it. Generated clients call it.
+//
+// A full resource name of the service, such as
+// "//pvs.origincloudapis.eu/projects/p/zones/z/volumes/vol-1" given to a
+// PVS client, is sent as its relative name, the path every call takes. A
+// full name of another service, one with a regional or zonal host or an API
+// version, a URN, a URL or a malformed full name is refused before
+// anything is sent, with a [*FullNameError].
+func (s *Service) PathValue(field, value, pattern string) (string, error) {
+	relative, err := pathName(s.shortcode, field, value)
+	if err != nil {
+		return "", err
+	}
+	return PathValue(field, relative, pattern)
+}
+
+// PathValue returns value, a relative resource name, as the path segments
+// of a request, checking it has the form pattern, such as
+// "projects/*/zones/*/volumes/*", gives it. field names it in the error.
+// [Service.PathValue] also takes a full resource name of its service.
 func PathValue(field, value, pattern string) (string, error) {
 	got := strings.Split(value, "/")
 	want := strings.Split(pattern, "/")

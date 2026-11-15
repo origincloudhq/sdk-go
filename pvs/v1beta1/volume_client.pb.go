@@ -34,7 +34,7 @@ func (c *VolumeClient) Service() *core.Service {
 
 // GetVolume returns a volume.
 func (c *VolumeClient) GetVolume(ctx context.Context, req *GetVolumeRequest) (*Volume, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/volumes/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/volumes/*")
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (c *VolumeClient) GetVolume(ctx context.Context, req *GetVolumeRequest) (*V
 // `pvs` with the location service (`location.origincloudapis.eu`), then
 // each zone's volumes.
 func (c *VolumeClient) ListVolumes(ctx context.Context, req *ListVolumesRequest) (*ListVolumesResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (c *VolumeClient) CreateVolume(ctx context.Context, req *CreateVolumeReques
 		req = proto.Clone(req).(*CreateVolumeRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (c *VolumeClient) ImportVolume(ctx context.Context, req *ImportVolumeReques
 		req = proto.Clone(req).(*ImportVolumeRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func (c *VolumeClient) UpdateVolume(ctx context.Context, req *UpdateVolumeReques
 		req = proto.Clone(req).(*UpdateVolumeRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("volume.name", req.GetVolume().GetName(), "projects/*/zones/*/volumes/*")
+	p1, err := c.service.PathValue("volume.name", req.GetVolume().GetName(), "projects/*/zones/*/volumes/*")
 	if err != nil {
 		return nil, err
 	}
@@ -199,7 +199,7 @@ func (c *VolumeClient) DeleteVolume(ctx context.Context, req *DeleteVolumeReques
 		req = proto.Clone(req).(*DeleteVolumeRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/volumes/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/volumes/*")
 	if err != nil {
 		return nil, err
 	}

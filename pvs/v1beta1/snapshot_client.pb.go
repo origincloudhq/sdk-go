@@ -34,7 +34,7 @@ func (c *SnapshotClient) Service() *core.Service {
 
 // GetSnapshot returns a snapshot.
 func (c *SnapshotClient) GetSnapshot(ctx context.Context, req *GetSnapshotRequest) (*Snapshot, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/snapshots/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/snapshots/*")
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +59,7 @@ func (c *SnapshotClient) GetSnapshot(ctx context.Context, req *GetSnapshotReques
 // `pvs` with the location service (`location.origincloudapis.eu`), then
 // each zone's snapshots.
 func (c *SnapshotClient) ListSnapshots(ctx context.Context, req *ListSnapshotsRequest) (*ListSnapshotsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (c *SnapshotClient) CreateSnapshot(ctx context.Context, req *CreateSnapshot
 		req = proto.Clone(req).(*CreateSnapshotRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*")
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func (c *SnapshotClient) CreateSnapshot(ctx context.Context, req *CreateSnapshot
 
 // UpdateSnapshot changes a snapshot's tags.
 func (c *SnapshotClient) UpdateSnapshot(ctx context.Context, req *UpdateSnapshotRequest) (*Snapshot, error) {
-	p1, err := core.PathValue("snapshot.name", req.GetSnapshot().GetName(), "projects/*/zones/*/snapshots/*")
+	p1, err := c.service.PathValue("snapshot.name", req.GetSnapshot().GetName(), "projects/*/zones/*/snapshots/*")
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (c *SnapshotClient) DeleteSnapshot(ctx context.Context, req *DeleteSnapshot
 		req = proto.Clone(req).(*DeleteSnapshotRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/snapshots/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/snapshots/*")
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +194,7 @@ func (c *SnapshotClient) ProtectSnapshot(ctx context.Context, req *ProtectSnapsh
 		req = proto.Clone(req).(*ProtectSnapshotRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/snapshots/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/snapshots/*")
 	if err != nil {
 		return nil, err
 	}
@@ -221,7 +221,7 @@ func (c *SnapshotClient) UnprotectSnapshot(ctx context.Context, req *UnprotectSn
 		req = proto.Clone(req).(*UnprotectSnapshotRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/snapshots/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/snapshots/*")
 	if err != nil {
 		return nil, err
 	}

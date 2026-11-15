@@ -33,7 +33,7 @@ func (c *UserClient) Service() *core.Service {
 // service account caller is refused with `BAD_REQUEST`, having no
 // profile.
 func (c *UserClient) GetUser(ctx context.Context, req *GetUserRequest) (*User, error) {
-	p1, err := core.PathValue("name", req.GetName(), "users/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "users/*")
 	if err != nil {
 		return nil, err
 	}

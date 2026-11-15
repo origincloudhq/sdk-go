@@ -38,7 +38,7 @@ func (c *DnsPolicyAssociationClient) Service() *core.Service {
 
 // GetDnsPolicyAssociation returns a DNS policy association.
 func (c *DnsPolicyAssociationClient) GetDnsPolicyAssociation(ctx context.Context, req *GetDnsPolicyAssociationRequest) (*DnsPolicyAssociation, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/vpcs/*/dnsPolicyAssociations/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/vpcs/*/dnsPolicyAssociations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *DnsPolicyAssociationClient) GetDnsPolicyAssociation(ctx context.Context
 
 // ListDnsPolicyAssociations lists a VPC's DNS policy associations: none or one.
 func (c *DnsPolicyAssociationClient) ListDnsPolicyAssociations(ctx context.Context, req *ListDnsPolicyAssociationsRequest) (*ListDnsPolicyAssociationsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*/vpcs/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*/vpcs/*")
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func (c *DnsPolicyAssociationClient) CreateDnsPolicyAssociation(ctx context.Cont
 		req = proto.Clone(req).(*CreateDnsPolicyAssociationRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/regions/*/vpcs/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/regions/*/vpcs/*")
 	if err != nil {
 		return nil, err
 	}
@@ -147,7 +147,7 @@ func (c *DnsPolicyAssociationClient) DeleteDnsPolicyAssociation(ctx context.Cont
 		req = proto.Clone(req).(*DeleteDnsPolicyAssociationRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/regions/*/vpcs/*/dnsPolicyAssociations/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/regions/*/vpcs/*/dnsPolicyAssociations/*")
 	if err != nil {
 		return nil, err
 	}

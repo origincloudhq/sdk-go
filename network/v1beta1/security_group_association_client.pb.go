@@ -38,7 +38,7 @@ func (c *SecurityGroupAssociationClient) Service() *core.Service {
 
 // GetSecurityGroupAssociation returns a security group association.
 func (c *SecurityGroupAssociationClient) GetSecurityGroupAssociation(ctx context.Context, req *GetSecurityGroupAssociationRequest) (*SecurityGroupAssociation, error) {
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/networkInterfaces/*/securityGroupAssociations/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/networkInterfaces/*/securityGroupAssociations/*")
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *SecurityGroupAssociationClient) GetSecurityGroupAssociation(ctx context
 
 // ListSecurityGroupAssociations lists a network interface's security group associations, oldest first.
 func (c *SecurityGroupAssociationClient) ListSecurityGroupAssociations(ctx context.Context, req *ListSecurityGroupAssociationsRequest) (*ListSecurityGroupAssociationsResponse, error) {
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*/networkInterfaces/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*/networkInterfaces/*")
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (c *SecurityGroupAssociationClient) CreateSecurityGroupAssociation(ctx cont
 		req = proto.Clone(req).(*CreateSecurityGroupAssociationRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("parent", req.GetParent(), "projects/*/zones/*/networkInterfaces/*")
+	p1, err := c.service.PathValue("parent", req.GetParent(), "projects/*/zones/*/networkInterfaces/*")
 	if err != nil {
 		return nil, err
 	}
@@ -148,7 +148,7 @@ func (c *SecurityGroupAssociationClient) DeleteSecurityGroupAssociation(ctx cont
 		req = proto.Clone(req).(*DeleteSecurityGroupAssociationRequest)
 		req.RequestId = core.NewRequestID()
 	}
-	p1, err := core.PathValue("name", req.GetName(), "projects/*/zones/*/networkInterfaces/*/securityGroupAssociations/*")
+	p1, err := c.service.PathValue("name", req.GetName(), "projects/*/zones/*/networkInterfaces/*/securityGroupAssociations/*")
 	if err != nil {
 		return nil, err
 	}

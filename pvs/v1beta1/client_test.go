@@ -3,6 +3,8 @@ package pvsv1beta1_test
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -13,6 +15,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 
+	"go.origincloud.eu/sdk/core"
 	pvsv1beta1 "go.origincloud.eu/sdk/pvs/v1beta1"
 )
 
@@ -121,6 +124,69 @@ func TestANameOfTheWrongFormIsRefusedBeforeSending(t *testing.T) {
 	_, err := volumes.GetVolume(context.Background(), &pvsv1beta1.GetVolumeRequest{Name: "vol-1"})
 	if err == nil || !strings.Contains(err.Error(), "name must have the form projects/*/zones/*/volumes/*") {
 		t.Fatalf("err = %v", err)
+	}
+	if len(*calls) != 0 {
+		t.Fatalf("sent %d calls", len(*calls))
+	}
+}
+
+// A full resource name of the client's own service is sent as its
+// relative name: the same request as the relative name makes.
+func TestAFullNameOfTheServiceIsSentAsItsRelativeName(t *testing.T) {
+	volumes, calls := recordingClient(t)
+	ctx := context.Background()
+	relative := zone + "/volumes/vol-1"
+
+	for _, prefix := range []string{"", "//pvs.origincloudapis.eu/"} {
+		if _, err := volumes.GetVolume(ctx, &pvsv1beta1.GetVolumeRequest{Name: prefix + relative}); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := volumes.ListVolumes(ctx, &pvsv1beta1.ListVolumesRequest{Parent: prefix + zone}); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := volumes.DeleteVolume(ctx, &pvsv1beta1.DeleteVolumeRequest{Name: prefix + relative, RequestId: "given"}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	want := []string{
+		"GET /v1beta1/" + relative + " map[]",
+		"GET /v1beta1/" + zone + "/volumes map[]",
+		"DELETE /v1beta1/" + relative + " map[requestId:[given]]",
+	}
+	want = append(want, want...)
+	var got []string
+	for _, c := range *calls {
+		got = append(got, fmt.Sprintf("%s %s %v", c.method, c.path, c.query))
+	}
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("sent\n%s\nwant\n%s", strings.Join(got, "\n"), strings.Join(want, "\n"))
+	}
+}
+
+// A full name of another service, or one that isn't a valid full name, is
+// refused before anything is sent, naming the field and the host the
+// client calls.
+func TestANameOfAnotherServiceIsRefusedBeforeSending(t *testing.T) {
+	volumes, calls := recordingClient(t)
+	ctx := context.Background()
+
+	for name, says := range map[string]string{
+		"//compute.origincloudapis.eu/projects/p/zones/z/volumes/vol-1":             "name must be a name on pvs.origincloudapis.eu, the host this client calls",
+		"//pvs.eu-central1-az1.origincloudapis.eu/projects/p/zones/z/volumes/vol-1": "the service's global host, pvs.origincloudapis.eu",
+		"//pvs.origincloudapis.eu/v1beta1/projects/p/zones/z/volumes/vol-1":         `carries the API version "v1beta1"`,
+		"urn:origincloud:storage:o:p:volume:vol-1":                                  "is a URN",
+		"//pvs.origincloudapis.eu/projects/p/zones/z/volumes/vol-1/":                "ends with a '/'",
+		// A full name of the service, but not of a volume.
+		"//pvs.origincloudapis.eu/projects/p/zones/z/snapshots/s-1": "name must have the form projects/*/zones/*/volumes/*",
+	} {
+		_, err := volumes.GetVolume(ctx, &pvsv1beta1.GetVolumeRequest{Name: name})
+		if err == nil || !strings.Contains(err.Error(), says) {
+			t.Errorf("%s: %v", name, err)
+		}
+	}
+	_, err := volumes.ListVolumes(ctx, &pvsv1beta1.ListVolumesRequest{Parent: "//resourcemanager.origincloudapis.eu/projects/p"})
+	if !errors.Is(err, core.ErrOtherService) || !strings.Contains(err.Error(), "parent must be a name on pvs.origincloudapis.eu") {
+		t.Errorf("parent: %v", err)
 	}
 	if len(*calls) != 0 {
 		t.Fatalf("sent %d calls", len(*calls))
