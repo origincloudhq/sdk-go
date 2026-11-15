@@ -29,7 +29,8 @@ type AclAssociation struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The association's resource name. Its last segment is the ACL's id.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The ACL that filters the subnet's traffic, in the subnet's VPC.
+	// The full name of the ACL that filters the subnet's traffic, in the
+	// subnet's VPC.
 	Acl           string `protobuf:"bytes,2,opt,name=acl,proto3" json:"acl,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

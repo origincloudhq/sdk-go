@@ -31,12 +31,10 @@ type FloatingIp struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The floating IP's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The floating IP's URN, the identifier access policies and the audit
-	// log use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// The public address.
 	Address string `protobuf:"bytes,3,opt,name=address,proto3" json:"address,omitempty"`
-	// The network interface the address reaches, as the floating IP's
+	// The full name of the network interface the address reaches, as the
+	// floating IP's
 	// association (a `FloatingIpAssociation`) sets it; empty while it has
 	// none.
 	NetworkInterface string `protobuf:"bytes,4,opt,name=network_interface,json=networkInterface,proto3" json:"network_interface,omitempty"`
@@ -51,8 +49,10 @@ type FloatingIp struct {
 	AutoAssigned bool `protobuf:"varint,6,opt,name=auto_assigned,json=autoAssigned,proto3" json:"auto_assigned,omitempty"`
 	// When the floating IP was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
-	// The principal that created the floating IP, such as `user:<id>` or
-	// `service_account:<id>`; empty for one the platform created.
+	// The principal that created the floating IP, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator string `protobuf:"bytes,8,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Labels of your own, at most 50. The `origin:name` tag is the name the
 	// console shows.
@@ -94,13 +94,6 @@ func (*FloatingIp) Descriptor() ([]byte, []int) {
 func (x *FloatingIp) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *FloatingIp) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -511,19 +504,20 @@ var File_origincloud_network_v1beta1_floating_ip_proto protoreflect.FileDescript
 
 const file_origincloud_network_v1beta1_floating_ip_proto_rawDesc = "" +
 	"\n" +
-	"-origincloud/network/v1beta1/floating_ip.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x94\x05\n" +
+	"-origincloud/network/v1beta1/floating_ip.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x82\x05\n" +
 	"\n" +
 	"FloatingIp\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12&\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12&\n" +
 	"\aaddress\x18\x03 \x01(\tB\f\xe2A\x01\x03\xe2\x8c\xcf\xd7\b\x02\b\x02R\aaddress\x12a\n" +
 	"\x11network_interface\x18\x04 \x01(\tB4\xe2A\x01\x03\xfaA-\n" +
 	"+network.origincloudapis.eu/NetworkInterfaceR\x10networkInterface\x125\n" +
 	"\x0fprivate_address\x18\x05 \x01(\tB\f\xe2A\x01\x03\xe2\x8c\xcf\xd7\b\x02\b\x02R\x0eprivateAddress\x12)\n" +
 	"\rauto_assigned\x18\x06 \x01(\bB\x04\xe2A\x01\x03R\fautoAssigned\x12A\n" +
 	"\vcreate_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"createTime\x12\x1e\n" +
-	"\acreator\x18\b \x01(\tB\x04\xe2A\x01\x03R\acreator\x12K\n" +
+	"createTime\x12$\n" +
+	"\acreator\x18\b \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12K\n" +
 	"\x04tags\x18\t \x03(\v21.origincloud.network.v1beta1.FloatingIp.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +

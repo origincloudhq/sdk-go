@@ -164,7 +164,8 @@ type SecurityGroupRule struct {
 	// The peer as an address range: where admitted traffic comes from, or
 	// where sent traffic goes to.
 	CidrBlock string `protobuf:"bytes,6,opt,name=cidr_block,json=cidrBlock,proto3" json:"cidr_block,omitempty"`
-	// The peer as another security group of the same VPC: its members'
+	// The peer as another security group of the same VPC, by its full name:
+	// its members'
 	// addresses. The rule's own group is refused here with
 	// `INVALID_ARGUMENT`: it is `same_group`.
 	PeerSecurityGroup string `protobuf:"bytes,7,opt,name=peer_security_group,json=peerSecurityGroup,proto3" json:"peer_security_group,omitempty"`

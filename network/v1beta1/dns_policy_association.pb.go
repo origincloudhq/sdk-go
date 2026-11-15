@@ -30,7 +30,8 @@ type DnsPolicyAssociation struct {
 	// The association's resource name. Its last segment is the DNS policy's
 	// id.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The DNS policy the VPC relays through, in the VPC's project and region.
+	// The full name of the DNS policy the VPC relays through, in the VPC's
+	// project and region.
 	DnsPolicy     string `protobuf:"bytes,2,opt,name=dns_policy,json=dnsPolicy,proto3" json:"dns_policy,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache

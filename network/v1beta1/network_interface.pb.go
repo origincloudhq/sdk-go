@@ -85,13 +85,12 @@ type NetworkInterface struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The interface's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The interface's URN, the identifier access policies and the audit log
-	// use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
-	// The subnet the interface has its addresses in, in the same project
+	// The full name of the subnet the interface has its addresses in, in the
+	// same project
 	// and zone.
 	Subnet string `protobuf:"bytes,3,opt,name=subnet,proto3" json:"subnet,omitempty"`
-	// The security groups that filter the interface's traffic, as its
+	// The full names of the security groups that filter the interface's
+	// traffic, as its
 	// security group associations (each a `SecurityGroupAssociation`) set
 	// them. The interface admits the traffic any of them allows. With none,
 	// it admits and sends nothing except replies to its own traffic and
@@ -108,13 +107,16 @@ type NetworkInterface struct {
 	Ipv6Address string `protobuf:"bytes,7,opt,name=ipv6_address,json=ipv6Address,proto3" json:"ipv6_address,omitempty"`
 	// Whether the interface is in use.
 	State NetworkInterface_State `protobuf:"varint,8,opt,name=state,proto3,enum=origincloud.network.v1beta1.NetworkInterface_State" json:"state,omitempty"`
-	// The instance the interface is attached to; empty while it is
+	// The full name of the instance the interface is attached to, on the
+	// compute service; empty while it is
 	// `AVAILABLE`. An instance attaches interfaces when it is launched.
 	Instance string `protobuf:"bytes,9,opt,name=instance,proto3" json:"instance,omitempty"`
 	// When the network interface was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
-	// The principal that created the network interface, such as `user:<id>`
-	// or `service_account:<id>`; empty for one the platform created.
+	// The principal that created the network interface, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator string `protobuf:"bytes,11,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Labels of your own, at most 50. The `origin:name` tag is the name the
 	// console shows.
@@ -156,13 +158,6 @@ func (*NetworkInterface) Descriptor() ([]byte, []int) {
 func (x *NetworkInterface) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *NetworkInterface) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -294,7 +289,7 @@ type ListNetworkInterfacesRequest struct {
 	PageSize int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A previous response's `next_page_token`, for the page after it.
 	PageToken string `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	// Only the interfaces in this subnet, when set.
+	// Only the interfaces in this subnet, by its full name, when set.
 	//
 	// (-- api-linter: core::0132::request-unknown-fields=disabled
 	//
@@ -610,10 +605,9 @@ var File_origincloud_network_v1beta1_network_interface_proto protoreflect.FileDe
 
 const file_origincloud_network_v1beta1_network_interface_proto_rawDesc = "" +
 	"\n" +
-	"3origincloud/network/v1beta1/network_interface.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x85\b\n" +
+	"3origincloud/network/v1beta1/network_interface.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xf3\a\n" +
 	"\x10NetworkInterface\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12C\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12C\n" +
 	"\x06subnet\x18\x03 \x01(\tB+\xe2A\x02\x02\x05\xfaA#\n" +
 	"!network.origincloudapis.eu/SubnetR\x06subnet\x12[\n" +
 	"\x0fsecurity_groups\x18\x04 \x03(\tB2\xe2A\x02\x03\x06\xfaA*\n" +
@@ -626,8 +620,10 @@ const file_origincloud_network_v1beta1_network_interface_proto_rawDesc = "" +
 	"#compute.origincloudapis.eu/InstanceR\binstance\x12A\n" +
 	"\vcreate_time\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"createTime\x12\x1e\n" +
-	"\acreator\x18\v \x01(\tB\x04\xe2A\x01\x03R\acreator\x12Q\n" +
+	"createTime\x12$\n" +
+	"\acreator\x18\v \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12Q\n" +
 	"\x04tags\x18\f \x03(\v27.origincloud.network.v1beta1.NetworkInterface.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +

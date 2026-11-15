@@ -30,7 +30,8 @@ type FloatingIpAssociation struct {
 	// The association's resource name. Its last segment is the network
 	// interface's id.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The network interface the address reaches, in the floating IP's project
+	// The full name of the network interface the address reaches, in the
+	// floating IP's project
 	// and zone.
 	NetworkInterface string `protobuf:"bytes,2,opt,name=network_interface,json=networkInterface,proto3" json:"network_interface,omitempty"`
 	// The interface's private IPv4 address the public one translates to.

@@ -31,20 +31,21 @@ type NatGateway struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The gateway's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The gateway's URN, the identifier access policies and the audit log
-	// use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
-	// The public subnet the gateway lives in, in the same project and zone.
+	// The full name of the public subnet the gateway lives in, in the same
+	// project and zone.
 	Subnet string `protobuf:"bytes,3,opt,name=subnet,proto3" json:"subnet,omitempty"`
-	// The floating IP instances behind the gateway appear as, in the same
+	// The full name of the floating IP instances behind the gateway appear
+	// as, in the same
 	// project and zone. It stays allocated when the gateway is deleted.
 	FloatingIp string `protobuf:"bytes,4,opt,name=floating_ip,json=floatingIp,proto3" json:"floating_ip,omitempty"`
-	// The subnet's VPC.
+	// The full name of the subnet's VPC.
 	Vpc string `protobuf:"bytes,5,opt,name=vpc,proto3" json:"vpc,omitempty"`
 	// When the NAT gateway was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
-	// The principal that created the NAT gateway, such as `user:<id>` or
-	// `service_account:<id>`; empty for one the platform created.
+	// The principal that created the NAT gateway, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator string `protobuf:"bytes,7,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Labels of your own, at most 50. The `origin:name` tag is the name the
 	// console shows.
@@ -86,13 +87,6 @@ func (*NatGateway) Descriptor() ([]byte, []int) {
 func (x *NatGateway) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *NatGateway) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -496,11 +490,10 @@ var File_origincloud_network_v1beta1_nat_gateway_proto protoreflect.FileDescript
 
 const file_origincloud_network_v1beta1_nat_gateway_proto_rawDesc = "" +
 	"\n" +
-	"-origincloud/network/v1beta1/nat_gateway.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xf9\x04\n" +
+	"-origincloud/network/v1beta1/nat_gateway.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xe7\x04\n" +
 	"\n" +
 	"NatGateway\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12C\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12C\n" +
 	"\x06subnet\x18\x03 \x01(\tB+\xe2A\x02\x02\x05\xfaA#\n" +
 	"!network.origincloudapis.eu/SubnetR\x06subnet\x12P\n" +
 	"\vfloating_ip\x18\x04 \x01(\tB/\xe2A\x02\x02\x05\xfaA'\n" +
@@ -509,8 +502,10 @@ const file_origincloud_network_v1beta1_nat_gateway_proto_rawDesc = "" +
 	"\x03vpc\x18\x05 \x01(\tB'\xe2A\x01\x03\xfaA \n" +
 	"\x1enetwork.origincloudapis.eu/VpcR\x03vpc\x12A\n" +
 	"\vcreate_time\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"createTime\x12\x1e\n" +
-	"\acreator\x18\a \x01(\tB\x04\xe2A\x01\x03R\acreator\x12K\n" +
+	"createTime\x12$\n" +
+	"\acreator\x18\a \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12K\n" +
 	"\x04tags\x18\b \x03(\v21.origincloud.network.v1beta1.NatGateway.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +

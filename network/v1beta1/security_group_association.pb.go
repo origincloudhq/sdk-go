@@ -30,7 +30,7 @@ type SecurityGroupAssociation struct {
 	// The association's resource name. Its last segment is the security
 	// group's id.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The security group, in the interface's VPC.
+	// The security group's full name, in the interface's VPC.
 	SecurityGroup string `protobuf:"bytes,2,opt,name=security_group,json=securityGroup,proto3" json:"security_group,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
