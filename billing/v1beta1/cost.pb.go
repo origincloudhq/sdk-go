@@ -387,7 +387,8 @@ func (x *OrganizationCostReport) GetProjects() []*ProjectCost {
 // One project's cost in an organization's report, over every service.
 type ProjectCost struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The project, `projects/{project}`.
+	// The project's full name,
+	// `//resourcemanager.origincloudapis.eu/projects/{project}`.
 	Project string `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
 	// The project's total.
 	Total string `protobuf:"bytes,2,opt,name=total,proto3" json:"total,omitempty"`
@@ -467,8 +468,8 @@ type UsageRecord struct {
 	StartTime *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	// When the interval ends.
 	EndTime *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	// The billing account the usage was charged to, the one the project was
-	// linked to when it was recorded; empty if it had none.
+	// The full name of the billing account the usage was charged to, the one
+	// the project was linked to when it was recorded; empty if it had none.
 	BillingAccount string `protobuf:"bytes,8,opt,name=billing_account,json=billingAccount,proto3" json:"billing_account,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache

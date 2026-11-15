@@ -29,8 +29,8 @@ type AssumeServiceAccountRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The OIDC token, a JWT its issuer signed, such as a CI job's.
 	OidcToken string `protobuf:"bytes,1,opt,name=oidc_token,json=oidcToken,proto3" json:"oidc_token,omitempty"`
-	// The service account to assume,
-	// `organizations/{organization}/serviceAccounts/{service_account}`. Only
+	// The full name of the service account to assume,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`. Only
 	// its federated credentials are considered. Without it, any service
 	// account's credential that trusts the token is.
 	ServiceAccount string `protobuf:"bytes,2,opt,name=service_account,json=serviceAccount,proto3" json:"service_account,omitempty"`
@@ -100,10 +100,11 @@ type AssumeServiceAccountResponse struct {
 	AccessToken string `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
 	// When the access token expires.
 	ExpireTime *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=expire_time,json=expireTime,proto3" json:"expire_time,omitempty"`
-	// The service account assumed,
-	// `organizations/{organization}/serviceAccounts/{service_account}`.
+	// The full name of the service account assumed,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`.
 	ServiceAccount string `protobuf:"bytes,3,opt,name=service_account,json=serviceAccount,proto3" json:"service_account,omitempty"`
-	// The federated credential that trusted the token.
+	// The full name of the federated credential that trusted the token, on
+	// iam.
 	FederatedCredential string `protobuf:"bytes,4,opt,name=federated_credential,json=federatedCredential,proto3" json:"federated_credential,omitempty"`
 	unknownFields       protoimpl.UnknownFields
 	sizeCache           protoimpl.SizeCache

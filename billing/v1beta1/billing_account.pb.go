@@ -108,9 +108,6 @@ type BillingAccount struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The billing account's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The billing account's URN, the identifier access policies and the audit
-	// log use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// The name the console and spend-limit alerts show. Not empty. An
 	// organization's default account is called `default` until it is
 	// renamed.
@@ -136,8 +133,10 @@ type BillingAccount struct {
 	PaymentMethod *PaymentMethod `protobuf:"bytes,9,opt,name=payment_method,json=paymentMethod,proto3" json:"payment_method,omitempty"`
 	// When the billing account was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
-	// The principal that created the billing account, such as `user:<id>` or
-	// `service_account:<id>`.
+	// The principal that created the billing account, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator       string `protobuf:"bytes,11,opt,name=creator,proto3" json:"creator,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -176,13 +175,6 @@ func (*BillingAccount) Descriptor() ([]byte, []int) {
 func (x *BillingAccount) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *BillingAccount) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -397,8 +389,9 @@ type ProjectBillingInfo struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The billing info's resource name, `projects/{project}/billingInfo`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The billing account that pays for the project's usage, one of its
-	// organization's.
+	// The full name of the billing account that pays for the project's usage,
+	// one of its organization's:
+	// `//billing.origincloudapis.eu/organizations/{organization}/billingAccounts/{billing_account}`.
 	BillingAccount string `protobuf:"bytes,3,opt,name=billing_account,json=billingAccount,proto3" json:"billing_account,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -1430,10 +1423,9 @@ var File_origincloud_billing_v1beta1_billing_account_proto protoreflect.FileDesc
 
 const file_origincloud_billing_v1beta1_billing_account_proto_rawDesc = "" +
 	"\n" +
-	"1origincloud/billing/v1beta1/billing_account.proto\x12\x1borigincloud.billing.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/billing/v1beta1/legal_document.proto\"\xba\x05\n" +
+	"1origincloud/billing/v1beta1/billing_account.proto\x12\x1borigincloud.billing.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/billing/v1beta1/legal_document.proto\"\xa8\x05\n" +
 	"\x0eBillingAccount\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12'\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12'\n" +
 	"\fdisplay_name\x18\x03 \x01(\tB\x04\xe2A\x01\x02R\vdisplayName\x12-\n" +
 	"\x0fdefault_account\x18\x04 \x01(\bB\x04\xe2A\x01\x03R\x0edefaultAccount\x12Z\n" +
 	"\x0fbilling_address\x18\x05 \x01(\v2+.origincloud.billing.v1beta1.BillingAddressB\x04\xe2A\x01\x01R\x0ebillingAddress\x12)\n" +
@@ -1443,8 +1435,10 @@ const file_origincloud_billing_v1beta1_billing_account_proto_rawDesc = "" +
 	"\x0epayment_method\x18\t \x01(\v2*.origincloud.billing.v1beta1.PaymentMethodB\x04\xe2A\x01\x03R\rpaymentMethod\x12A\n" +
 	"\vcreate_time\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"createTime\x12\x1e\n" +
-	"\acreator\x18\v \x01(\tB\x04\xe2A\x01\x03R\acreator:\x90\x01\xeaA\x8c\x01\n" +
+	"createTime\x12$\n" +
+	"\acreator\x18\v \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator:\x90\x01\xeaA\x8c\x01\n" +
 	")billing.origincloudapis.eu/BillingAccount\x12>organizations/{organization}/billingAccounts/{billing_account}*\x0fbillingAccounts2\x0ebillingAccount\"\x96\x01\n" +
 	"\x0eBillingAddress\x12\x1c\n" +
 	"\x06street\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\x06street\x12\x18\n" +

@@ -86,11 +86,13 @@ type QueryTimeSeriesRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The project the resource is in, `projects/{project}`.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
-	// The resource whose metrics to return, in `parent`: an instance,
-	// `projects/{project}/zones/{zone}/instances/{instance}`, a volume,
-	// `projects/{project}/zones/{zone}/volumes/{volume}`, or a network
-	// interface,
-	// `projects/{project}/zones/{zone}/networkInterfaces/{network_interface}`.
+	// The full name of the resource whose metrics to return, in `parent`: an
+	// instance,
+	// `//compute.origincloudapis.eu/projects/{project}/zones/{zone}/instances/{instance}`,
+	// a volume,
+	// `//pvs.origincloudapis.eu/projects/{project}/zones/{zone}/volumes/{volume}`,
+	// or a network interface,
+	// `//network.origincloudapis.eu/projects/{project}/zones/{zone}/networkInterfaces/{network_interface}`.
 	Resource string `protobuf:"bytes,2,opt,name=resource,proto3" json:"resource,omitempty"`
 	// The metrics to return, such as `oc_compute_instance_cpu_seconds_total`,
 	// at least one. A metric of another kind of resource returns a series
@@ -241,7 +243,7 @@ type TimeSeries struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The metric, as asked.
 	Metric string `protobuf:"bytes,1,opt,name=metric,proto3" json:"metric,omitempty"`
-	// The resource, as asked.
+	// The resource's full name, as asked.
 	Resource string `protobuf:"bytes,2,opt,name=resource,proto3" json:"resource,omitempty"`
 	// The unit of the counter, such as `seconds` or `bytes`: a `RATE` of a
 	// `bytes` counter is bytes per second.

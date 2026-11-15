@@ -87,13 +87,15 @@ type LegalAcceptance struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The acceptance's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The version accepted,
-	// `legalDocuments/{legal_document}/versions/{version}`.
+	// The full name of the version accepted,
+	// `//billing.origincloudapis.eu/legalDocuments/{legal_document}/versions/{version}`.
 	LegalDocumentVersion string `protobuf:"bytes,2,opt,name=legal_document_version,json=legalDocumentVersion,proto3" json:"legal_document_version,omitempty"`
 	// The SHA-256 of the text accepted: the version's `sha256`.
 	Sha256 string `protobuf:"bytes,3,opt,name=sha256,proto3" json:"sha256,omitempty"`
-	// Who accepted: `user:{id}`, or `service_account:{id}` for a service
-	// account.
+	// Who accepted, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Accepter string `protobuf:"bytes,4,opt,name=accepter,proto3" json:"accepter,omitempty"`
 	// When the version was accepted.
 	AcceptTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=accept_time,json=acceptTime,proto3" json:"accept_time,omitempty"`
@@ -217,7 +219,8 @@ func (x *LegalAcceptance) GetVatId() string {
 // A legal document version a billing account has yet to accept.
 type LegalRequirement struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The version, `legalDocuments/{legal_document}/versions/{version}`.
+	// The version's full name,
+	// `//billing.origincloudapis.eu/legalDocuments/{legal_document}/versions/{version}`.
 	LegalDocumentVersion string `protobuf:"bytes,1,opt,name=legal_document_version,json=legalDocumentVersion,proto3" json:"legal_document_version,omitempty"`
 	// The version's title, such as `Terms of Service`.
 	DisplayName string `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
@@ -637,13 +640,15 @@ var File_origincloud_billing_v1beta1_legal_acceptance_proto protoreflect.FileDes
 
 const file_origincloud_billing_v1beta1_legal_acceptance_proto_rawDesc = "" +
 	"\n" +
-	"2origincloud/billing/v1beta1/legal_acceptance.proto\x12\x1borigincloud.billing.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16google/type/date.proto\x1a1origincloud/billing/v1beta1/billing_account.proto\x1a0origincloud/billing/v1beta1/legal_document.proto\"\xdf\x06\n" +
+	"2origincloud/billing/v1beta1/legal_acceptance.proto\x12\x1borigincloud.billing.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16google/type/date.proto\x1a1origincloud/billing/v1beta1/billing_account.proto\x1a0origincloud/billing/v1beta1/legal_document.proto\"\xe5\x06\n" +
 	"\x0fLegalAcceptance\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12n\n" +
 	"\x16legal_document_version\x18\x02 \x01(\tB8\xe2A\x01\x03\xfaA1\n" +
 	"/billing.origincloudapis.eu/LegalDocumentVersionR\x14legalDocumentVersion\x12\x1c\n" +
-	"\x06sha256\x18\x03 \x01(\tB\x04\xe2A\x01\x03R\x06sha256\x12 \n" +
-	"\baccepter\x18\x04 \x01(\tB\x04\xe2A\x01\x03R\baccepter\x12A\n" +
+	"\x06sha256\x18\x03 \x01(\tB\x04\xe2A\x01\x03R\x06sha256\x12&\n" +
+	"\baccepter\x18\x04 \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\baccepter\x12A\n" +
 	"\vaccept_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"acceptTime\x12Q\n" +
 	"\x06method\x18\x06 \x01(\x0e23.origincloud.billing.v1beta1.LegalAcceptance.MethodB\x04\xe2A\x01\x03R\x06method\x12.\n" +

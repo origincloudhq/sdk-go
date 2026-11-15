@@ -175,7 +175,7 @@ type Key struct {
 	//
 	//	aip.dev/not-precedent: enabling and disabling a key is setting its state. --)
 	State Key_State `protobuf:"varint,3,opt,name=state,proto3,enum=origincloud.kms.v1beta1.Key_State" json:"state,omitempty"`
-	// The version new ciphertexts and signatures use.
+	// The full name of the version new ciphertexts and signatures use.
 	PrimaryVersion string `protobuf:"bytes,4,opt,name=primary_version,json=primaryVersion,proto3" json:"primary_version,omitempty"`
 	// Every version, oldest first. RotateKey adds one.
 	Versions []*Key_Version `protobuf:"bytes,5,rep,name=versions,proto3" json:"versions,omitempty"`
@@ -932,7 +932,7 @@ type EncryptResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The ciphertext, to store and pass to Decrypt.
 	Ciphertext []byte `protobuf:"bytes,1,opt,name=ciphertext,proto3" json:"ciphertext,omitempty"`
-	// The key version that encrypted it.
+	// The full name of the key version that encrypted it.
 	KeyVersion    string `protobuf:"bytes,2,opt,name=key_version,json=keyVersion,proto3" json:"key_version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1051,7 +1051,7 @@ type DecryptResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The decrypted data.
 	Plaintext []byte `protobuf:"bytes,1,opt,name=plaintext,proto3" json:"plaintext,omitempty"`
-	// The key version that decrypted it.
+	// The full name of the key version that decrypted it.
 	KeyVersion    string `protobuf:"bytes,2,opt,name=key_version,json=keyVersion,proto3" json:"key_version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1164,7 +1164,7 @@ type GenerateDataKeyResponse struct {
 	// The data key encrypted under the key, to store beside your data and
 	// pass to Decrypt.
 	Ciphertext []byte `protobuf:"bytes,2,opt,name=ciphertext,proto3" json:"ciphertext,omitempty"`
-	// The key version that encrypted it.
+	// The full name of the key version that encrypted it.
 	KeyVersion    string `protobuf:"bytes,3,opt,name=key_version,json=keyVersion,proto3" json:"key_version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1228,7 +1228,8 @@ type SignRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The data to sign, at most 64 KiB.
 	Data []byte `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty"`
-	// The version of `name` to sign with, `{name}/versions/{version}`.
+	// The full name of the version of `name` to sign with,
+	// `//kms.origincloudapis.eu/{name}/versions/{version}`.
 	// Without it, the key's primary version signs. Name it when the
 	// signature's verifiers must know the version before the signature
 	// exists, for example a token whose header names its key: the primary
@@ -1295,7 +1296,8 @@ type SignResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The signature: ASN.1 DER for ECDSA, 64 bytes for Ed25519.
 	Signature []byte `protobuf:"bytes,1,opt,name=signature,proto3" json:"signature,omitempty"`
-	// The key version that signed, whose public key verifies it.
+	// The full name of the key version that signed, whose public key
+	// verifies it.
 	KeyVersion    string `protobuf:"bytes,2,opt,name=key_version,json=keyVersion,proto3" json:"key_version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -1395,8 +1397,8 @@ func (x *GetPublicKeyRequest) GetName() string {
 // A version of the key: one generation of its material.
 type Key_Version struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The version's resource name,
-	// `projects/{project}/regions/{region}/keys/{key}/versions/{version}`,
+	// The version's full name,
+	// `//kms.origincloudapis.eu/projects/{project}/regions/{region}/keys/{key}/versions/{version}`,
 	// numbered from 1.
 	KeyVersion string `protobuf:"bytes,1,opt,name=key_version,json=keyVersion,proto3" json:"key_version,omitempty"`
 	// When the version was created.

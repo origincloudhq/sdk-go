@@ -88,9 +88,6 @@ type Organization struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The organization's resource name, `organizations/{organization}`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The organization's URN, the identifier access policies and the audit
-	// log use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// The name the console shows, typically the company's name. Not empty.
 	DisplayName string `protobuf:"bytes,3,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
 	// Whether the organization may create resources. Decided by the
@@ -98,8 +95,10 @@ type Organization struct {
 	State Organization_State `protobuf:"varint,4,opt,name=state,proto3,enum=origincloud.resourcemanager.v1beta1.Organization_State" json:"state,omitempty"`
 	// When the organization was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
-	// The principal that created the organization, such as `user:<id>` or
-	// `service_account:<id>`.
+	// The principal that created the organization, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator       string `protobuf:"bytes,6,opt,name=creator,proto3" json:"creator,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -138,13 +137,6 @@ func (*Organization) Descriptor() ([]byte, []int) {
 func (x *Organization) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *Organization) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -545,15 +537,16 @@ var File_origincloud_resourcemanager_v1beta1_organization_proto protoreflect.Fil
 
 const file_origincloud_resourcemanager_v1beta1_organization_proto_rawDesc = "" +
 	"\n" +
-	"6origincloud/resourcemanager/v1beta1/organization.proto\x12#origincloud.resourcemanager.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a/origincloud/resourcemanager/v1beta1/quota.proto\"\xe0\x03\n" +
+	"6origincloud/resourcemanager/v1beta1/organization.proto\x12#origincloud.resourcemanager.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a/origincloud/resourcemanager/v1beta1/quota.proto\"\xce\x03\n" +
 	"\fOrganization\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12'\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12'\n" +
 	"\fdisplay_name\x18\x03 \x01(\tB\x04\xe2A\x01\x02R\vdisplayName\x12S\n" +
 	"\x05state\x18\x04 \x01(\x0e27.origincloud.resourcemanager.v1beta1.Organization.StateB\x04\xe2A\x01\x03R\x05state\x12A\n" +
 	"\vcreate_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
-	"createTime\x12\x1e\n" +
-	"\acreator\x18\x06 \x01(\tB\x04\xe2A\x01\x03R\acreator\"L\n" +
+	"createTime\x12$\n" +
+	"\acreator\x18\x06 \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\"L\n" +
 	"\x05State\x12\x15\n" +
 	"\x11STATE_UNSPECIFIED\x10\x00\x12\x12\n" +
 	"\x0ePENDING_REVIEW\x10\x01\x12\n" +

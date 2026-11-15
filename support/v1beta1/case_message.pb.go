@@ -31,8 +31,10 @@ type CaseMessage struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The message's text. Not empty.
 	Body string `protobuf:"bytes,2,opt,name=body,proto3" json:"body,omitempty"`
-	// The principal that wrote the message, such as `user:<id>` or
-	// `service_account:<id>`.
+	// The principal that wrote the message, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Author string `protobuf:"bytes,3,opt,name=author,proto3" json:"author,omitempty"`
 	// When the message was added.
 	CreateTime    *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
@@ -335,11 +337,13 @@ var File_origincloud_support_v1beta1_case_message_proto protoreflect.FileDescrip
 
 const file_origincloud_support_v1beta1_case_message_proto_rawDesc = "" +
 	"\n" +
-	".origincloud/support/v1beta1/case_message.proto\x12\x1borigincloud.support.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xab\x02\n" +
+	".origincloud/support/v1beta1/case_message.proto\x12\x1borigincloud.support.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb1\x02\n" +
 	"\vCaseMessage\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x19\n" +
-	"\x04body\x18\x02 \x01(\tB\x05\xe2A\x02\x02\x05R\x04body\x12\x1c\n" +
-	"\x06author\x18\x03 \x01(\tB\x04\xe2A\x01\x03R\x06author\x12A\n" +
+	"\x04body\x18\x02 \x01(\tB\x05\xe2A\x02\x02\x05R\x04body\x12\"\n" +
+	"\x06author\x18\x03 \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\x06author\x12A\n" +
 	"\vcreate_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime:\x85\x01\xeaA\x81\x01\n" +
 	"&support.origincloudapis.eu/CaseMessage\x12<organizations/{organization}/cases/{case}/messages/{message}*\fcaseMessages2\vcaseMessage\"\\\n" +

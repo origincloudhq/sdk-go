@@ -96,10 +96,9 @@ type Case struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The case's resource name, `organizations/{organization}/cases/{case}`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The case's URN, the identifier access policies and the audit log use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
-	// The project the case is about, `projects/{project}`, one of the
-	// organization's. Empty for a case about the organization as a whole.
+	// The full name of the project the case is about, one of the
+	// organization's: `//resourcemanager.origincloudapis.eu/projects/{project}`.
+	// Empty for a case about the organization as a whole.
 	Project string `protobuf:"bytes,3,opt,name=project,proto3" json:"project,omitempty"`
 	// A one-line summary. Not empty.
 	Subject string `protobuf:"bytes,4,opt,name=subject,proto3" json:"subject,omitempty"`
@@ -112,8 +111,10 @@ type Case struct {
 	// Where the case stands. Changed by support, and by `CloseCase` and
 	// `ReopenCase`.
 	State Case_State `protobuf:"varint,7,opt,name=state,proto3,enum=origincloud.support.v1beta1.Case_State" json:"state,omitempty"`
-	// The principal that opened the case, such as `user:<id>` or
-	// `service_account:<id>`.
+	// The principal that opened the case, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform did.
 	Creator string `protobuf:"bytes,8,opt,name=creator,proto3" json:"creator,omitempty"`
 	// When the case was opened.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
@@ -156,13 +157,6 @@ func (*Case) Descriptor() ([]byte, []int) {
 func (x *Case) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *Case) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -555,17 +549,18 @@ var File_origincloud_support_v1beta1_case_proto protoreflect.FileDescriptor
 
 const file_origincloud_support_v1beta1_case_proto_rawDesc = "" +
 	"\n" +
-	"&origincloud/support/v1beta1/case.proto\x12\x1borigincloud.support.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9c\x05\n" +
+	"&origincloud/support/v1beta1/case.proto\x12\x1borigincloud.support.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8a\x05\n" +
 	"\x04Case\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12N\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12N\n" +
 	"\aproject\x18\x03 \x01(\tB4\xe2A\x02\x01\x05\xfaA,\n" +
 	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12\x1f\n" +
 	"\asubject\x18\x04 \x01(\tB\x05\xe2A\x02\x02\x05R\asubject\x12'\n" +
 	"\vdescription\x18\x05 \x01(\tB\x05\xe2A\x02\x02\x05R\vdescription\x12*\n" +
 	"\rcontact_email\x18\x06 \x01(\tB\x05\xe2A\x02\x02\x05R\fcontactEmail\x12C\n" +
-	"\x05state\x18\a \x01(\x0e2'.origincloud.support.v1beta1.Case.StateB\x04\xe2A\x01\x03R\x05state\x12\x1e\n" +
-	"\acreator\x18\b \x01(\tB\x04\xe2A\x01\x03R\acreator\x12A\n" +
+	"\x05state\x18\a \x01(\x0e2'.origincloud.support.v1beta1.Case.StateB\x04\xe2A\x01\x03R\x05state\x12$\n" +
+	"\acreator\x18\b \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12A\n" +
 	"\vcreate_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime\x12A\n" +
 	"\vupdate_time\x18\n" +

@@ -100,11 +100,12 @@ type LegalDocument struct {
 	// that is accepted needs a new acceptance; the other documents are
 	// published only.
 	AcceptanceRequired bool `protobuf:"varint,3,opt,name=acceptance_required,json=acceptanceRequired,proto3" json:"acceptance_required,omitempty"`
-	// The version in force today, by its resource name. Empty while the first
-	// version has not taken effect yet.
+	// The full name of the version in force today,
+	// `//billing.origincloudapis.eu/legalDocuments/{legal_document}/versions/{version}`.
+	// Empty while the first version has not taken effect yet.
 	CurrentVersion string `protobuf:"bytes,4,opt,name=current_version,json=currentVersion,proto3" json:"current_version,omitempty"`
-	// The latest version published, by its resource name: `current_version`,
-	// or a version announced to take effect later.
+	// The full name of the latest version published: `current_version`, or a
+	// version announced to take effect later.
 	LatestVersion string `protobuf:"bytes,5,opt,name=latest_version,json=latestVersion,proto3" json:"latest_version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -316,7 +317,8 @@ func (x *LegalDocumentVersion) GetPdfUri() string {
 // A version to accept, with the text it was shown as.
 type LegalDocumentVersionToAccept struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The version, `legalDocuments/{legal_document}/versions/{version}`.
+	// The version's full name,
+	// `//billing.origincloudapis.eu/legalDocuments/{legal_document}/versions/{version}`.
 	LegalDocumentVersion string `protobuf:"bytes,1,opt,name=legal_document_version,json=legalDocumentVersion,proto3" json:"legal_document_version,omitempty"`
 	// The version's `sha256`, as read with it: an acceptance is refused when
 	// the text shown isn't the version's.
