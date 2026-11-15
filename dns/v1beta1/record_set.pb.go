@@ -104,9 +104,6 @@ type RecordSet struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The record set's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The record set's URN, the identifier access policies and the audit log
-	// use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// The name the records answer for: the zone's `dns_name` or a name below
 	// it, written in full, such as `www.example.com`, without the final dot;
 	// answered in lowercase. Labels may hold `_` (`_dmarc.example.com`), and
@@ -169,13 +166,6 @@ func (*RecordSet) Descriptor() ([]byte, []int) {
 func (x *RecordSet) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *RecordSet) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -324,8 +314,8 @@ func (x *BasicRecordData) GetValues() []string {
 // follows it as it changes.
 type AliasRecordData struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The Floating IP whose address the record set answers with, in the
-	// zone's project. A Floating IP's address is an IPv4 address, so the
+	// The full name of the Floating IP whose address the record set answers
+	// with, in the zone's project. A Floating IP's address is an IPv4 address, so the
 	// record set is of type `A`; an `AAAA` alias is refused.
 	FloatingIp    string `protobuf:"bytes,1,opt,name=floating_ip,json=floatingIp,proto3" json:"floating_ip,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -762,7 +752,7 @@ type BatchChangeRecordSetsRequest struct {
 	// The zone whose record sets to change,
 	// `projects/{project}/hostedZones/{hosted_zone}`.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
-	// The record sets to delete, by name.
+	// The record sets to delete, by their full names.
 	Deletions []string `protobuf:"bytes,2,rep,name=deletions,proto3" json:"deletions,omitempty"`
 	// The record sets to change, each with the fields to change, as
 	// `UpdateRecordSet` takes them.
@@ -948,10 +938,9 @@ var File_origincloud_dns_v1beta1_record_set_proto protoreflect.FileDescriptor
 
 const file_origincloud_dns_v1beta1_record_set_proto_rawDesc = "" +
 	"\n" +
-	"(origincloud/dns/v1beta1/record_set.proto\x12\x17origincloud.dns.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe3\x05\n" +
+	"(origincloud/dns/v1beta1/record_set.proto\x12\x17origincloud.dns.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xcb\x05\n" +
 	"\tRecordSet\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12 \n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12 \n" +
 	"\bdns_name\x18\x03 \x01(\tB\x05\xe2A\x02\x02\x05R\adnsName\x12B\n" +
 	"\x04type\x18\x04 \x01(\x0e2'.origincloud.dns.v1beta1.RecordSet.TypeB\x05\xe2A\x02\x02\x05R\x04type\x126\n" +
 	"\x03ttl\x18\x05 \x01(\v2\x19.google.protobuf.DurationB\x04\xe2A\x01\x01H\x01R\x03ttl\x88\x01\x01\x12F\n" +

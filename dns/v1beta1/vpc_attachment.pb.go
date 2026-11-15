@@ -29,10 +29,7 @@ type VpcAttachment struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The attachment's resource name. Its last segment is the VPC's id.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The attachment's URN, the identifier access policies and the audit log
-	// use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
-	// The VPC the zone answers in, in the zone's project.
+	// The full name of the VPC the zone answers in, in the zone's project.
 	Vpc string `protobuf:"bytes,3,opt,name=vpc,proto3" json:"vpc,omitempty"`
 	// When the zone was attached.
 	CreateTime    *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
@@ -73,13 +70,6 @@ func (*VpcAttachment) Descriptor() ([]byte, []int) {
 func (x *VpcAttachment) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *VpcAttachment) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -156,7 +146,8 @@ type ListVpcAttachmentsRequest struct {
 	PageSize int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A previous response's `next_page_token`, for the page after it.
 	PageToken string `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	// Only the attachments to this VPC; every VPC's when left empty.
+	// Only the attachments to this VPC, by its full name; every VPC's when
+	// left empty.
 	//
 	// (-- api-linter: core::0132::request-unknown-fields=disabled
 	//
@@ -406,10 +397,9 @@ var File_origincloud_dns_v1beta1_vpc_attachment_proto protoreflect.FileDescripto
 
 const file_origincloud_dns_v1beta1_vpc_attachment_proto_rawDesc = "" +
 	"\n" +
-	",origincloud/dns/v1beta1/vpc_attachment.proto\x12\x17origincloud.dns.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xda\x02\n" +
+	",origincloud/dns/v1beta1/vpc_attachment.proto\x12\x17origincloud.dns.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc2\x02\n" +
 	"\rVpcAttachment\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12:\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12:\n" +
 	"\x03vpc\x18\x03 \x01(\tB(\xe2A\x02\x02\x05\xfaA \n" +
 	"\x1enetwork.origincloudapis.eu/VpcR\x03vpc\x12A\n" +
 	"\vcreate_time\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
