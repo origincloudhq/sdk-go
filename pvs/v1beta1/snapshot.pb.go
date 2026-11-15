@@ -162,10 +162,7 @@ type Snapshot struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The snapshot's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The snapshot's URN, the identifier access policies and the audit log
-	// use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
-	// The volume copied, in the same project and zone.
+	// The full name of the volume copied, in the same project and zone.
 	SourceVolume string `protobuf:"bytes,3,opt,name=source_volume,json=sourceVolume,proto3" json:"source_volume,omitempty"`
 	// The source volume's size in GiB when it was copied: the least a volume
 	// created from the snapshot holds.
@@ -179,8 +176,11 @@ type Snapshot struct {
 	// Why the last protection change failed, when `protection_state` is
 	// `PROTECTION_FAILED`.
 	ProtectionReason string `protobuf:"bytes,8,opt,name=protection_reason,json=protectionReason,proto3" json:"protection_reason,omitempty"`
-	// The principal that took the snapshot, such as `user:<id>` or
-	// `service_account:<id>`.
+	// The principal that took the snapshot, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform took
+	// it.
 	Creator string `protobuf:"bytes,10,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Labels of your own, at most 50. The `origin:name` tag is the name the
 	// console shows.
@@ -222,13 +222,6 @@ func (*Snapshot) Descriptor() ([]byte, []int) {
 func (x *Snapshot) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *Snapshot) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -749,19 +742,20 @@ var File_origincloud_pvs_v1beta1_snapshot_proto protoreflect.FileDescriptor
 
 const file_origincloud_pvs_v1beta1_snapshot_proto_rawDesc = "" +
 	"\n" +
-	"&origincloud/pvs/v1beta1/snapshot.proto\x12\x17origincloud.pvs.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xbf\a\n" +
+	"&origincloud/pvs/v1beta1/snapshot.proto\x12\x17origincloud.pvs.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xad\a\n" +
 	"\bSnapshot\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12L\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12L\n" +
 	"\rsource_volume\x18\x03 \x01(\tB'\xe2A\x02\x02\x05\xfaA\x1f\n" +
 	"\x1dpvs.origincloudapis.eu/VolumeR\fsourceVolume\x12,\n" +
 	"\x0fsource_size_gib\x18\x04 \x01(\x05B\x04\xe2A\x01\x03R\rsourceSizeGib\x12C\n" +
 	"\x05state\x18\x05 \x01(\x0e2'.origincloud.pvs.v1beta1.Snapshot.StateB\x04\xe2A\x01\x03R\x05state\x12'\n" +
 	"\fstate_reason\x18\x06 \x01(\tB\x04\xe2A\x01\x03R\vstateReason\x12b\n" +
 	"\x10protection_state\x18\a \x01(\x0e21.origincloud.pvs.v1beta1.Snapshot.ProtectionStateB\x04\xe2A\x01\x03R\x0fprotectionState\x121\n" +
-	"\x11protection_reason\x18\b \x01(\tB\x04\xe2A\x01\x03R\x10protectionReason\x12\x1e\n" +
+	"\x11protection_reason\x18\b \x01(\tB\x04\xe2A\x01\x03R\x10protectionReason\x12$\n" +
 	"\acreator\x18\n" +
-	" \x01(\tB\x04\xe2A\x01\x03R\acreator\x12E\n" +
+	" \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12E\n" +
 	"\x04tags\x18\v \x03(\v2+.origincloud.pvs.v1beta1.Snapshot.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +

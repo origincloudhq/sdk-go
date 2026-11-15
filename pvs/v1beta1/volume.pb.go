@@ -158,18 +158,16 @@ type Volume struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The volume's resource name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The volume's URN, the identifier access policies and the audit log
-	// use.
-	Urn string `protobuf:"bytes,2,opt,name=urn,proto3" json:"urn,omitempty"`
 	// The size in GiB, at least 1. Growing it resizes the volume; it never
 	// shrinks.
 	SizeGib int32 `protobuf:"varint,3,opt,name=size_gib,json=sizeGib,proto3" json:"size_gib,omitempty"`
-	// The storage class, `storageClasses/{storage_class}`. The default class
-	// when left empty.
+	// The storage class by its full name,
+	// `//pvs.origincloudapis.eu/storageClasses/{storage_class}`. The default
+	// class when left empty.
 	StorageClass string `protobuf:"bytes,4,opt,name=storage_class,json=storageClass,proto3" json:"storage_class,omitempty"`
-	// The snapshot the volume was created from, in the same project and
-	// zone; empty for an empty volume. The volume is at least the snapshot's
-	// size.
+	// The full name of the snapshot the volume was created from, in the same
+	// project and zone; empty for an empty volume. The volume is at least the
+	// snapshot's size.
 	SourceSnapshot string `protobuf:"bytes,5,opt,name=source_snapshot,json=sourceSnapshot,proto3" json:"source_snapshot,omitempty"`
 	// Where the volume is in its lifecycle.
 	State Volume_State `protobuf:"varint,6,opt,name=state,proto3,enum=origincloud.pvs.v1beta1.Volume_State" json:"state,omitempty"`
@@ -194,8 +192,11 @@ type Volume struct {
 	// The most MiB per second the volume transfers, reads and writes
 	// combined: a ceiling, not a guaranteed rate. 0 when it isn't limited.
 	ThroughputMibps int32 `protobuf:"varint,14,opt,name=throughput_mibps,json=throughputMibps,proto3" json:"throughput_mibps,omitempty"`
-	// The principal that created the volume, such as `user:<id>` or
-	// `service_account:<id>`.
+	// The principal that created the volume, by its full name on iam:
+	// `//iam.origincloudapis.eu/users/{user}`,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
+	// or a platform service agent's or service's name when the platform
+	// created it.
 	Creator string `protobuf:"bytes,15,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Labels of your own, at most 50. The `origin:name` tag is the name the
 	// console shows.
@@ -237,13 +238,6 @@ func (*Volume) Descriptor() ([]byte, []int) {
 func (x *Volume) GetName() string {
 	if x != nil {
 		return x.Name
-	}
-	return ""
-}
-
-func (x *Volume) GetUrn() string {
-	if x != nil {
-		return x.Urn
 	}
 	return ""
 }
@@ -779,10 +773,9 @@ var File_origincloud_pvs_v1beta1_volume_proto protoreflect.FileDescriptor
 
 const file_origincloud_pvs_v1beta1_volume_proto_rawDesc = "" +
 	"\n" +
-	"$origincloud/pvs/v1beta1/volume.proto\x12\x17origincloud.pvs.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x96\t\n" +
+	"$origincloud/pvs/v1beta1/volume.proto\x12\x17origincloud.pvs.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x84\t\n" +
 	"\x06Volume\x12\x18\n" +
-	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x16\n" +
-	"\x03urn\x18\x02 \x01(\tB\x04\xe2A\x01\x03R\x03urn\x12\x1f\n" +
+	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x1f\n" +
 	"\bsize_gib\x18\x03 \x01(\x05B\x04\xe2A\x01\x02R\asizeGib\x12R\n" +
 	"\rstorage_class\x18\x04 \x01(\tB-\xe2A\x02\x05\x01\xfaA%\n" +
 	"#pvs.origincloudapis.eu/StorageClassR\fstorageClass\x12R\n" +
@@ -799,8 +792,10 @@ const file_origincloud_pvs_v1beta1_volume_proto_rawDesc = "" +
 	"\x10pending_size_gib\x18\v \x01(\x05B\x04\xe2A\x01\x03R\x0ependingSizeGib\x12+\n" +
 	"\x0eretention_note\x18\f \x01(\tB\x04\xe2A\x01\x03R\rretentionNote\x12\x18\n" +
 	"\x04iops\x18\r \x01(\x05B\x04\xe2A\x01\x03R\x04iops\x12/\n" +
-	"\x10throughput_mibps\x18\x0e \x01(\x05B\x04\xe2A\x01\x03R\x0fthroughputMibps\x12\x1e\n" +
-	"\acreator\x18\x0f \x01(\tB\x04\xe2A\x01\x03R\acreator\x12C\n" +
+	"\x10throughput_mibps\x18\x0e \x01(\x05B\x04\xe2A\x01\x03R\x0fthroughputMibps\x12$\n" +
+	"\acreator\x18\x0f \x01(\tB\n" +
+	"\xe2A\x01\x03\xfaA\x03\n" +
+	"\x01*R\acreator\x12C\n" +
 	"\x04tags\x18\x10 \x03(\v2).origincloud.pvs.v1beta1.Volume.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
