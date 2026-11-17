@@ -120,9 +120,9 @@ func (c *VpcClient) AllVpcs(ctx context.Context, req *ListVpcsRequest) iter.Seq2
 }
 
 // CreateVpc creates an empty VPC: no subnets, security groups, ACLs, route tables
-// or internet gateway. It relays DNS through the project's default DNS
-// policy in its region until a DNS policy association names another. The
-// operation is done once the VPC is recorded.
+// or internet gateway. It relays DNS through the project's default
+// resolver policy in its region until a resolver policy association names
+// another. The operation is done once the VPC is recorded.
 //
 // It answers with an operation to wait on, whose result is the Vpc.
 func (c *VpcClient) CreateVpc(ctx context.Context, req *CreateVpcRequest) (*core.Operation[*Vpc], error) {
@@ -197,7 +197,7 @@ func (c *VpcClient) UpdateVpc(ctx context.Context, req *UpdateVpcRequest) (*core
 	return core.NewOperation[*Vpc](c.service, out), nil
 }
 
-// DeleteVpc deletes a VPC with its DNS policy association. Refused with
+// DeleteVpc deletes a VPC with its resolver policy association. Refused with
 // `FAILED_PRECONDITION` while the VPC has subnets, security groups,
 // ACLs, route tables or an internet gateway, except those the platform
 // created with it, which are deleted with it. The operation is done once
