@@ -5,14 +5,14 @@
 // source: origincloud/network/v1beta1/vpc.proto
 
 // VPCs, subnets, routing, gateways, floating IPs, network interfaces, security
-// groups, ACLs and DNS policies.
+// groups, ACLs and resolver policies.
 //
 // A VPC is a private network in one region of a project; its subnets, NAT
 // gateways, floating IPs and network interfaces each live in one zone.
 // Route tables say where a subnet's traffic leaves the VPC: through an
 // internet gateway or a NAT gateway. Security groups allow traffic to and
 // from the network interfaces associated with them, ACLs filter a subnet's
-// traffic with stateless rules, and a DNS policy says how a VPC's resolver
+// traffic with stateless rules, and a resolver policy says how a VPC's resolver
 // answers names outside the platform's own.
 
 package networkv1beta1
@@ -53,12 +53,11 @@ type Vpc struct {
 	SubnetIpv4PrefixLength int32 `protobuf:"varint,5,opt,name=subnet_ipv4_prefix_length,json=subnetIpv4PrefixLength,proto3" json:"subnet_ipv4_prefix_length,omitempty"`
 	// How many more subnets the VPC's address space holds.
 	AvailableSubnetCount int32 `protobuf:"varint,6,opt,name=available_subnet_count,json=availableSubnetCount,proto3" json:"available_subnet_count,omitempty"`
-	// The full name of the DNS policy the VPC's resolver relays through, as
-	// the VPC's DNS
-	// policy association (a `DnsPolicyAssociation`) sets it. Empty while it
-	// has none: the VPC then relays through the project's default DNS policy
-	// in its region.
-	DnsPolicy string `protobuf:"bytes,7,opt,name=dns_policy,json=dnsPolicy,proto3" json:"dns_policy,omitempty"`
+	// The full name of the resolver policy the VPC's resolver relays through, as
+	// the VPC's resolver policy association (a `ResolverPolicyAssociation`) sets
+	// it. Empty while it has none: the VPC then relays through the project's
+	// default resolver policy in its region.
+	ResolverPolicy string `protobuf:"bytes,7,opt,name=resolver_policy,json=resolverPolicy,proto3" json:"resolver_policy,omitempty"`
 	// The full name of the VPC's internet gateway; empty while it has none.
 	InternetGateway string `protobuf:"bytes,8,opt,name=internet_gateway,json=internetGateway,proto3" json:"internet_gateway,omitempty"`
 	// Whether this is the project's default VPC. Unlike a VPC you create, the
@@ -145,9 +144,9 @@ func (x *Vpc) GetAvailableSubnetCount() int32 {
 	return 0
 }
 
-func (x *Vpc) GetDnsPolicy() string {
+func (x *Vpc) GetResolverPolicy() string {
 	if x != nil {
-		return x.DnsPolicy
+		return x.ResolverPolicy
 	}
 	return ""
 }
@@ -543,16 +542,15 @@ var File_origincloud_network_v1beta1_vpc_proto protoreflect.FileDescriptor
 
 const file_origincloud_network_v1beta1_vpc_proto_rawDesc = "" +
 	"\n" +
-	"%origincloud/network/v1beta1/vpc.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x9e\x06\n" +
+	"%origincloud/network/v1beta1/vpc.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xad\x06\n" +
 	"\x03Vpc\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12-\n" +
 	"\x0fipv4_cidr_block\x18\x03 \x01(\tB\x05\xe2A\x02\x05\x01R\ripv4CidrBlock\x12,\n" +
 	"\x0fipv6_cidr_block\x18\x04 \x01(\tB\x04\xe2A\x01\x03R\ripv6CidrBlock\x12?\n" +
 	"\x19subnet_ipv4_prefix_length\x18\x05 \x01(\x05B\x04\xe2A\x01\x03R\x16subnetIpv4PrefixLength\x12:\n" +
-	"\x16available_subnet_count\x18\x06 \x01(\x05B\x04\xe2A\x01\x03R\x14availableSubnetCount\x12L\n" +
-	"\n" +
-	"dns_policy\x18\a \x01(\tB-\xe2A\x01\x03\xfaA&\n" +
-	"$network.origincloudapis.eu/DnsPolicyR\tdnsPolicy\x12^\n" +
+	"\x16available_subnet_count\x18\x06 \x01(\x05B\x04\xe2A\x01\x03R\x14availableSubnetCount\x12[\n" +
+	"\x0fresolver_policy\x18\a \x01(\tB2\xe2A\x01\x03\xfaA+\n" +
+	")network.origincloudapis.eu/ResolverPolicyR\x0eresolverPolicy\x12^\n" +
 	"\x10internet_gateway\x18\b \x01(\tB3\xe2A\x01\x03\xfaA,\n" +
 	"*network.origincloudapis.eu/InternetGatewayR\x0finternetGateway\x12-\n" +
 	"\x0fproject_default\x18\t \x01(\bB\x04\xe2A\x01\x03R\x0eprojectDefault\x12A\n" +

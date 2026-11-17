@@ -164,9 +164,9 @@ func (c *ProjectClient) UpdateProject(ctx context.Context, req *UpdateProjectReq
 // DeleteProject deletes a project. Refused as a `CONFLICT` while the project
 // still has a resource you can delete yourself: an instance that isn't terminated, an image, a key
 // pair, a volume or snapshot that isn't deleted, a NAT gateway, a floating
-// IP, a VPC, or a DNS policy other than its default one. The refusal names
+// IP, a VPC, or a resolver policy other than its default one. The refusal names
 // every kind left, in the order to delete them. Nothing you can delete
-// yourself is deleted on your behalf. The project's default DNS policy,
+// yourself is deleted on your behalf. The project's default resolver policy,
 // its quota and every role granted on it go with it; roles granted on the
 // organization stay.
 func (c *ProjectClient) DeleteProject(ctx context.Context, req *DeleteProjectRequest) (*emptypb.Empty, error) {
