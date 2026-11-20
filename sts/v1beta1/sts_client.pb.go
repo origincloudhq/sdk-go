@@ -36,7 +36,8 @@ func (c *SecurityTokenClient) Service() *core.Service {
 // conditions. The token is verified with its issuer's published keys
 // (RS256), and a pull request's job is admitted only by a credential that
 // names its `event_name`. Refused with `PERMISSION_DENIED` when the token
-// isn't trusted, without saying why, and with `UNAVAILABLE` when its
+// isn't trusted, without saying why, with `INVALID_ARGUMENT` when it asks
+// for an audience no token is issued for, and with `UNAVAILABLE` when its
 // issuer or the trust can't be read now.
 func (c *SecurityTokenClient) AssumeServiceAccount(ctx context.Context, req *AssumeServiceAccountRequest) (*AssumeServiceAccountResponse, error) {
 	out := new(AssumeServiceAccountResponse)

@@ -36,7 +36,12 @@ type AssumeServiceAccountRequest struct {
 	ServiceAccount string `protobuf:"bytes,2,opt,name=service_account,json=serviceAccount,proto3" json:"service_account,omitempty"`
 	// How long the access token lives: from 60 seconds to 1 hour, 15 minutes
 	// when unset.
-	Lifetime      *durationpb.Duration `protobuf:"bytes,3,opt,name=lifetime,proto3" json:"lifetime,omitempty"`
+	Lifetime *durationpb.Duration `protobuf:"bytes,3,opt,name=lifetime,proto3" json:"lifetime,omitempty"`
+	// Who the access token is for: `origincloud:api`, the platform's APIs, when
+	// unset, or `https://mcp.origincloudapis.eu`, the hosted MCP server. A
+	// token for the hosted MCP server isn't accepted by the APIs. Any other
+	// audience is refused with `INVALID_ARGUMENT`, before the token is checked.
+	Audience      string `protobuf:"bytes,4,opt,name=audience,proto3" json:"audience,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -90,6 +95,13 @@ func (x *AssumeServiceAccountRequest) GetLifetime() *durationpb.Duration {
 		return x.Lifetime
 	}
 	return nil
+}
+
+func (x *AssumeServiceAccountRequest) GetAudience() string {
+	if x != nil {
+		return x.Audience
+	}
+	return ""
 }
 
 // The response of `AssumeServiceAccount`.
@@ -172,13 +184,14 @@ var File_origincloud_sts_v1beta1_sts_proto protoreflect.FileDescriptor
 
 const file_origincloud_sts_v1beta1_sts_proto_rawDesc = "" +
 	"\n" +
-	"!origincloud/sts/v1beta1/sts.proto\x12\x17origincloud.sts.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd8\x01\n" +
+	"!origincloud/sts/v1beta1/sts.proto\x12\x17origincloud.sts.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xfa\x01\n" +
 	"\x1bAssumeServiceAccountRequest\x12#\n" +
 	"\n" +
 	"oidc_token\x18\x01 \x01(\tB\x04\xe2A\x01\x02R\toidcToken\x12W\n" +
 	"\x0fservice_account\x18\x02 \x01(\tB.\xe2A\x01\x01\xfaA'\n" +
 	"%iam.origincloudapis.eu/ServiceAccountR\x0eserviceAccount\x12;\n" +
-	"\blifetime\x18\x03 \x01(\v2\x19.google.protobuf.DurationB\x04\xe2A\x01\x01R\blifetime\"\xb7\x02\n" +
+	"\blifetime\x18\x03 \x01(\v2\x19.google.protobuf.DurationB\x04\xe2A\x01\x01R\blifetime\x12 \n" +
+	"\baudience\x18\x04 \x01(\tB\x04\xe2A\x01\x01R\baudience\"\xb7\x02\n" +
 	"\x1cAssumeServiceAccountResponse\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12;\n" +
 	"\vexpire_time\x18\x02 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
