@@ -88,6 +88,11 @@ func main() {
    CI provider, a Kubernetes projected token), read again at every exchange; or
    else the token `ORIGINCLOUD_OIDC_TOKEN` holds (a GitLab CI job's `id_tokens`
    entry of that name), which can't be renewed and so serves until it expires;
+   or else an HCP Terraform run's workload identity token,
+   `TFC_WORKLOAD_IDENTITY_TOKEN` (for a workspace whose
+   `TFC_WORKLOAD_IDENTITY_AUDIENCE` is `https://sts.origincloudapis.eu`), or
+   `TFC_WORKLOAD_IDENTITY_TOKEN_<TAG>` when
+   `ORIGINCLOUD_TFC_WORKLOAD_IDENTITY_TAG` names the tag of a tagged audience;
    or else, in a GitHub Actions job with `permissions: id-token: write`, the
    job's. A federated credential on the service account decides which jobs'
    tokens it trusts. `ORIGINCLOUD_OIDC_DISABLED=true` leaves this step out;
