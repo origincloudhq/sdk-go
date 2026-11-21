@@ -393,8 +393,9 @@ type Instance struct {
 	// project and zone that nothing else holds, created with the network
 	// service: its subnet and security groups are the instance's.
 	// Terminating the instance releases it, and it stays. An instance
-	// launched before interfaces were named at launch shows the interface
-	// created for it, which is deleted with the instance.
+	// launched from a recipe with an interface spec, or before interfaces
+	// were named at launch, shows the interface created for it once it
+	// exists, which is deleted with the instance.
 	NetworkInterfaces []string `protobuf:"bytes,9,rep,name=network_interfaces,json=networkInterfaces,proto3" json:"network_interfaces,omitempty"`
 	// Where the instance is in its lifecycle.
 	State Instance_State `protobuf:"varint,10,opt,name=state,proto3,enum=origincloud.compute.v1beta1.Instance_State" json:"state,omitempty"`
@@ -1068,6 +1069,71 @@ func (x *CreateInstanceRequest) GetRequestId() string {
 	return ""
 }
 
+// The request for LaunchInstance.
+type LaunchInstanceRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The zone to launch the instance in, `projects/{project}/zones/{zone}`.
+	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
+	// The recipe of the instance to launch.
+	LaunchTemplateData *LaunchTemplateData `protobuf:"bytes,2,opt,name=launch_template_data,json=launchTemplateData,proto3" json:"launch_template_data,omitempty"`
+	// A UUID; a repeat with the same id returns the first request's
+	// operation instead of launching a second instance.
+	RequestId     string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LaunchInstanceRequest) Reset() {
+	*x = LaunchInstanceRequest{}
+	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LaunchInstanceRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LaunchInstanceRequest) ProtoMessage() {}
+
+func (x *LaunchInstanceRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LaunchInstanceRequest.ProtoReflect.Descriptor instead.
+func (*LaunchInstanceRequest) Descriptor() ([]byte, []int) {
+	return file_origincloud_compute_v1beta1_instance_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *LaunchInstanceRequest) GetParent() string {
+	if x != nil {
+		return x.Parent
+	}
+	return ""
+}
+
+func (x *LaunchInstanceRequest) GetLaunchTemplateData() *LaunchTemplateData {
+	if x != nil {
+		return x.LaunchTemplateData
+	}
+	return nil
+}
+
+func (x *LaunchInstanceRequest) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
 // The request for UpdateInstance.
 type UpdateInstanceRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -1086,7 +1152,7 @@ type UpdateInstanceRequest struct {
 
 func (x *UpdateInstanceRequest) Reset() {
 	*x = UpdateInstanceRequest{}
-	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[9]
+	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1098,7 +1164,7 @@ func (x *UpdateInstanceRequest) String() string {
 func (*UpdateInstanceRequest) ProtoMessage() {}
 
 func (x *UpdateInstanceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[9]
+	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1111,7 +1177,7 @@ func (x *UpdateInstanceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateInstanceRequest.ProtoReflect.Descriptor instead.
 func (*UpdateInstanceRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_compute_v1beta1_instance_proto_rawDescGZIP(), []int{9}
+	return file_origincloud_compute_v1beta1_instance_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *UpdateInstanceRequest) GetInstance() *Instance {
@@ -1149,7 +1215,7 @@ type DeleteInstanceRequest struct {
 
 func (x *DeleteInstanceRequest) Reset() {
 	*x = DeleteInstanceRequest{}
-	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[10]
+	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1161,7 +1227,7 @@ func (x *DeleteInstanceRequest) String() string {
 func (*DeleteInstanceRequest) ProtoMessage() {}
 
 func (x *DeleteInstanceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[10]
+	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1174,7 +1240,7 @@ func (x *DeleteInstanceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteInstanceRequest.ProtoReflect.Descriptor instead.
 func (*DeleteInstanceRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_compute_v1beta1_instance_proto_rawDescGZIP(), []int{10}
+	return file_origincloud_compute_v1beta1_instance_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *DeleteInstanceRequest) GetName() string {
@@ -1205,7 +1271,7 @@ type StartInstanceRequest struct {
 
 func (x *StartInstanceRequest) Reset() {
 	*x = StartInstanceRequest{}
-	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[11]
+	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1217,7 +1283,7 @@ func (x *StartInstanceRequest) String() string {
 func (*StartInstanceRequest) ProtoMessage() {}
 
 func (x *StartInstanceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[11]
+	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1230,7 +1296,7 @@ func (x *StartInstanceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartInstanceRequest.ProtoReflect.Descriptor instead.
 func (*StartInstanceRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_compute_v1beta1_instance_proto_rawDescGZIP(), []int{11}
+	return file_origincloud_compute_v1beta1_instance_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *StartInstanceRequest) GetName() string {
@@ -1261,7 +1327,7 @@ type StopInstanceRequest struct {
 
 func (x *StopInstanceRequest) Reset() {
 	*x = StopInstanceRequest{}
-	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[12]
+	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1273,7 +1339,7 @@ func (x *StopInstanceRequest) String() string {
 func (*StopInstanceRequest) ProtoMessage() {}
 
 func (x *StopInstanceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[12]
+	mi := &file_origincloud_compute_v1beta1_instance_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1286,7 +1352,7 @@ func (x *StopInstanceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StopInstanceRequest.ProtoReflect.Descriptor instead.
 func (*StopInstanceRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_compute_v1beta1_instance_proto_rawDescGZIP(), []int{12}
+	return file_origincloud_compute_v1beta1_instance_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *StopInstanceRequest) GetName() string {
@@ -1307,7 +1373,7 @@ var File_origincloud_compute_v1beta1_instance_proto protoreflect.FileDescriptor
 
 const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"\n" +
-	"*origincloud/compute/v1beta1/instance.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xaf\v\n" +
+	"*origincloud/compute/v1beta1/instance.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a1origincloud/compute/v1beta1/launch_template.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xaf\v\n" +
 	"\bInstance\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12U\n" +
 	"\rinstance_type\x18\x03 \x01(\tB0\xe2A\x01\x02\xfaA)\n" +
@@ -1413,6 +1479,11 @@ const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"\x06parent\x18\x01 \x01(\tB,\xe2A\x01\x02\xfaA%\x12#compute.origincloudapis.eu/InstanceR\x06parent\x12G\n" +
 	"\binstance\x18\x02 \x01(\v2%.origincloud.compute.v1beta1.InstanceB\x04\xe2A\x01\x02R\binstance\x12+\n" +
 	"\n" +
+	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\xf3\x01\n" +
+	"\x15LaunchInstanceRequest\x12D\n" +
+	"\x06parent\x18\x01 \x01(\tB,\xe2A\x01\x02\xfaA%\x12#compute.origincloudapis.eu/InstanceR\x06parent\x12g\n" +
+	"\x14launch_template_data\x18\x02 \x01(\v2/.origincloud.compute.v1beta1.LaunchTemplateDataB\x04\xe2A\x01\x02R\x12launchTemplateData\x12+\n" +
+	"\n" +
 	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\xd0\x01\n" +
 	"\x15UpdateInstanceRequest\x12G\n" +
 	"\binstance\x18\x01 \x01(\v2%.origincloud.compute.v1beta1.InstanceB\x04\xe2A\x01\x02R\binstance\x12A\n" +
@@ -1434,12 +1505,14 @@ const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tB,\xe2A\x01\x02\xfaA%\n" +
 	"#compute.origincloudapis.eu/InstanceR\x04name\x12+\n" +
 	"\n" +
-	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId2\xdf\f\n" +
+	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId2\xe6\x0e\n" +
 	"\x0fInstanceService\x12\xa4\x01\n" +
 	"\vGetInstance\x12/.origincloud.compute.v1beta1.GetInstanceRequest\x1a%.origincloud.compute.v1beta1.Instance\"=\xdaA\x04name\x82\xd3\xe4\x93\x020\x12./v1beta1/{name=projects/*/zones/*/instances/*}\x12\xb7\x01\n" +
 	"\rListInstances\x121.origincloud.compute.v1beta1.ListInstancesRequest\x1a2.origincloud.compute.v1beta1.ListInstancesResponse\"?\xdaA\x06parent\x82\xd3\xe4\x93\x020\x12./v1beta1/{parent=projects/*/zones/*}/instances\x12\xf8\x01\n" +
 	"\x0eCreateInstance\x122.origincloud.compute.v1beta1.CreateInstanceRequest\x1a\x1d.google.longrunning.Operation\"\x92\x01\xcaA=\n" +
-	"\bInstance\x121origincloud.longrunning.v1beta1.OperationMetadata\xdaA\x0fparent,instance\x82\xd3\xe4\x93\x02::\binstance\"./v1beta1/{parent=projects/*/zones/*}/instances\x12\x86\x02\n" +
+	"\bInstance\x121origincloud.longrunning.v1beta1.OperationMetadata\xdaA\x0fparent,instance\x82\xd3\xe4\x93\x02::\binstance\"./v1beta1/{parent=projects/*/zones/*}/instances\x12\x84\x02\n" +
+	"\x0eLaunchInstance\x122.origincloud.compute.v1beta1.LaunchInstanceRequest\x1a\x1d.google.longrunning.Operation\"\x9e\x01\xcaA=\n" +
+	"\bInstance\x121origincloud.longrunning.v1beta1.OperationMetadata\xdaA\x1bparent,launch_template_data\x82\xd3\xe4\x93\x02::\x01*\"5/v1beta1/{parent=projects/*/zones/*}/instances:launch\x12\x86\x02\n" +
 	"\x0eUpdateInstance\x122.origincloud.compute.v1beta1.UpdateInstanceRequest\x1a\x1d.google.longrunning.Operation\"\xa0\x01\xcaA=\n" +
 	"\bInstance\x121origincloud.longrunning.v1beta1.OperationMetadata\xdaA\x14instance,update_mask\x82\xd3\xe4\x93\x02C:\binstance27/v1beta1/{instance.name=projects/*/zones/*/instances/*}\x12\xf0\x01\n" +
 	"\x0eDeleteInstance\x122.origincloud.compute.v1beta1.DeleteInstanceRequest\x1a\x1d.google.longrunning.Operation\"\x8a\x01\xcaAJ\n" +
@@ -1462,7 +1535,7 @@ func file_origincloud_compute_v1beta1_instance_proto_rawDescGZIP() []byte {
 }
 
 var file_origincloud_compute_v1beta1_instance_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
-var file_origincloud_compute_v1beta1_instance_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_origincloud_compute_v1beta1_instance_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_origincloud_compute_v1beta1_instance_proto_goTypes = []any{
 	(Instance_State)(0),              // 0: origincloud.compute.v1beta1.Instance.State
 	(InstanceHealth_Availability)(0), // 1: origincloud.compute.v1beta1.InstanceHealth.Availability
@@ -1478,51 +1551,56 @@ var file_origincloud_compute_v1beta1_instance_proto_goTypes = []any{
 	(*ListInstancesRequest)(nil),     // 11: origincloud.compute.v1beta1.ListInstancesRequest
 	(*ListInstancesResponse)(nil),    // 12: origincloud.compute.v1beta1.ListInstancesResponse
 	(*CreateInstanceRequest)(nil),    // 13: origincloud.compute.v1beta1.CreateInstanceRequest
-	(*UpdateInstanceRequest)(nil),    // 14: origincloud.compute.v1beta1.UpdateInstanceRequest
-	(*DeleteInstanceRequest)(nil),    // 15: origincloud.compute.v1beta1.DeleteInstanceRequest
-	(*StartInstanceRequest)(nil),     // 16: origincloud.compute.v1beta1.StartInstanceRequest
-	(*StopInstanceRequest)(nil),      // 17: origincloud.compute.v1beta1.StopInstanceRequest
-	nil,                              // 18: origincloud.compute.v1beta1.Instance.TagsEntry
-	(*timestamppb.Timestamp)(nil),    // 19: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),    // 20: google.protobuf.FieldMask
-	(*longrunningpb.Operation)(nil),  // 21: google.longrunning.Operation
+	(*LaunchInstanceRequest)(nil),    // 14: origincloud.compute.v1beta1.LaunchInstanceRequest
+	(*UpdateInstanceRequest)(nil),    // 15: origincloud.compute.v1beta1.UpdateInstanceRequest
+	(*DeleteInstanceRequest)(nil),    // 16: origincloud.compute.v1beta1.DeleteInstanceRequest
+	(*StartInstanceRequest)(nil),     // 17: origincloud.compute.v1beta1.StartInstanceRequest
+	(*StopInstanceRequest)(nil),      // 18: origincloud.compute.v1beta1.StopInstanceRequest
+	nil,                              // 19: origincloud.compute.v1beta1.Instance.TagsEntry
+	(*timestamppb.Timestamp)(nil),    // 20: google.protobuf.Timestamp
+	(*LaunchTemplateData)(nil),       // 21: origincloud.compute.v1beta1.LaunchTemplateData
+	(*fieldmaskpb.FieldMask)(nil),    // 22: google.protobuf.FieldMask
+	(*longrunningpb.Operation)(nil),  // 23: google.longrunning.Operation
 }
 var file_origincloud_compute_v1beta1_instance_proto_depIdxs = []int32{
 	6,  // 0: origincloud.compute.v1beta1.Instance.boot_volume:type_name -> origincloud.compute.v1beta1.BootVolume
 	0,  // 1: origincloud.compute.v1beta1.Instance.state:type_name -> origincloud.compute.v1beta1.Instance.State
 	8,  // 2: origincloud.compute.v1beta1.Instance.health:type_name -> origincloud.compute.v1beta1.InstanceHealth
-	19, // 3: origincloud.compute.v1beta1.Instance.create_time:type_name -> google.protobuf.Timestamp
-	18, // 4: origincloud.compute.v1beta1.Instance.tags:type_name -> origincloud.compute.v1beta1.Instance.TagsEntry
+	20, // 3: origincloud.compute.v1beta1.Instance.create_time:type_name -> google.protobuf.Timestamp
+	19, // 4: origincloud.compute.v1beta1.Instance.tags:type_name -> origincloud.compute.v1beta1.Instance.TagsEntry
 	7,  // 5: origincloud.compute.v1beta1.Instance.interface_addresses:type_name -> origincloud.compute.v1beta1.InterfaceAddresses
 	1,  // 6: origincloud.compute.v1beta1.InstanceHealth.availability:type_name -> origincloud.compute.v1beta1.InstanceHealth.Availability
 	9,  // 7: origincloud.compute.v1beta1.InstanceHealth.checks:type_name -> origincloud.compute.v1beta1.HealthCheck
 	2,  // 8: origincloud.compute.v1beta1.HealthCheck.kind:type_name -> origincloud.compute.v1beta1.HealthCheck.Kind
 	3,  // 9: origincloud.compute.v1beta1.HealthCheck.category:type_name -> origincloud.compute.v1beta1.HealthCheck.Category
 	4,  // 10: origincloud.compute.v1beta1.HealthCheck.outcome:type_name -> origincloud.compute.v1beta1.HealthCheck.Outcome
-	19, // 11: origincloud.compute.v1beta1.HealthCheck.change_time:type_name -> google.protobuf.Timestamp
+	20, // 11: origincloud.compute.v1beta1.HealthCheck.change_time:type_name -> google.protobuf.Timestamp
 	5,  // 12: origincloud.compute.v1beta1.ListInstancesResponse.instances:type_name -> origincloud.compute.v1beta1.Instance
 	5,  // 13: origincloud.compute.v1beta1.CreateInstanceRequest.instance:type_name -> origincloud.compute.v1beta1.Instance
-	5,  // 14: origincloud.compute.v1beta1.UpdateInstanceRequest.instance:type_name -> origincloud.compute.v1beta1.Instance
-	20, // 15: origincloud.compute.v1beta1.UpdateInstanceRequest.update_mask:type_name -> google.protobuf.FieldMask
-	10, // 16: origincloud.compute.v1beta1.InstanceService.GetInstance:input_type -> origincloud.compute.v1beta1.GetInstanceRequest
-	11, // 17: origincloud.compute.v1beta1.InstanceService.ListInstances:input_type -> origincloud.compute.v1beta1.ListInstancesRequest
-	13, // 18: origincloud.compute.v1beta1.InstanceService.CreateInstance:input_type -> origincloud.compute.v1beta1.CreateInstanceRequest
-	14, // 19: origincloud.compute.v1beta1.InstanceService.UpdateInstance:input_type -> origincloud.compute.v1beta1.UpdateInstanceRequest
-	15, // 20: origincloud.compute.v1beta1.InstanceService.DeleteInstance:input_type -> origincloud.compute.v1beta1.DeleteInstanceRequest
-	16, // 21: origincloud.compute.v1beta1.InstanceService.StartInstance:input_type -> origincloud.compute.v1beta1.StartInstanceRequest
-	17, // 22: origincloud.compute.v1beta1.InstanceService.StopInstance:input_type -> origincloud.compute.v1beta1.StopInstanceRequest
-	5,  // 23: origincloud.compute.v1beta1.InstanceService.GetInstance:output_type -> origincloud.compute.v1beta1.Instance
-	12, // 24: origincloud.compute.v1beta1.InstanceService.ListInstances:output_type -> origincloud.compute.v1beta1.ListInstancesResponse
-	21, // 25: origincloud.compute.v1beta1.InstanceService.CreateInstance:output_type -> google.longrunning.Operation
-	21, // 26: origincloud.compute.v1beta1.InstanceService.UpdateInstance:output_type -> google.longrunning.Operation
-	21, // 27: origincloud.compute.v1beta1.InstanceService.DeleteInstance:output_type -> google.longrunning.Operation
-	21, // 28: origincloud.compute.v1beta1.InstanceService.StartInstance:output_type -> google.longrunning.Operation
-	21, // 29: origincloud.compute.v1beta1.InstanceService.StopInstance:output_type -> google.longrunning.Operation
-	23, // [23:30] is the sub-list for method output_type
-	16, // [16:23] is the sub-list for method input_type
-	16, // [16:16] is the sub-list for extension type_name
-	16, // [16:16] is the sub-list for extension extendee
-	0,  // [0:16] is the sub-list for field type_name
+	21, // 14: origincloud.compute.v1beta1.LaunchInstanceRequest.launch_template_data:type_name -> origincloud.compute.v1beta1.LaunchTemplateData
+	5,  // 15: origincloud.compute.v1beta1.UpdateInstanceRequest.instance:type_name -> origincloud.compute.v1beta1.Instance
+	22, // 16: origincloud.compute.v1beta1.UpdateInstanceRequest.update_mask:type_name -> google.protobuf.FieldMask
+	10, // 17: origincloud.compute.v1beta1.InstanceService.GetInstance:input_type -> origincloud.compute.v1beta1.GetInstanceRequest
+	11, // 18: origincloud.compute.v1beta1.InstanceService.ListInstances:input_type -> origincloud.compute.v1beta1.ListInstancesRequest
+	13, // 19: origincloud.compute.v1beta1.InstanceService.CreateInstance:input_type -> origincloud.compute.v1beta1.CreateInstanceRequest
+	14, // 20: origincloud.compute.v1beta1.InstanceService.LaunchInstance:input_type -> origincloud.compute.v1beta1.LaunchInstanceRequest
+	15, // 21: origincloud.compute.v1beta1.InstanceService.UpdateInstance:input_type -> origincloud.compute.v1beta1.UpdateInstanceRequest
+	16, // 22: origincloud.compute.v1beta1.InstanceService.DeleteInstance:input_type -> origincloud.compute.v1beta1.DeleteInstanceRequest
+	17, // 23: origincloud.compute.v1beta1.InstanceService.StartInstance:input_type -> origincloud.compute.v1beta1.StartInstanceRequest
+	18, // 24: origincloud.compute.v1beta1.InstanceService.StopInstance:input_type -> origincloud.compute.v1beta1.StopInstanceRequest
+	5,  // 25: origincloud.compute.v1beta1.InstanceService.GetInstance:output_type -> origincloud.compute.v1beta1.Instance
+	12, // 26: origincloud.compute.v1beta1.InstanceService.ListInstances:output_type -> origincloud.compute.v1beta1.ListInstancesResponse
+	23, // 27: origincloud.compute.v1beta1.InstanceService.CreateInstance:output_type -> google.longrunning.Operation
+	23, // 28: origincloud.compute.v1beta1.InstanceService.LaunchInstance:output_type -> google.longrunning.Operation
+	23, // 29: origincloud.compute.v1beta1.InstanceService.UpdateInstance:output_type -> google.longrunning.Operation
+	23, // 30: origincloud.compute.v1beta1.InstanceService.DeleteInstance:output_type -> google.longrunning.Operation
+	23, // 31: origincloud.compute.v1beta1.InstanceService.StartInstance:output_type -> google.longrunning.Operation
+	23, // 32: origincloud.compute.v1beta1.InstanceService.StopInstance:output_type -> google.longrunning.Operation
+	25, // [25:33] is the sub-list for method output_type
+	17, // [17:25] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_origincloud_compute_v1beta1_instance_proto_init() }
@@ -1530,13 +1608,14 @@ func file_origincloud_compute_v1beta1_instance_proto_init() {
 	if File_origincloud_compute_v1beta1_instance_proto != nil {
 		return
 	}
+	file_origincloud_compute_v1beta1_launch_template_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_origincloud_compute_v1beta1_instance_proto_rawDesc), len(file_origincloud_compute_v1beta1_instance_proto_rawDesc)),
 			NumEnums:      5,
-			NumMessages:   14,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

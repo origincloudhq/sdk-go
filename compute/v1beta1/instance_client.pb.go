@@ -16,8 +16,9 @@ import (
 // InstanceClient calls InstanceService.
 //
 // Instances: virtual machines in one zone, booted from an image onto a
-// durable boot volume, with network interfaces created beforehand with the
-// network service.
+// durable boot volume. An instance is launched either with network
+// interfaces created beforehand with the network service, or from a recipe
+// whose interface specs the launch creates the interfaces from.
 type InstanceClient struct {
 	service *core.Service
 }
@@ -156,6 +157,44 @@ func (c *InstanceClient) CreateInstance(ctx context.Context, req *CreateInstance
 		Path:       "/v1beta1/" + p1 + "/instances",
 		Body:       req.GetInstance(),
 		Query:      query,
+		Idempotent: true,
+	}, out); err != nil {
+		return nil, err
+	}
+	return core.NewOperation[*Instance](c.service, out), nil
+}
+
+// LaunchInstance launches an instance from a recipe: the instance it describes, with a
+// network interface created from each interface spec it holds. Nothing
+// is created when the launch is refused, as for an invalid field, a
+// quota or a subnet with no address left. The operation is done once
+// the instance is `RUNNING`, or failed once it is `FAILED`, with the
+// reason in `state_reason`; a failed instance still exists, keeps the
+// interfaces created for it, and can be started again or deleted.
+//
+// It answers with an operation to wait on, whose result is the Instance.
+func (c *InstanceClient) LaunchInstance(ctx context.Context, req *LaunchInstanceRequest) (*core.Operation[*Instance], error) {
+	if req.GetRequestId() == "" {
+		req = proto.Clone(req).(*LaunchInstanceRequest)
+		req.RequestId = core.NewRequestID()
+	}
+	n1, err := c.service.RelativeName("parent", req.GetParent(), "compute")
+	if err != nil {
+		return nil, err
+	}
+	p1, err := core.PathValue("parent", n1, "projects/*/zones/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetParent() {
+		req = proto.Clone(req).(*LaunchInstanceRequest)
+		req.Parent = n1
+	}
+	out := new(longrunningpb.Operation)
+	if err := c.service.Call(ctx, core.Request{
+		Method:     http.MethodPost,
+		Path:       "/v1beta1/" + p1 + "/instances:launch",
+		Body:       req,
 		Idempotent: true,
 	}, out); err != nil {
 		return nil, err
