@@ -3,6 +3,7 @@ package computev1beta1_test
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
@@ -174,5 +175,41 @@ func TestCreateKeyPairDecodesThePrivateKey(t *testing.T) {
 	}
 	if got := rec.calls[0]; got.method != "POST" || got.url.Path != "/v1beta1/projects/p/keyPairs" || !uuid.MatchString(got.url.Query().Get("requestId")) {
 		t.Errorf("create: %s %s", got.method, got.url)
+	}
+}
+
+// A client given only a full name calls the resource: the name carries the
+// project, the zone and the service, so nothing else is given and no table
+// from collection to service is consulted. The request goes to the
+// service's host, at the name's relative path.
+func TestAClientGivenOnlyAFullNameCallsTheResource(t *testing.T) {
+	const name = "//compute.origincloudapis.eu/projects/p/zones/eu-central1-az1/instances/i-1"
+	rec := &recorder{}
+	instances := computev1beta1.NewInstanceClient(newClient(t, rec))
+	if _, err := instances.GetInstance(context.Background(), &computev1beta1.GetInstanceRequest{Name: name}); err != nil {
+		t.Fatal(err)
+	}
+	if len(rec.calls) != 1 {
+		t.Fatalf("%d calls", len(rec.calls))
+	}
+	got := rec.calls[0]
+	if got.method != http.MethodGet || got.url.Host != "compute.origincloudapis.eu" || got.url.EscapedPath() != "/v1beta1/projects/p/zones/eu-central1-az1/instances/i-1" {
+		t.Errorf("%s %s", got.method, got.url)
+	}
+}
+
+// A full name on another service's host is refused before anything is
+// sent: the client doesn't send a name its service doesn't own.
+func TestAFullNameOfAnotherServiceIsRefusedBeforeSending(t *testing.T) {
+	rec := &recorder{}
+	instances := computev1beta1.NewInstanceClient(newClient(t, rec))
+	_, err := instances.GetInstance(context.Background(), &computev1beta1.GetInstanceRequest{
+		Name: "//pvs.origincloudapis.eu/projects/p/zones/eu-central1-az1/instances/i-1",
+	})
+	if !errors.Is(err, core.ErrOtherService) || !strings.Contains(err.Error(), "name must be a name on compute.origincloudapis.eu") {
+		t.Errorf("%v", err)
+	}
+	if len(rec.calls) != 0 {
+		t.Errorf("sent %d calls", len(rec.calls))
 	}
 }
