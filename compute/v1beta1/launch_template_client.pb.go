@@ -284,10 +284,10 @@ func (c *LaunchTemplateClient) ListLaunchTemplateVersions(ctx context.Context, r
 	return out, nil
 }
 
-// AllLaunchTemplates returns everything ListLaunchTemplateVersions lists from req's page on, fetching
+// AllLaunchTemplateVersions returns everything ListLaunchTemplateVersions lists from req's page on, fetching
 // the next page as the loop reaches it. A page that fails ends the sequence
 // with its error.
-func (c *LaunchTemplateClient) AllLaunchTemplates(ctx context.Context, req *ListLaunchTemplateVersionsRequest) iter.Seq2[*LaunchTemplate, error] {
+func (c *LaunchTemplateClient) AllLaunchTemplateVersions(ctx context.Context, req *ListLaunchTemplateVersionsRequest) iter.Seq2[*LaunchTemplate, error] {
 	return func(yield func(*LaunchTemplate, error) bool) {
 		req := proto.Clone(req).(*ListLaunchTemplateVersionsRequest)
 		for {

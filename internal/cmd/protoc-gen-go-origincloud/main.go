@@ -140,15 +140,52 @@ func generateService(g *protogen.GeneratedFile, f *protogen.File, s *protogen.Se
 		g.P("}")
 	}
 
+	pagers, err := pagerNames(s)
+	if err != nil {
+		return err
+	}
 	for _, m := range s.Methods {
 		if err := generateMethod(g, client, m, messages, r); err != nil {
 			return fmt.Errorf("%s: %w", m.Desc.Name(), err)
 		}
 		if list := listOf(m); list != nil {
-			generateAll(g, client, m, list)
+			generateAll(g, client, m, list, pagers[m])
 		}
 	}
 	return nil
+}
+
+// pagerNames names each list method's All... method in the service: after
+// its repeated field, AllVolumes for ListVolumes. Where two list methods'
+// fields share a name, as a resource's and its revisions' do (AIP-162: both
+// list the resource itself), each of them is named after its method
+// instead, AllLaunchTemplateVersions for ListLaunchTemplateVersions; a
+// method named after its field keeps the name it had.
+func pagerNames(s *protogen.Service) (map[*protogen.Method]string, error) {
+	fields := map[string]int{}
+	for _, m := range s.Methods {
+		if list := listOf(m); list != nil {
+			fields[list.GoName]++
+		}
+	}
+	names := map[*protogen.Method]string{}
+	taken := map[string]bool{}
+	for _, m := range s.Methods {
+		list := listOf(m)
+		if list == nil {
+			continue
+		}
+		name := "All" + list.GoName
+		if fields[list.GoName] > 1 {
+			name = "All" + strings.TrimPrefix(m.GoName, "List")
+		}
+		if taken[name] {
+			return nil, fmt.Errorf("%s: two list methods' pagers are both named %s", s.Desc.Name(), name)
+		}
+		taken[name] = true
+		names[m] = name
+	}
+	return names, nil
 }
 
 // A google.api.http path template, split into literals and variables.
@@ -341,12 +378,11 @@ func listOf(m *protogen.Method) *protogen.Field {
 	return items
 }
 
-func generateAll(g *protogen.GeneratedFile, client string, m *protogen.Method, items *protogen.Field) {
+func generateAll(g *protogen.GeneratedFile, client string, m *protogen.Method, items *protogen.Field, name string) {
 	ctx := g.QualifiedGoIdent(contextPackage.Ident("Context"))
 	input := g.QualifiedGoIdent(m.Input.GoIdent)
 	item := "*" + g.QualifiedGoIdent(items.Message.GoIdent)
 	seq := g.QualifiedGoIdent(iterPackage.Ident("Seq2"))
-	name := "All" + items.GoName
 	g.P()
 	g.P("// ", name, " returns everything ", m.GoName, " lists from req's page on, fetching")
 	g.P("// the next page as the loop reaches it. A page that fails ends the sequence")
