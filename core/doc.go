@@ -23,7 +23,10 @@
 //     the file ORIGINCLOUD_OIDC_TOKEN_FILE names, read again at every
 //     exchange; or else the token ORIGINCLOUD_OIDC_TOKEN holds, such as the
 //     one GitLab CI sets for a job's id_tokens, which can't be renewed and
-//     so serves until it expires; or else, in a GitHub Actions job with
+//     so serves until it expires; or else the workload identity token of an
+//     HCP Terraform run, TFC_WORKLOAD_IDENTITY_TOKEN, or the one a tagged
+//     audience sets, TFC_WORKLOAD_IDENTITY_TOKEN_<tag>, when
+//     ORIGINCLOUD_TFC_WORKLOAD_IDENTITY_TAG names the tag; or else, in a GitHub Actions job with
 //     `permissions: id-token: write`, the job's.
 //     ORIGINCLOUD_OIDC_DISABLED=true leaves this step out;
 //     ORIGINCLOUD_STS_ENDPOINT asks another service than [STSEndpoint], and

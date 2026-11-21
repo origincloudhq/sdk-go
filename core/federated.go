@@ -29,6 +29,13 @@ const (
 	envOIDCAudience  = "ORIGINCLOUD_OIDC_AUDIENCE"
 	envSTSEndpoint   = "ORIGINCLOUD_STS_ENDPOINT"
 
+	// What an HCP Terraform workspace with dynamic credentials sets in a
+	// run: the workload identity token in envTFCToken, or, for an audience
+	// variable with a tag (TFC_WORKLOAD_IDENTITY_AUDIENCE_<TAG>), in
+	// envTFCToken + "_" + tag. envTFCTag names the tag to read.
+	envTFCToken = "TFC_WORKLOAD_IDENTITY_TOKEN"
+	envTFCTag   = "ORIGINCLOUD_TFC_WORKLOAD_IDENTITY_TAG"
+
 	// What GitHub Actions sets in a job that may ask for an OIDC token:
 	// one with `permissions: id-token: write`.
 	envGitHubTokenURL     = "ACTIONS_ID_TOKEN_REQUEST_URL"
@@ -102,6 +109,9 @@ func federatedFromToken(token, variable string) *FederatedCredentials {
 	token = strings.TrimSpace(token)
 	return &FederatedCredentials{subjectToken: func(context.Context, *http.Client, string) (string, error) {
 		if token == "" {
+			if variable != "" {
+				return "", fmt.Errorf("origincloud: the CI job's OIDC token in %s is empty or not set", variable)
+			}
 			return "", errors.New("origincloud: the CI job's OIDC token is empty")
 		}
 		if expiry, ok := jwtExpiry(token); ok && !time.Now().Before(expiry) {
@@ -147,7 +157,8 @@ func FederatedFromGitHubActions(requestURL, requestToken string) *FederatedCrede
 
 // federatedFromEnvironment returns the federated credentials the
 // environment names: a token file, which comes first as Kubernetes rotates
-// it in place, or else a token in ORIGINCLOUD_OIDC_TOKEN, or else a GitHub
+// it in place, or else a token in ORIGINCLOUD_OIDC_TOKEN, or else an HCP
+// Terraform run's workload identity token, or else a GitHub
 // Actions job. It returns nil when it names none, or when
 // ORIGINCLOUD_OIDC_DISABLED is true.
 func federatedFromEnvironment() *FederatedCredentials {
@@ -156,11 +167,14 @@ func federatedFromEnvironment() *FederatedCredentials {
 	}
 	var c *FederatedCredentials
 	requestURL, requestToken := os.Getenv(envGitHubTokenURL), os.Getenv(envGitHubRequestToken)
+	tfcVariable := tfcTokenVariable()
 	switch path := os.Getenv(envOIDCTokenFile); {
 	case path != "":
 		c = FederatedFromFile(path)
 	case os.Getenv(envOIDCToken) != "":
 		c = federatedFromToken(os.Getenv(envOIDCToken), envOIDCToken)
+	case os.Getenv(envTFCTag) != "" || os.Getenv(tfcVariable) != "":
+		c = federatedFromToken(os.Getenv(tfcVariable), tfcVariable)
 	case requestURL != "" && requestToken != "":
 		c = FederatedFromGitHubActions(requestURL, requestToken)
 	default:
@@ -169,6 +183,16 @@ func federatedFromEnvironment() *FederatedCredentials {
 	c.Endpoint = os.Getenv(envSTSEndpoint)
 	c.Audience = os.Getenv(envOIDCAudience)
 	return c
+}
+
+// tfcTokenVariable is the variable an HCP Terraform run's workload identity
+// token is read from: the tagged one when ORIGINCLOUD_TFC_WORKLOAD_IDENTITY_TAG
+// names a tag, the untagged one otherwise.
+func tfcTokenVariable() string {
+	if tag := strings.TrimSpace(os.Getenv(envTFCTag)); tag != "" {
+		return envTFCToken + "_" + tag
+	}
+	return envTFCToken
 }
 
 // Token returns the current access token, exchanging a job token for a

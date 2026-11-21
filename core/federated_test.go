@@ -655,3 +655,130 @@ func TestAnEmptyTokenHandedOverIsNotExchanged(t *testing.T) {
 		t.Fatal("the security token service was asked without a token")
 	}
 }
+
+func TestAnHCPTerraformRunsTokenIsExchanged(t *testing.T) {
+	dir := clearCredentialEnv(t)
+	writeSession(t, dir, time.Now().Add(time.Hour), time.Now().Add(time.Hour))
+	sts := newSTSServer(t)
+	token := unsignedJWT(t, map[string]any{"sub": "organization:org:project:p:workspace:w:run_phase:plan", "exp": time.Now().Add(time.Hour).Unix()})
+	t.Setenv(envTFCToken, token)
+	t.Setenv(envSTSEndpoint, sts.URL)
+
+	credentials, err := DefaultCredentials(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, err := credentials.Token(context.Background()); err != nil || got != "access-1" {
+		t.Fatalf("Token() = %q, %v; want the exchanged access-1", got, err)
+	}
+	if got := strings.Join(sts.subjects(), ", "); got != token {
+		t.Fatalf("exchanged %q, want the run's token", got)
+	}
+}
+
+func TestATaggedHCPTerraformTokenIsPickedByItsTag(t *testing.T) {
+	clearCredentialEnv(t)
+	sts := newSTSServer(t)
+	t.Setenv(envTFCToken, "untagged-token")
+	t.Setenv(envTFCToken+"_ORIGIN", "tagged-token")
+	t.Setenv(envTFCToken+"_OTHER", "other-token")
+	t.Setenv(envTFCTag, "ORIGIN")
+	t.Setenv(envSTSEndpoint, sts.URL)
+
+	credentials, err := DefaultCredentials(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := credentials.Token(context.Background()); err != nil {
+		t.Fatal(err)
+	}
+	if got := strings.Join(sts.subjects(), ", "); got != "tagged-token" {
+		t.Fatalf("exchanged %q, want the tagged token alone", got)
+	}
+}
+
+func TestATaggedHCPTerraformTokenAloneNeedsItsTag(t *testing.T) {
+	clearCredentialEnv(t)
+	// Without the tag, only the untagged variable is read: a tagged token
+	// is left out and the chain goes on.
+	t.Setenv(envTFCToken+"_ORIGIN", "tagged-token")
+
+	credentials, err := DefaultCredentials(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := credentials.(*InstanceMetadataCredentials); !ok {
+		t.Fatalf("credentials = %T, want the metadata service's", credentials)
+	}
+}
+
+func TestAMissingTaggedHCPTerraformTokenNamesItsVariable(t *testing.T) {
+	clearCredentialEnv(t)
+	t.Setenv(envTFCToken, "untagged-token")
+	t.Setenv(envTFCTag, "ORIGIN")
+
+	credentials, err := DefaultCredentials(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = credentials.Token(context.Background())
+	if err == nil || !strings.Contains(err.Error(), "TFC_WORKLOAD_IDENTITY_TOKEN_ORIGIN") {
+		t.Fatalf("Token() error = %v, want the tagged variable named", err)
+	}
+	assertNoToken(t, err, "untagged-token")
+}
+
+func TestHCPTerraformComesAfterTheTokenFileAndTheVariableAndBeforeGitHub(t *testing.T) {
+	for name, tc := range map[string]struct {
+		env  map[string]string
+		want string
+	}{
+		"variable": {map[string]string{envOIDCToken: "variable-token"}, "variable-token"},
+		"file":     {map[string]string{envOIDCTokenFile: "FILE"}, "file-token"},
+		"neither":  {nil, "tfc-token"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			clearCredentialEnv(t)
+			github, sts := newGitHubServer(t), newSTSServer(t)
+			t.Setenv(envGitHubTokenURL, github.URL+"/idtoken?api-version=2.0")
+			t.Setenv(envGitHubRequestToken, gitHubRequestToken)
+			t.Setenv(envTFCToken, "tfc-token")
+			t.Setenv(envSTSEndpoint, sts.URL)
+			for key, value := range tc.env {
+				if value == "FILE" {
+					value = filepath.Join(t.TempDir(), "token")
+					if err := os.WriteFile(value, []byte("file-token"), 0o600); err != nil {
+						t.Fatal(err)
+					}
+				}
+				t.Setenv(key, value)
+			}
+
+			credentials, err := DefaultCredentials(context.Background())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := credentials.Token(context.Background()); err != nil {
+				t.Fatal(err)
+			}
+			if got := strings.Join(sts.subjects(), ", "); got != tc.want || github.requests() != 0 {
+				t.Fatalf("exchanged %q and asked GitHub %d times, want %q alone", got, github.requests(), tc.want)
+			}
+		})
+	}
+}
+
+func TestAnHCPTerraformTokenIsLeftOutWhenDisabled(t *testing.T) {
+	clearCredentialEnv(t)
+	t.Setenv(envTFCToken, "tfc-token")
+	t.Setenv(envTFCTag, "ORIGIN")
+	t.Setenv(envOIDCDisabled, "true")
+
+	credentials, err := DefaultCredentials(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, ok := credentials.(*InstanceMetadataCredentials); !ok {
+		t.Fatalf("credentials = %T, want the metadata service's", credentials)
+	}
+}
