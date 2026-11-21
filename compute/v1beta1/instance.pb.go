@@ -427,6 +427,13 @@ type Instance struct {
 	// that leaves it empty removes it, and a terminated instance's can't
 	// change. Empty for an instance that runs as none.
 	ServiceAccount string `protobuf:"bytes,17,opt,name=service_account,json=serviceAccount,proto3" json:"service_account,omitempty"`
+	// The full name of the launch template version the instance was launched
+	// from,
+	// `//compute.origincloudapis.eu/projects/{project}/launchTemplates/{launch_template}@{version}`,
+	// with the number the launch resolved `@default` or `@latest` to. Empty
+	// for an instance launched without a template. The template may since
+	// have been changed or deleted.
+	LaunchTemplate string `protobuf:"bytes,18,opt,name=launch_template,json=launchTemplate,proto3" json:"launch_template,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -569,6 +576,13 @@ func (x *Instance) GetInterfaceAddresses() []*InterfaceAddresses {
 func (x *Instance) GetServiceAccount() string {
 	if x != nil {
 		return x.ServiceAccount
+	}
+	return ""
+}
+
+func (x *Instance) GetLaunchTemplate() string {
+	if x != nil {
+		return x.LaunchTemplate
 	}
 	return ""
 }
@@ -1074,13 +1088,30 @@ type LaunchInstanceRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The zone to launch the instance in, `projects/{project}/zones/{zone}`.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
-	// The recipe of the instance to launch.
+	// The recipe of the instance to launch. Required unless
+	// `launch_template` is set. With `launch_template`, the fields set here
+	// override the version's for this launch only, and the version stays as
+	// it is: a field left empty keeps the version's, so an override can't
+	// clear one. `image` or `image_family` replaces both of the version's,
+	// `size_gib` and `storage_class` of `boot_volume` each replace the
+	// version's own, and `tags` and `network_interfaces` replace the
+	// version's whole.
 	LaunchTemplateData *LaunchTemplateData `protobuf:"bytes,2,opt,name=launch_template_data,json=launchTemplateData,proto3" json:"launch_template_data,omitempty"`
 	// A UUID; a repeat with the same id returns the first request's
 	// operation instead of launching a second instance.
-	RequestId     string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	RequestId string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	// The full name of a launch template of the instance's project to launch
+	// from,
+	// `//compute.origincloudapis.eu/projects/{project}/launchTemplates/{launch_template}`
+	// for its default version, or with `@{version}`, `@default` or `@latest`
+	// after it for that version, resolved when the launch is made. Launching
+	// from one needs `compute.launch_template.get` on it as well. An unknown
+	// template or version is refused with `NOT_FOUND`, and a version whose
+	// image, key pair or subnet is gone is refused naming that field of
+	// `launch_template_data`.
+	LaunchTemplate string `protobuf:"bytes,4,opt,name=launch_template,json=launchTemplate,proto3" json:"launch_template,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *LaunchInstanceRequest) Reset() {
@@ -1130,6 +1161,13 @@ func (x *LaunchInstanceRequest) GetLaunchTemplateData() *LaunchTemplateData {
 func (x *LaunchInstanceRequest) GetRequestId() string {
 	if x != nil {
 		return x.RequestId
+	}
+	return ""
+}
+
+func (x *LaunchInstanceRequest) GetLaunchTemplate() string {
+	if x != nil {
+		return x.LaunchTemplate
 	}
 	return ""
 }
@@ -1373,7 +1411,7 @@ var File_origincloud_compute_v1beta1_instance_proto protoreflect.FileDescriptor
 
 const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"\n" +
-	"*origincloud/compute/v1beta1/instance.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a1origincloud/compute/v1beta1/launch_template.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xaf\v\n" +
+	"*origincloud/compute/v1beta1/instance.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a1origincloud/compute/v1beta1/launch_template.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x8c\f\n" +
 	"\bInstance\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12U\n" +
 	"\rinstance_type\x18\x03 \x01(\tB0\xe2A\x01\x02\xfaA)\n" +
@@ -1402,7 +1440,9 @@ const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"\x04tags\x18\x0f \x03(\v2/.origincloud.compute.v1beta1.Instance.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x12f\n" +
 	"\x13interface_addresses\x18\x10 \x03(\v2/.origincloud.compute.v1beta1.InterfaceAddressesB\x04\xe2A\x01\x03R\x12interfaceAddresses\x12W\n" +
 	"\x0fservice_account\x18\x11 \x01(\tB.\xe2A\x01\x01\xfaA'\n" +
-	"%iam.origincloudapis.eu/ServiceAccountR\x0eserviceAccount\x1a7\n" +
+	"%iam.origincloudapis.eu/ServiceAccountR\x0eserviceAccount\x12[\n" +
+	"\x0flaunch_template\x18\x12 \x01(\tB2\xe2A\x01\x03\xfaA+\n" +
+	")compute.origincloudapis.eu/LaunchTemplateR\x0elaunchTemplate\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x94\x01\n" +
@@ -1479,12 +1519,14 @@ const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"\x06parent\x18\x01 \x01(\tB,\xe2A\x01\x02\xfaA%\x12#compute.origincloudapis.eu/InstanceR\x06parent\x12G\n" +
 	"\binstance\x18\x02 \x01(\v2%.origincloud.compute.v1beta1.InstanceB\x04\xe2A\x01\x02R\binstance\x12+\n" +
 	"\n" +
-	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\xf3\x01\n" +
+	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\xd0\x02\n" +
 	"\x15LaunchInstanceRequest\x12D\n" +
 	"\x06parent\x18\x01 \x01(\tB,\xe2A\x01\x02\xfaA%\x12#compute.origincloudapis.eu/InstanceR\x06parent\x12g\n" +
-	"\x14launch_template_data\x18\x02 \x01(\v2/.origincloud.compute.v1beta1.LaunchTemplateDataB\x04\xe2A\x01\x02R\x12launchTemplateData\x12+\n" +
+	"\x14launch_template_data\x18\x02 \x01(\v2/.origincloud.compute.v1beta1.LaunchTemplateDataB\x04\xe2A\x01\x01R\x12launchTemplateData\x12+\n" +
 	"\n" +
-	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\xd0\x01\n" +
+	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\x12[\n" +
+	"\x0flaunch_template\x18\x04 \x01(\tB2\xe2A\x01\x01\xfaA+\n" +
+	")compute.origincloudapis.eu/LaunchTemplateR\x0elaunchTemplate\"\xd0\x01\n" +
 	"\x15UpdateInstanceRequest\x12G\n" +
 	"\binstance\x18\x01 \x01(\v2%.origincloud.compute.v1beta1.InstanceB\x04\xe2A\x01\x02R\binstance\x12A\n" +
 	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x04\xe2A\x01\x02R\n" +
