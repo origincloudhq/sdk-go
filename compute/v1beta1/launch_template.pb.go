@@ -27,16 +27,23 @@ const (
 
 // A recipe kept under a name: numbered versions of it, and the one that is
 // the default.
+//
+// (-- api-linter: core::0133::http-uri-resource=disabled
+//
+//	aip.dev/not-precedent: CreateLaunchTemplateVersion adds a revision (AIP-162) to a template; its URI is the template's. --)
 type LaunchTemplate struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The launch template's resource name.
+	// The launch template's resource name. A template read at one version,
+	// by `@{version}`, `@default` or `@latest`, is named with that version's
+	// number, `projects/{project}/launchTemplates/{launch_template}@{version}`.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The recipe of the default version. On creation, the recipe of version
-	// 1.
+	// The recipe of the version this shows, `version`: the default version's
+	// unless the name named another. On creation, the recipe of version 1.
 	LaunchTemplateData *LaunchTemplateData `protobuf:"bytes,2,opt,name=launch_template_data,json=launchTemplateData,proto3" json:"launch_template_data,omitempty"`
-	// The number of the version launches use when they name no version.
+	// The number of the version launches use when they name no version. 1 on
+	// creation; an update sets it to another version the template has.
 	DefaultVersion int32 `protobuf:"varint,3,opt,name=default_version,json=defaultVersion,proto3" json:"default_version,omitempty"`
-	// The number of the newest version.
+	// The number of the newest version the template has.
 	LatestVersion int32 `protobuf:"varint,4,opt,name=latest_version,json=latestVersion,proto3" json:"latest_version,omitempty"`
 	// When the launch template was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
@@ -48,9 +55,13 @@ type LaunchTemplate struct {
 	// Labels of your own for the launch template, at most 50. The
 	// `origin:name` tag is the name the console shows. The recipe's own
 	// `tags` are the instances'.
-	Tags          map[string]string `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Tags map[string]string `protobuf:"bytes,7,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// The number of the version whose recipe this shows.
+	Version int32 `protobuf:"varint,8,opt,name=version,proto3" json:"version,omitempty"`
+	// When that version was created.
+	VersionCreateTime *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=version_create_time,json=versionCreateTime,proto3" json:"version_create_time,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *LaunchTemplate) Reset() {
@@ -132,10 +143,26 @@ func (x *LaunchTemplate) GetTags() map[string]string {
 	return nil
 }
 
+func (x *LaunchTemplate) GetVersion() int32 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
+}
+
+func (x *LaunchTemplate) GetVersionCreateTime() *timestamppb.Timestamp {
+	if x != nil {
+		return x.VersionCreateTime
+	}
+	return nil
+}
+
 // The request for GetLaunchTemplate.
 type GetLaunchTemplateRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The launch template to return.
+	// The launch template to return: `projects/{project}/launchTemplates/{launch_template}`
+	// for its default version, or with `@{version}`, `@default` or `@latest`
+	// after it for that version.
 	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -367,10 +394,12 @@ func (x *CreateLaunchTemplateRequest) GetRequestId() string {
 // The request for UpdateLaunchTemplate.
 type UpdateLaunchTemplateRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The launch template, by its name, with the tags to set.
+	// The launch template, by its name, with the tags or the default version
+	// to set.
 	LaunchTemplate *LaunchTemplate `protobuf:"bytes,1,opt,name=launch_template,json=launchTemplate,proto3" json:"launch_template,omitempty"`
-	// The fields to change: `tags`, the only field that changes. `*` is the
-	// same.
+	// The fields to change: `tags`, `default_version`, or both. `*` is both,
+	// where a `default_version` of 0 leaves the default as it is. A
+	// `default_version` must be a version the template has.
 	UpdateMask    *fieldmaskpb.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -466,6 +495,246 @@ func (x *DeleteLaunchTemplateRequest) GetName() string {
 	return ""
 }
 
+// The request for CreateLaunchTemplateVersion.
+//
+// (-- api-linter: core::0133::request-parent-required=disabled
+//
+//	api-linter: core::0133::request-required-fields=disabled
+//	api-linter: core::0133::request-unknown-fields=disabled
+//	api-linter: core::0133::request-resource-field=disabled
+//	aip.dev/not-precedent: a version is a revision of the template (AIP-162), named on the template, not a child resource. --)
+type CreateLaunchTemplateVersionRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The launch template to add a version to.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The new version's recipe.
+	LaunchTemplateData *LaunchTemplateData `protobuf:"bytes,2,opt,name=launch_template_data,json=launchTemplateData,proto3" json:"launch_template_data,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *CreateLaunchTemplateVersionRequest) Reset() {
+	*x = CreateLaunchTemplateVersionRequest{}
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateLaunchTemplateVersionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateLaunchTemplateVersionRequest) ProtoMessage() {}
+
+func (x *CreateLaunchTemplateVersionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateLaunchTemplateVersionRequest.ProtoReflect.Descriptor instead.
+func (*CreateLaunchTemplateVersionRequest) Descriptor() ([]byte, []int) {
+	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *CreateLaunchTemplateVersionRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateLaunchTemplateVersionRequest) GetLaunchTemplateData() *LaunchTemplateData {
+	if x != nil {
+		return x.LaunchTemplateData
+	}
+	return nil
+}
+
+// The request for ListLaunchTemplateVersions.
+//
+// (-- api-linter: core::0132::request-parent-required=disabled
+//
+//	api-linter: core::0132::request-required-fields=disabled
+//	api-linter: core::0132::request-unknown-fields=disabled
+//	aip.dev/not-precedent: a version is a revision of the template (AIP-162), named on the template, not a child resource. --)
+type ListLaunchTemplateVersionsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The launch template whose versions to list.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The most versions to return; the server clamps it, and 0 means its
+	// default.
+	PageSize int32 `protobuf:"varint,2,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	// A previous response's `next_page_token`, for the page after it.
+	PageToken     string `protobuf:"bytes,3,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListLaunchTemplateVersionsRequest) Reset() {
+	*x = ListLaunchTemplateVersionsRequest{}
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListLaunchTemplateVersionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListLaunchTemplateVersionsRequest) ProtoMessage() {}
+
+func (x *ListLaunchTemplateVersionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListLaunchTemplateVersionsRequest.ProtoReflect.Descriptor instead.
+func (*ListLaunchTemplateVersionsRequest) Descriptor() ([]byte, []int) {
+	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *ListLaunchTemplateVersionsRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ListLaunchTemplateVersionsRequest) GetPageSize() int32 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListLaunchTemplateVersionsRequest) GetPageToken() string {
+	if x != nil {
+		return x.PageToken
+	}
+	return ""
+}
+
+// The response for ListLaunchTemplateVersions.
+//
+// (-- api-linter: core::0132::response-unknown-fields=disabled
+//
+//	aip.dev/not-precedent: each revision is the template at that version (AIP-162). --)
+type ListLaunchTemplateVersionsResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The template at each version on this page, newest first, each named
+	// with its version's number.
+	LaunchTemplates []*LaunchTemplate `protobuf:"bytes,1,rep,name=launch_templates,json=launchTemplates,proto3" json:"launch_templates,omitempty"`
+	// The token for the next page; empty on the last one.
+	NextPageToken string `protobuf:"bytes,2,opt,name=next_page_token,json=nextPageToken,proto3" json:"next_page_token,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListLaunchTemplateVersionsResponse) Reset() {
+	*x = ListLaunchTemplateVersionsResponse{}
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListLaunchTemplateVersionsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListLaunchTemplateVersionsResponse) ProtoMessage() {}
+
+func (x *ListLaunchTemplateVersionsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListLaunchTemplateVersionsResponse.ProtoReflect.Descriptor instead.
+func (*ListLaunchTemplateVersionsResponse) Descriptor() ([]byte, []int) {
+	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ListLaunchTemplateVersionsResponse) GetLaunchTemplates() []*LaunchTemplate {
+	if x != nil {
+		return x.LaunchTemplates
+	}
+	return nil
+}
+
+func (x *ListLaunchTemplateVersionsResponse) GetNextPageToken() string {
+	if x != nil {
+		return x.NextPageToken
+	}
+	return ""
+}
+
+// The request for DeleteLaunchTemplateVersion.
+type DeleteLaunchTemplateVersionRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The version to delete, `projects/{project}/launchTemplates/{launch_template}@{version}`
+	// with the version's number.
+	Name          string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteLaunchTemplateVersionRequest) Reset() {
+	*x = DeleteLaunchTemplateVersionRequest{}
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteLaunchTemplateVersionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteLaunchTemplateVersionRequest) ProtoMessage() {}
+
+func (x *DeleteLaunchTemplateVersionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteLaunchTemplateVersionRequest.ProtoReflect.Descriptor instead.
+func (*DeleteLaunchTemplateVersionRequest) Descriptor() ([]byte, []int) {
+	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *DeleteLaunchTemplateVersionRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
 // The recipe for an instance: what to launch, and the specs of what the
 // launch creates for it. A launch reads the recipe and sets up what it
 // needs: a network interface described by a spec is created for the
@@ -518,7 +787,7 @@ type LaunchTemplateData struct {
 
 func (x *LaunchTemplateData) Reset() {
 	*x = LaunchTemplateData{}
-	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[7]
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -530,7 +799,7 @@ func (x *LaunchTemplateData) String() string {
 func (*LaunchTemplateData) ProtoMessage() {}
 
 func (x *LaunchTemplateData) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[7]
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -543,7 +812,7 @@ func (x *LaunchTemplateData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LaunchTemplateData.ProtoReflect.Descriptor instead.
 func (*LaunchTemplateData) Descriptor() ([]byte, []int) {
-	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{7}
+	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *LaunchTemplateData) GetInstanceType() string {
@@ -625,7 +894,7 @@ type LaunchTemplateBootVolume struct {
 
 func (x *LaunchTemplateBootVolume) Reset() {
 	*x = LaunchTemplateBootVolume{}
-	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[8]
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -637,7 +906,7 @@ func (x *LaunchTemplateBootVolume) String() string {
 func (*LaunchTemplateBootVolume) ProtoMessage() {}
 
 func (x *LaunchTemplateBootVolume) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[8]
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -650,7 +919,7 @@ func (x *LaunchTemplateBootVolume) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LaunchTemplateBootVolume.ProtoReflect.Descriptor instead.
 func (*LaunchTemplateBootVolume) Descriptor() ([]byte, []int) {
-	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{8}
+	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *LaunchTemplateBootVolume) GetSizeGib() int32 {
@@ -683,7 +952,7 @@ type LaunchTemplateNetworkInterface struct {
 
 func (x *LaunchTemplateNetworkInterface) Reset() {
 	*x = LaunchTemplateNetworkInterface{}
-	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[9]
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -695,7 +964,7 @@ func (x *LaunchTemplateNetworkInterface) String() string {
 func (*LaunchTemplateNetworkInterface) ProtoMessage() {}
 
 func (x *LaunchTemplateNetworkInterface) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[9]
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -708,7 +977,7 @@ func (x *LaunchTemplateNetworkInterface) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LaunchTemplateNetworkInterface.ProtoReflect.Descriptor instead.
 func (*LaunchTemplateNetworkInterface) Descriptor() ([]byte, []int) {
-	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{9}
+	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *LaunchTemplateNetworkInterface) GetSource() isLaunchTemplateNetworkInterface_Source {
@@ -785,7 +1054,7 @@ type NetworkInterfaceSpec struct {
 
 func (x *NetworkInterfaceSpec) Reset() {
 	*x = NetworkInterfaceSpec{}
-	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[10]
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -797,7 +1066,7 @@ func (x *NetworkInterfaceSpec) String() string {
 func (*NetworkInterfaceSpec) ProtoMessage() {}
 
 func (x *NetworkInterfaceSpec) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[10]
+	mi := &file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -810,7 +1079,7 @@ func (x *NetworkInterfaceSpec) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NetworkInterfaceSpec.ProtoReflect.Descriptor instead.
 func (*NetworkInterfaceSpec) Descriptor() ([]byte, []int) {
-	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{10}
+	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *NetworkInterfaceSpec) GetSubnet() string {
@@ -831,18 +1100,20 @@ var File_origincloud_compute_v1beta1_launch_template_proto protoreflect.FileDesc
 
 const file_origincloud_compute_v1beta1_launch_template_proto_rawDesc = "" +
 	"\n" +
-	"1origincloud/compute/v1beta1/launch_template.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xec\x04\n" +
+	"1origincloud/compute/v1beta1/launch_template.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xde\x05\n" +
 	"\x0eLaunchTemplate\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12h\n" +
 	"\x14launch_template_data\x18\x02 \x01(\v2/.origincloud.compute.v1beta1.LaunchTemplateDataB\x05\xe2A\x02\x02\x05R\x12launchTemplateData\x12-\n" +
-	"\x0fdefault_version\x18\x03 \x01(\x05B\x04\xe2A\x01\x03R\x0edefaultVersion\x12+\n" +
+	"\x0fdefault_version\x18\x03 \x01(\x05B\x04\xe2A\x01\x01R\x0edefaultVersion\x12+\n" +
 	"\x0elatest_version\x18\x04 \x01(\x05B\x04\xe2A\x01\x03R\rlatestVersion\x12A\n" +
 	"\vcreate_time\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime\x12$\n" +
 	"\acreator\x18\x06 \x01(\tB\n" +
 	"\xe2A\x01\x03\xfaA\x03\n" +
 	"\x01*R\acreator\x12O\n" +
-	"\x04tags\x18\a \x03(\v25.origincloud.compute.v1beta1.LaunchTemplate.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x1a7\n" +
+	"\x04tags\x18\a \x03(\v25.origincloud.compute.v1beta1.LaunchTemplate.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x12\x1e\n" +
+	"\aversion\x18\b \x01(\x05B\x04\xe2A\x01\x03R\aversion\x12P\n" +
+	"\x13version_create_time\x18\t \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\x11versionCreateTime\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01:\x86\x01\xeaA\x82\x01\n" +
@@ -868,6 +1139,22 @@ const file_origincloud_compute_v1beta1_launch_template_proto_rawDesc = "" +
 	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x04\xe2A\x01\x02R\n" +
 	"updateMask\"e\n" +
 	"\x1bDeleteLaunchTemplateRequest\x12F\n" +
+	"\x04name\x18\x01 \x01(\tB2\xe2A\x01\x02\xfaA+\n" +
+	")compute.origincloudapis.eu/LaunchTemplateR\x04name\"\xd5\x01\n" +
+	"\"CreateLaunchTemplateVersionRequest\x12F\n" +
+	"\x04name\x18\x01 \x01(\tB2\xe2A\x01\x02\xfaA+\n" +
+	")compute.origincloudapis.eu/LaunchTemplateR\x04name\x12g\n" +
+	"\x14launch_template_data\x18\x02 \x01(\v2/.origincloud.compute.v1beta1.LaunchTemplateDataB\x04\xe2A\x01\x02R\x12launchTemplateData\"\xb3\x01\n" +
+	"!ListLaunchTemplateVersionsRequest\x12F\n" +
+	"\x04name\x18\x01 \x01(\tB2\xe2A\x01\x02\xfaA+\n" +
+	")compute.origincloudapis.eu/LaunchTemplateR\x04name\x12!\n" +
+	"\tpage_size\x18\x02 \x01(\x05B\x04\xe2A\x01\x01R\bpageSize\x12#\n" +
+	"\n" +
+	"page_token\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\tpageToken\"\xa4\x01\n" +
+	"\"ListLaunchTemplateVersionsResponse\x12V\n" +
+	"\x10launch_templates\x18\x01 \x03(\v2+.origincloud.compute.v1beta1.LaunchTemplateR\x0flaunchTemplates\x12&\n" +
+	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"l\n" +
+	"\"DeleteLaunchTemplateVersionRequest\x12F\n" +
 	"\x04name\x18\x01 \x01(\tB2\xe2A\x01\x02\xfaA+\n" +
 	")compute.origincloudapis.eu/LaunchTemplateR\x04name\"\xa4\x06\n" +
 	"\x12LaunchTemplateData\x12U\n" +
@@ -903,13 +1190,16 @@ const file_origincloud_compute_v1beta1_launch_template_proto_rawDesc = "" +
 	"\x06subnet\x18\x01 \x01(\tB*\xe2A\x01\x01\xfaA#\n" +
 	"!network.origincloudapis.eu/SubnetR\x06subnet\x12Z\n" +
 	"\x0fsecurity_groups\x18\x02 \x03(\tB1\xe2A\x01\x01\xfaA*\n" +
-	"(network.origincloudapis.eu/SecurityGroupR\x0esecurityGroups2\xb4\b\n" +
+	"(network.origincloudapis.eu/SecurityGroupR\x0esecurityGroups2\xd3\r\n" +
 	"\x15LaunchTemplateService\x12\xb4\x01\n" +
 	"\x11GetLaunchTemplate\x125.origincloud.compute.v1beta1.GetLaunchTemplateRequest\x1a+.origincloud.compute.v1beta1.LaunchTemplate\";\xdaA\x04name\x82\xd3\xe4\x93\x02.\x12,/v1beta1/{name=projects/*/launchTemplates/*}\x12\xc7\x01\n" +
 	"\x13ListLaunchTemplates\x127.origincloud.compute.v1beta1.ListLaunchTemplatesRequest\x1a8.origincloud.compute.v1beta1.ListLaunchTemplatesResponse\"=\xdaA\x06parent\x82\xd3\xe4\x93\x02.\x12,/v1beta1/{parent=projects/*}/launchTemplates\x12\xdd\x01\n" +
 	"\x14CreateLaunchTemplate\x128.origincloud.compute.v1beta1.CreateLaunchTemplateRequest\x1a+.origincloud.compute.v1beta1.LaunchTemplate\"^\xdaA\x16parent,launch_template\x82\xd3\xe4\x93\x02?:\x0flaunch_template\",/v1beta1/{parent=projects/*}/launchTemplates\x12\xf2\x01\n" +
 	"\x14UpdateLaunchTemplate\x128.origincloud.compute.v1beta1.UpdateLaunchTemplateRequest\x1a+.origincloud.compute.v1beta1.LaunchTemplate\"s\xdaA\x1blaunch_template,update_mask\x82\xd3\xe4\x93\x02O:\x0flaunch_template2</v1beta1/{launch_template.name=projects/*/launchTemplates/*}\x12\xa5\x01\n" +
-	"\x14DeleteLaunchTemplate\x128.origincloud.compute.v1beta1.DeleteLaunchTemplateRequest\x1a\x16.google.protobuf.Empty\";\xdaA\x04name\x82\xd3\xe4\x93\x02.*,/v1beta1/{name=projects/*/launchTemplates/*}\x1a\x1d\xcaA\x1acompute.origincloudapis.eub\x06proto3"
+	"\x14DeleteLaunchTemplate\x128.origincloud.compute.v1beta1.DeleteLaunchTemplateRequest\x1a\x16.google.protobuf.Empty\";\xdaA\x04name\x82\xd3\xe4\x93\x02.*,/v1beta1/{name=projects/*/launchTemplates/*}\x12\xee\x01\n" +
+	"\x1bCreateLaunchTemplateVersion\x12?.origincloud.compute.v1beta1.CreateLaunchTemplateVersionRequest\x1a+.origincloud.compute.v1beta1.LaunchTemplate\"a\xdaA\x19name,launch_template_data\x82\xd3\xe4\x93\x02?:\x01*\":/v1beta1/{name=projects/*/launchTemplates/*}:createVersion\x12\xe7\x01\n" +
+	"\x1aListLaunchTemplateVersions\x12>.origincloud.compute.v1beta1.ListLaunchTemplateVersionsRequest\x1a?.origincloud.compute.v1beta1.ListLaunchTemplateVersionsResponse\"H\xdaA\x04name\x82\xd3\xe4\x93\x02;\x129/v1beta1/{name=projects/*/launchTemplates/*}:listVersions\x12\xc1\x01\n" +
+	"\x1bDeleteLaunchTemplateVersion\x12?.origincloud.compute.v1beta1.DeleteLaunchTemplateVersionRequest\x1a\x16.google.protobuf.Empty\"I\xdaA\x04name\x82\xd3\xe4\x93\x02<*:/v1beta1/{name=projects/*/launchTemplates/*}:deleteVersion\x1a\x1d\xcaA\x1acompute.origincloudapis.eub\x06proto3"
 
 var (
 	file_origincloud_compute_v1beta1_launch_template_proto_rawDescOnce sync.Once
@@ -923,52 +1213,65 @@ func file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP() []byte
 	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescData
 }
 
-var file_origincloud_compute_v1beta1_launch_template_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_origincloud_compute_v1beta1_launch_template_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_origincloud_compute_v1beta1_launch_template_proto_goTypes = []any{
-	(*LaunchTemplate)(nil),                 // 0: origincloud.compute.v1beta1.LaunchTemplate
-	(*GetLaunchTemplateRequest)(nil),       // 1: origincloud.compute.v1beta1.GetLaunchTemplateRequest
-	(*ListLaunchTemplatesRequest)(nil),     // 2: origincloud.compute.v1beta1.ListLaunchTemplatesRequest
-	(*ListLaunchTemplatesResponse)(nil),    // 3: origincloud.compute.v1beta1.ListLaunchTemplatesResponse
-	(*CreateLaunchTemplateRequest)(nil),    // 4: origincloud.compute.v1beta1.CreateLaunchTemplateRequest
-	(*UpdateLaunchTemplateRequest)(nil),    // 5: origincloud.compute.v1beta1.UpdateLaunchTemplateRequest
-	(*DeleteLaunchTemplateRequest)(nil),    // 6: origincloud.compute.v1beta1.DeleteLaunchTemplateRequest
-	(*LaunchTemplateData)(nil),             // 7: origincloud.compute.v1beta1.LaunchTemplateData
-	(*LaunchTemplateBootVolume)(nil),       // 8: origincloud.compute.v1beta1.LaunchTemplateBootVolume
-	(*LaunchTemplateNetworkInterface)(nil), // 9: origincloud.compute.v1beta1.LaunchTemplateNetworkInterface
-	(*NetworkInterfaceSpec)(nil),           // 10: origincloud.compute.v1beta1.NetworkInterfaceSpec
-	nil,                                    // 11: origincloud.compute.v1beta1.LaunchTemplate.TagsEntry
-	nil,                                    // 12: origincloud.compute.v1beta1.LaunchTemplateData.TagsEntry
-	(*timestamppb.Timestamp)(nil),          // 13: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),          // 14: google.protobuf.FieldMask
-	(*emptypb.Empty)(nil),                  // 15: google.protobuf.Empty
+	(*LaunchTemplate)(nil),                     // 0: origincloud.compute.v1beta1.LaunchTemplate
+	(*GetLaunchTemplateRequest)(nil),           // 1: origincloud.compute.v1beta1.GetLaunchTemplateRequest
+	(*ListLaunchTemplatesRequest)(nil),         // 2: origincloud.compute.v1beta1.ListLaunchTemplatesRequest
+	(*ListLaunchTemplatesResponse)(nil),        // 3: origincloud.compute.v1beta1.ListLaunchTemplatesResponse
+	(*CreateLaunchTemplateRequest)(nil),        // 4: origincloud.compute.v1beta1.CreateLaunchTemplateRequest
+	(*UpdateLaunchTemplateRequest)(nil),        // 5: origincloud.compute.v1beta1.UpdateLaunchTemplateRequest
+	(*DeleteLaunchTemplateRequest)(nil),        // 6: origincloud.compute.v1beta1.DeleteLaunchTemplateRequest
+	(*CreateLaunchTemplateVersionRequest)(nil), // 7: origincloud.compute.v1beta1.CreateLaunchTemplateVersionRequest
+	(*ListLaunchTemplateVersionsRequest)(nil),  // 8: origincloud.compute.v1beta1.ListLaunchTemplateVersionsRequest
+	(*ListLaunchTemplateVersionsResponse)(nil), // 9: origincloud.compute.v1beta1.ListLaunchTemplateVersionsResponse
+	(*DeleteLaunchTemplateVersionRequest)(nil), // 10: origincloud.compute.v1beta1.DeleteLaunchTemplateVersionRequest
+	(*LaunchTemplateData)(nil),                 // 11: origincloud.compute.v1beta1.LaunchTemplateData
+	(*LaunchTemplateBootVolume)(nil),           // 12: origincloud.compute.v1beta1.LaunchTemplateBootVolume
+	(*LaunchTemplateNetworkInterface)(nil),     // 13: origincloud.compute.v1beta1.LaunchTemplateNetworkInterface
+	(*NetworkInterfaceSpec)(nil),               // 14: origincloud.compute.v1beta1.NetworkInterfaceSpec
+	nil,                                        // 15: origincloud.compute.v1beta1.LaunchTemplate.TagsEntry
+	nil,                                        // 16: origincloud.compute.v1beta1.LaunchTemplateData.TagsEntry
+	(*timestamppb.Timestamp)(nil),              // 17: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),              // 18: google.protobuf.FieldMask
+	(*emptypb.Empty)(nil),                      // 19: google.protobuf.Empty
 }
 var file_origincloud_compute_v1beta1_launch_template_proto_depIdxs = []int32{
-	7,  // 0: origincloud.compute.v1beta1.LaunchTemplate.launch_template_data:type_name -> origincloud.compute.v1beta1.LaunchTemplateData
-	13, // 1: origincloud.compute.v1beta1.LaunchTemplate.create_time:type_name -> google.protobuf.Timestamp
-	11, // 2: origincloud.compute.v1beta1.LaunchTemplate.tags:type_name -> origincloud.compute.v1beta1.LaunchTemplate.TagsEntry
-	0,  // 3: origincloud.compute.v1beta1.ListLaunchTemplatesResponse.launch_templates:type_name -> origincloud.compute.v1beta1.LaunchTemplate
-	0,  // 4: origincloud.compute.v1beta1.CreateLaunchTemplateRequest.launch_template:type_name -> origincloud.compute.v1beta1.LaunchTemplate
-	0,  // 5: origincloud.compute.v1beta1.UpdateLaunchTemplateRequest.launch_template:type_name -> origincloud.compute.v1beta1.LaunchTemplate
-	14, // 6: origincloud.compute.v1beta1.UpdateLaunchTemplateRequest.update_mask:type_name -> google.protobuf.FieldMask
-	8,  // 7: origincloud.compute.v1beta1.LaunchTemplateData.boot_volume:type_name -> origincloud.compute.v1beta1.LaunchTemplateBootVolume
-	12, // 8: origincloud.compute.v1beta1.LaunchTemplateData.tags:type_name -> origincloud.compute.v1beta1.LaunchTemplateData.TagsEntry
-	9,  // 9: origincloud.compute.v1beta1.LaunchTemplateData.network_interfaces:type_name -> origincloud.compute.v1beta1.LaunchTemplateNetworkInterface
-	10, // 10: origincloud.compute.v1beta1.LaunchTemplateNetworkInterface.spec:type_name -> origincloud.compute.v1beta1.NetworkInterfaceSpec
-	1,  // 11: origincloud.compute.v1beta1.LaunchTemplateService.GetLaunchTemplate:input_type -> origincloud.compute.v1beta1.GetLaunchTemplateRequest
-	2,  // 12: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplates:input_type -> origincloud.compute.v1beta1.ListLaunchTemplatesRequest
-	4,  // 13: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplate:input_type -> origincloud.compute.v1beta1.CreateLaunchTemplateRequest
-	5,  // 14: origincloud.compute.v1beta1.LaunchTemplateService.UpdateLaunchTemplate:input_type -> origincloud.compute.v1beta1.UpdateLaunchTemplateRequest
-	6,  // 15: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplate:input_type -> origincloud.compute.v1beta1.DeleteLaunchTemplateRequest
-	0,  // 16: origincloud.compute.v1beta1.LaunchTemplateService.GetLaunchTemplate:output_type -> origincloud.compute.v1beta1.LaunchTemplate
-	3,  // 17: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplates:output_type -> origincloud.compute.v1beta1.ListLaunchTemplatesResponse
-	0,  // 18: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplate:output_type -> origincloud.compute.v1beta1.LaunchTemplate
-	0,  // 19: origincloud.compute.v1beta1.LaunchTemplateService.UpdateLaunchTemplate:output_type -> origincloud.compute.v1beta1.LaunchTemplate
-	15, // 20: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplate:output_type -> google.protobuf.Empty
-	16, // [16:21] is the sub-list for method output_type
-	11, // [11:16] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	11, // 0: origincloud.compute.v1beta1.LaunchTemplate.launch_template_data:type_name -> origincloud.compute.v1beta1.LaunchTemplateData
+	17, // 1: origincloud.compute.v1beta1.LaunchTemplate.create_time:type_name -> google.protobuf.Timestamp
+	15, // 2: origincloud.compute.v1beta1.LaunchTemplate.tags:type_name -> origincloud.compute.v1beta1.LaunchTemplate.TagsEntry
+	17, // 3: origincloud.compute.v1beta1.LaunchTemplate.version_create_time:type_name -> google.protobuf.Timestamp
+	0,  // 4: origincloud.compute.v1beta1.ListLaunchTemplatesResponse.launch_templates:type_name -> origincloud.compute.v1beta1.LaunchTemplate
+	0,  // 5: origincloud.compute.v1beta1.CreateLaunchTemplateRequest.launch_template:type_name -> origincloud.compute.v1beta1.LaunchTemplate
+	0,  // 6: origincloud.compute.v1beta1.UpdateLaunchTemplateRequest.launch_template:type_name -> origincloud.compute.v1beta1.LaunchTemplate
+	18, // 7: origincloud.compute.v1beta1.UpdateLaunchTemplateRequest.update_mask:type_name -> google.protobuf.FieldMask
+	11, // 8: origincloud.compute.v1beta1.CreateLaunchTemplateVersionRequest.launch_template_data:type_name -> origincloud.compute.v1beta1.LaunchTemplateData
+	0,  // 9: origincloud.compute.v1beta1.ListLaunchTemplateVersionsResponse.launch_templates:type_name -> origincloud.compute.v1beta1.LaunchTemplate
+	12, // 10: origincloud.compute.v1beta1.LaunchTemplateData.boot_volume:type_name -> origincloud.compute.v1beta1.LaunchTemplateBootVolume
+	16, // 11: origincloud.compute.v1beta1.LaunchTemplateData.tags:type_name -> origincloud.compute.v1beta1.LaunchTemplateData.TagsEntry
+	13, // 12: origincloud.compute.v1beta1.LaunchTemplateData.network_interfaces:type_name -> origincloud.compute.v1beta1.LaunchTemplateNetworkInterface
+	14, // 13: origincloud.compute.v1beta1.LaunchTemplateNetworkInterface.spec:type_name -> origincloud.compute.v1beta1.NetworkInterfaceSpec
+	1,  // 14: origincloud.compute.v1beta1.LaunchTemplateService.GetLaunchTemplate:input_type -> origincloud.compute.v1beta1.GetLaunchTemplateRequest
+	2,  // 15: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplates:input_type -> origincloud.compute.v1beta1.ListLaunchTemplatesRequest
+	4,  // 16: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplate:input_type -> origincloud.compute.v1beta1.CreateLaunchTemplateRequest
+	5,  // 17: origincloud.compute.v1beta1.LaunchTemplateService.UpdateLaunchTemplate:input_type -> origincloud.compute.v1beta1.UpdateLaunchTemplateRequest
+	6,  // 18: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplate:input_type -> origincloud.compute.v1beta1.DeleteLaunchTemplateRequest
+	7,  // 19: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplateVersion:input_type -> origincloud.compute.v1beta1.CreateLaunchTemplateVersionRequest
+	8,  // 20: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplateVersions:input_type -> origincloud.compute.v1beta1.ListLaunchTemplateVersionsRequest
+	10, // 21: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplateVersion:input_type -> origincloud.compute.v1beta1.DeleteLaunchTemplateVersionRequest
+	0,  // 22: origincloud.compute.v1beta1.LaunchTemplateService.GetLaunchTemplate:output_type -> origincloud.compute.v1beta1.LaunchTemplate
+	3,  // 23: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplates:output_type -> origincloud.compute.v1beta1.ListLaunchTemplatesResponse
+	0,  // 24: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplate:output_type -> origincloud.compute.v1beta1.LaunchTemplate
+	0,  // 25: origincloud.compute.v1beta1.LaunchTemplateService.UpdateLaunchTemplate:output_type -> origincloud.compute.v1beta1.LaunchTemplate
+	19, // 26: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplate:output_type -> google.protobuf.Empty
+	0,  // 27: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplateVersion:output_type -> origincloud.compute.v1beta1.LaunchTemplate
+	9,  // 28: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplateVersions:output_type -> origincloud.compute.v1beta1.ListLaunchTemplateVersionsResponse
+	19, // 29: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplateVersion:output_type -> google.protobuf.Empty
+	22, // [22:30] is the sub-list for method output_type
+	14, // [14:22] is the sub-list for method input_type
+	14, // [14:14] is the sub-list for extension type_name
+	14, // [14:14] is the sub-list for extension extendee
+	0,  // [0:14] is the sub-list for field type_name
 }
 
 func init() { file_origincloud_compute_v1beta1_launch_template_proto_init() }
@@ -976,7 +1279,7 @@ func file_origincloud_compute_v1beta1_launch_template_proto_init() {
 	if File_origincloud_compute_v1beta1_launch_template_proto != nil {
 		return
 	}
-	file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[9].OneofWrappers = []any{
+	file_origincloud_compute_v1beta1_launch_template_proto_msgTypes[13].OneofWrappers = []any{
 		(*LaunchTemplateNetworkInterface_Spec)(nil),
 		(*LaunchTemplateNetworkInterface_NetworkInterface)(nil),
 	}
@@ -986,7 +1289,7 @@ func file_origincloud_compute_v1beta1_launch_template_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_origincloud_compute_v1beta1_launch_template_proto_rawDesc), len(file_origincloud_compute_v1beta1_launch_template_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

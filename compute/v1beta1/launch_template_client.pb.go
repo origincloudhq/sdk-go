@@ -35,7 +35,9 @@ func (c *LaunchTemplateClient) Service() *core.Service {
 	return c.service
 }
 
-// GetLaunchTemplate returns a launch template, with its default version's recipe.
+// GetLaunchTemplate returns a launch template with one version's recipe: its default
+// version's for a bare name or `@default`, its newest for `@latest`, or
+// version `N` for `@N`.
 func (c *LaunchTemplateClient) GetLaunchTemplate(ctx context.Context, req *GetLaunchTemplateRequest) (*LaunchTemplate, error) {
 	n1, err := c.service.RelativeName("name", req.GetName(), "compute")
 	if err != nil {
@@ -161,7 +163,8 @@ func (c *LaunchTemplateClient) CreateLaunchTemplate(ctx context.Context, req *Cr
 	return out, nil
 }
 
-// UpdateLaunchTemplate changes a launch template's tags. A version's recipe never changes.
+// UpdateLaunchTemplate changes a launch template's tags or its default version, or both. A
+// version's recipe never changes.
 func (c *LaunchTemplateClient) UpdateLaunchTemplate(ctx context.Context, req *UpdateLaunchTemplateRequest) (*LaunchTemplate, error) {
 	n1, err := c.service.RelativeName("launchTemplate.name", req.GetLaunchTemplate().GetName(), "compute")
 	if err != nil {
@@ -214,6 +217,123 @@ func (c *LaunchTemplateClient) DeleteLaunchTemplate(ctx context.Context, req *De
 	if err := c.service.Call(ctx, core.Request{
 		Method: http.MethodDelete,
 		Path:   "/v1beta1/" + p1,
+		Query:  query,
+	}, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// CreateLaunchTemplateVersion adds a version to a launch template with `launch_template_data` as its
+// recipe, numbered one past the highest number the template has ever
+// given, and returns the template at it. The default version stays as it
+// is. The recipe is checked as CreateLaunchTemplate checks it. A template
+// holds at most 100 versions.
+func (c *LaunchTemplateClient) CreateLaunchTemplateVersion(ctx context.Context, req *CreateLaunchTemplateVersionRequest) (*LaunchTemplate, error) {
+	n1, err := c.service.RelativeName("name", req.GetName(), "compute")
+	if err != nil {
+		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/launchTemplates/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*CreateLaunchTemplateVersionRequest)
+		req.Name = n1
+	}
+	out := new(LaunchTemplate)
+	if err := c.service.Call(ctx, core.Request{
+		Method: http.MethodPost,
+		Path:   "/v1beta1/" + p1 + ":createVersion",
+		Body:   req,
+	}, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ListLaunchTemplateVersions lists a launch template's versions, newest first, each as the template
+// at that version, named `{launch_template}@{version}`.
+func (c *LaunchTemplateClient) ListLaunchTemplateVersions(ctx context.Context, req *ListLaunchTemplateVersionsRequest) (*ListLaunchTemplateVersionsResponse, error) {
+	n1, err := c.service.RelativeName("name", req.GetName(), "compute")
+	if err != nil {
+		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/launchTemplates/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*ListLaunchTemplateVersionsRequest)
+		req.Name = n1
+	}
+	query, err := core.Query(req, "name")
+	if err != nil {
+		return nil, err
+	}
+	out := new(ListLaunchTemplateVersionsResponse)
+	if err := c.service.Call(ctx, core.Request{
+		Method:     http.MethodGet,
+		Path:       "/v1beta1/" + p1 + ":listVersions",
+		Query:      query,
+		Idempotent: true,
+	}, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// AllLaunchTemplates returns everything ListLaunchTemplateVersions lists from req's page on, fetching
+// the next page as the loop reaches it. A page that fails ends the sequence
+// with its error.
+func (c *LaunchTemplateClient) AllLaunchTemplates(ctx context.Context, req *ListLaunchTemplateVersionsRequest) iter.Seq2[*LaunchTemplate, error] {
+	return func(yield func(*LaunchTemplate, error) bool) {
+		req := proto.Clone(req).(*ListLaunchTemplateVersionsRequest)
+		for {
+			page, err := c.ListLaunchTemplateVersions(ctx, req)
+			if err != nil {
+				yield(nil, err)
+				return
+			}
+			for _, item := range page.GetLaunchTemplates() {
+				if !yield(item, nil) {
+					return
+				}
+			}
+			if page.GetNextPageToken() == "" {
+				return
+			}
+			req.PageToken = page.GetNextPageToken()
+		}
+	}
+}
+
+// DeleteLaunchTemplateVersion deletes one version of a launch template, named
+// `{launch_template}@{version}`. The default version can't be deleted:
+// set another default first. A deleted version's number is never given
+// to another version.
+func (c *LaunchTemplateClient) DeleteLaunchTemplateVersion(ctx context.Context, req *DeleteLaunchTemplateVersionRequest) (*emptypb.Empty, error) {
+	n1, err := c.service.RelativeName("name", req.GetName(), "compute")
+	if err != nil {
+		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/launchTemplates/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*DeleteLaunchTemplateVersionRequest)
+		req.Name = n1
+	}
+	query, err := core.Query(req, "name")
+	if err != nil {
+		return nil, err
+	}
+	out := new(emptypb.Empty)
+	if err := c.service.Call(ctx, core.Request{
+		Method: http.MethodDelete,
+		Path:   "/v1beta1/" + p1 + ":deleteVersion",
 		Query:  query,
 	}, out); err != nil {
 		return nil, err

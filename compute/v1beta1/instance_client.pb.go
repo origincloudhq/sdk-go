@@ -165,8 +165,11 @@ func (c *InstanceClient) CreateInstance(ctx context.Context, req *CreateInstance
 }
 
 // LaunchInstance launches an instance from a recipe: the instance it describes, with a
-// network interface created from each interface spec it holds. Nothing
-// is created when the launch is refused, as for an invalid field, a
+// network interface created from each interface spec it holds. The
+// recipe is sent inline as `launch_template_data`, or is a version of a
+// launch template named by `launch_template`, with the fields set in
+// `launch_template_data` overriding that version's for this launch only.
+// Nothing is created when the launch is refused, as for an invalid field, a
 // quota or a subnet with no address left. The operation is done once
 // the instance is `RUNNING`, or failed once it is `FAILED`, with the
 // reason in `state_reason`; a failed instance still exists, keeps the
