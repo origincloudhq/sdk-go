@@ -213,3 +213,30 @@ func TestAFullNameOfAnotherServiceIsRefusedBeforeSending(t *testing.T) {
 		t.Errorf("sent %d calls", len(rec.calls))
 	}
 }
+
+// A launch template's versions are the template itself (AIP-162), so their
+// pager is named after its method, not after the field it shares with
+// AllLaunchTemplates.
+func TestAllLaunchTemplateVersionsFollowsThePages(t *testing.T) {
+	const template = "projects/p/launchTemplates/web"
+	pages := map[string]string{
+		"":   `{"launchTemplates":[{"name":"` + template + `@1"},{"name":"` + template + `@2"}],"nextPageToken":"p2"}`,
+		"p2": `{"launchTemplates":[{"name":"` + template + `@3"}]}`,
+	}
+	rec := &recorder{answer: func(r *http.Request) string { return pages[r.URL.Query().Get("pageToken")] }}
+	templates := computev1beta1.NewLaunchTemplateClient(newClient(t, rec))
+
+	var names []string
+	for version, err := range templates.AllLaunchTemplateVersions(context.Background(), &computev1beta1.ListLaunchTemplateVersionsRequest{Name: template}) {
+		if err != nil {
+			t.Fatal(err)
+		}
+		names = append(names, version.GetName())
+	}
+	if want := template + "@1," + template + "@2," + template + "@3"; strings.Join(names, ",") != want {
+		t.Fatalf("listed %v", names)
+	}
+	if len(rec.calls) != 2 || rec.calls[0].url.Path != "/v1beta1/"+template+":listVersions" {
+		t.Fatalf("sent %d calls, the first to %v", len(rec.calls), rec.calls[0].url)
+	}
+}
