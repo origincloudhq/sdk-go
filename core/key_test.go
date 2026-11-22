@@ -338,6 +338,7 @@ func TestACredentialsFileThatIsntOneIsRefused(t *testing.T) {
 			f["private_key"] = strings.ReplaceAll(f["private_key"], "PRIVATE", "PUBLIC")
 		},
 		"a relative url": func(f map[string]string) { f["sts_endpoint"] = "sts.origincloudapis.eu" },
+		"plain http":     func(f map[string]string) { f["sts_endpoint"] = "http://sts.example.com" },
 	} {
 		t.Run(name, func(t *testing.T) {
 			file := map[string]string{}

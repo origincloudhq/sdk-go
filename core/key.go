@@ -13,6 +13,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -95,8 +96,8 @@ func CredentialsFromJSON(data []byte) (*ServiceAccountKeyCredentials, error) {
 		return nil, errors.New("origincloud: the credentials file names no key or no service account")
 	}
 	endpoint, err := url.Parse(file.STSEndpoint)
-	if err != nil || endpoint.Host == "" || (endpoint.Scheme != "https" && endpoint.Scheme != "http") {
-		return nil, fmt.Errorf("origincloud: the credentials file's sts_endpoint %q is not a URL", file.STSEndpoint)
+	if err != nil || endpoint.Host == "" || !secureEndpoint(endpoint) {
+		return nil, fmt.Errorf("origincloud: the credentials file's sts_endpoint %q is not an https URL", file.STSEndpoint)
 	}
 	privateKey, err := parseES256Key(file.PrivateKey)
 	if err != nil {
@@ -224,4 +225,22 @@ func keyRefusal(status int, granted grantedToken, key string) error {
 	default:
 		return fmt.Errorf("origincloud: the security token service refused the assertion (HTTP %d): %s", status, granted.reason())
 	}
+}
+
+// secureEndpoint reports whether an assertion may be sent to endpoint: over
+// https, or over http to the loopback interface, as a local test server
+// answers. An assertion sent in the clear could be replayed until it expires.
+func secureEndpoint(endpoint *url.URL) bool {
+	switch endpoint.Scheme {
+	case "https":
+		return true
+	case "http":
+		host := endpoint.Hostname()
+		if host == "localhost" {
+			return true
+		}
+		ip := net.ParseIP(host)
+		return ip != nil && ip.IsLoopback()
+	}
+	return false
 }
