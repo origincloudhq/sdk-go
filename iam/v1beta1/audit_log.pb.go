@@ -109,7 +109,11 @@ type AuditLogEntry struct {
 	OccurTime *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=occur_time,json=occurTime,proto3" json:"occur_time,omitempty"`
 	// Details of the change that depend on the action, such as the `role`
 	// granted or a service account's `display_name`.
-	Details       map[string]string `protobuf:"bytes,8,rep,name=details,proto3" json:"details,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Details map[string]string `protobuf:"bytes,8,rep,name=details,proto3" json:"details,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// Who acted for `actor` when the change was made: the hosted MCP server,
+	// by the SPIFFE id of its workload, when `actor` made the change through
+	// it. Empty when no one acted for `actor`.
+	ActingParty   string `protobuf:"bytes,9,opt,name=acting_party,json=actingParty,proto3" json:"acting_party,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -198,6 +202,13 @@ func (x *AuditLogEntry) GetDetails() map[string]string {
 		return x.Details
 	}
 	return nil
+}
+
+func (x *AuditLogEntry) GetActingParty() string {
+	if x != nil {
+		return x.ActingParty
+	}
+	return ""
 }
 
 // The request for GetAuditLogEntry.
@@ -428,7 +439,7 @@ var File_origincloud_iam_v1beta1_audit_log_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_audit_log_proto_rawDesc = "" +
 	"\n" +
-	"'origincloud/iam/v1beta1/audit_log.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd6\x05\n" +
+	"'origincloud/iam/v1beta1/audit_log.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xff\x05\n" +
 	"\rAuditLogEntry\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12M\n" +
 	"\aproject\x18\x02 \x01(\tB3\xe2A\x01\x03\xfaA,\n" +
@@ -443,7 +454,8 @@ const file_origincloud_iam_v1beta1_audit_log_proto_rawDesc = "" +
 	"\aoutcome\x18\x06 \x01(\x0e2..origincloud.iam.v1beta1.AuditLogEntry.OutcomeB\x04\xe2A\x01\x03R\aoutcome\x12?\n" +
 	"\n" +
 	"occur_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\toccurTime\x12S\n" +
-	"\adetails\x18\b \x03(\v23.origincloud.iam.v1beta1.AuditLogEntry.DetailsEntryB\x04\xe2A\x01\x03R\adetails\x1a:\n" +
+	"\adetails\x18\b \x03(\v23.origincloud.iam.v1beta1.AuditLogEntry.DetailsEntryB\x04\xe2A\x01\x03R\adetails\x12'\n" +
+	"\facting_party\x18\t \x01(\tB\x04\xe2A\x01\x03R\vactingParty\x1a:\n" +
 	"\fDetailsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"I\n" +
