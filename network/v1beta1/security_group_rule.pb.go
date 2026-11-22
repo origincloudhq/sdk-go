@@ -141,7 +141,7 @@ func (SecurityGroupRule_Protocol) EnumDescriptor() ([]byte, []int) {
 
 // A security group rule: the traffic it allows in one direction, to or from
 // one peer. Set exactly one of `cidr_block`, `peer_security_group` and
-// `same_group`.
+// `same_group`: they are the oneof `peer`.
 type SecurityGroupRule struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The rule's resource name.
@@ -161,16 +161,15 @@ type SecurityGroupRule struct {
 	// The last port the rule matches, above `first_port`; 0 for the single
 	// port `first_port`, or with `first_port` 0 for every port.
 	LastPort int32 `protobuf:"varint,5,opt,name=last_port,json=lastPort,proto3" json:"last_port,omitempty"`
-	// The peer as an address range: where admitted traffic comes from, or
-	// where sent traffic goes to.
-	CidrBlock string `protobuf:"bytes,6,opt,name=cidr_block,json=cidrBlock,proto3" json:"cidr_block,omitempty"`
-	// The peer as another security group of the same VPC, by its full name:
-	// its members'
-	// addresses. The rule's own group is refused here with
-	// `INVALID_ARGUMENT`: it is `same_group`.
-	PeerSecurityGroup string `protobuf:"bytes,7,opt,name=peer_security_group,json=peerSecurityGroup,proto3" json:"peer_security_group,omitempty"`
-	// The peer as the rule's own group's members.
-	SameGroup bool `protobuf:"varint,8,opt,name=same_group,json=sameGroup,proto3" json:"same_group,omitempty"`
+	// The rule's peer: exactly one of these. None, or more than one, is
+	// refused with `INVALID_ARGUMENT`.
+	//
+	// Types that are valid to be assigned to Peer:
+	//
+	//	*SecurityGroupRule_CidrBlock
+	//	*SecurityGroupRule_PeerSecurityGroup
+	//	*SecurityGroupRule_SameGroup
+	Peer isSecurityGroupRule_Peer `protobuf_oneof:"peer"`
 	// What the rule is for.
 	Description   string `protobuf:"bytes,9,opt,name=description,proto3" json:"description,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -242,23 +241,36 @@ func (x *SecurityGroupRule) GetLastPort() int32 {
 	return 0
 }
 
+func (x *SecurityGroupRule) GetPeer() isSecurityGroupRule_Peer {
+	if x != nil {
+		return x.Peer
+	}
+	return nil
+}
+
 func (x *SecurityGroupRule) GetCidrBlock() string {
 	if x != nil {
-		return x.CidrBlock
+		if x, ok := x.Peer.(*SecurityGroupRule_CidrBlock); ok {
+			return x.CidrBlock
+		}
 	}
 	return ""
 }
 
 func (x *SecurityGroupRule) GetPeerSecurityGroup() string {
 	if x != nil {
-		return x.PeerSecurityGroup
+		if x, ok := x.Peer.(*SecurityGroupRule_PeerSecurityGroup); ok {
+			return x.PeerSecurityGroup
+		}
 	}
 	return ""
 }
 
 func (x *SecurityGroupRule) GetSameGroup() bool {
 	if x != nil {
-		return x.SameGroup
+		if x, ok := x.Peer.(*SecurityGroupRule_SameGroup); ok {
+			return x.SameGroup
+		}
 	}
 	return false
 }
@@ -269,6 +281,34 @@ func (x *SecurityGroupRule) GetDescription() string {
 	}
 	return ""
 }
+
+type isSecurityGroupRule_Peer interface {
+	isSecurityGroupRule_Peer()
+}
+
+type SecurityGroupRule_CidrBlock struct {
+	// The peer as an address range: where admitted traffic comes from, or
+	// where sent traffic goes to.
+	CidrBlock string `protobuf:"bytes,6,opt,name=cidr_block,json=cidrBlock,proto3,oneof"`
+}
+
+type SecurityGroupRule_PeerSecurityGroup struct {
+	// The peer as another security group of the same VPC, by its full
+	// name: its members' addresses. The rule's own group is refused here
+	// with `INVALID_ARGUMENT`: it is `same_group`.
+	PeerSecurityGroup string `protobuf:"bytes,7,opt,name=peer_security_group,json=peerSecurityGroup,proto3,oneof"`
+}
+
+type SecurityGroupRule_SameGroup struct {
+	// The peer as the rule's own group's members; only `true` is a peer.
+	SameGroup bool `protobuf:"varint,8,opt,name=same_group,json=sameGroup,proto3,oneof"`
+}
+
+func (*SecurityGroupRule_CidrBlock) isSecurityGroupRule_Peer() {}
+
+func (*SecurityGroupRule_PeerSecurityGroup) isSecurityGroupRule_Peer() {}
+
+func (*SecurityGroupRule_SameGroup) isSecurityGroupRule_Peer() {}
 
 // The request for GetSecurityGroupRule.
 type GetSecurityGroupRuleRequest struct {
@@ -563,20 +603,20 @@ var File_origincloud_network_v1beta1_security_group_rule_proto protoreflect.File
 
 const file_origincloud_network_v1beta1_security_group_rule_proto_rawDesc = "" +
 	"\n" +
-	"5origincloud/network/v1beta1/security_group_rule.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xc5\x06\n" +
+	"5origincloud/network/v1beta1/security_group_rule.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xd0\x06\n" +
 	"\x11SecurityGroupRule\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12]\n" +
 	"\tdirection\x18\x02 \x01(\x0e28.origincloud.network.v1beta1.SecurityGroupRule.DirectionB\x05\xe2A\x02\x02\x05R\tdirection\x12Z\n" +
 	"\bprotocol\x18\x03 \x01(\x0e27.origincloud.network.v1beta1.SecurityGroupRule.ProtocolB\x05\xe2A\x02\x02\x05R\bprotocol\x12$\n" +
 	"\n" +
 	"first_port\x18\x04 \x01(\x05B\x05\xe2A\x02\x05\x01R\tfirstPort\x12\"\n" +
-	"\tlast_port\x18\x05 \x01(\x05B\x05\xe2A\x02\x05\x01R\blastPort\x12$\n" +
+	"\tlast_port\x18\x05 \x01(\x05B\x05\xe2A\x02\x05\x01R\blastPort\x12%\n" +
 	"\n" +
-	"cidr_block\x18\x06 \x01(\tB\x05\xe2A\x02\x05\x01R\tcidrBlock\x12b\n" +
-	"\x13peer_security_group\x18\a \x01(\tB2\xe2A\x02\x05\x01\xfaA*\n" +
-	"(network.origincloudapis.eu/SecurityGroupR\x11peerSecurityGroup\x12$\n" +
+	"cidr_block\x18\x06 \x01(\tB\x04\xe2A\x01\x05H\x00R\tcidrBlock\x12c\n" +
+	"\x13peer_security_group\x18\a \x01(\tB1\xe2A\x01\x05\xfaA*\n" +
+	"(network.origincloudapis.eu/SecurityGroupH\x00R\x11peerSecurityGroup\x12%\n" +
 	"\n" +
-	"same_group\x18\b \x01(\bB\x05\xe2A\x02\x05\x01R\tsameGroup\x12'\n" +
+	"same_group\x18\b \x01(\bB\x04\xe2A\x01\x05H\x00R\tsameGroup\x12'\n" +
 	"\vdescription\x18\t \x01(\tB\x05\xe2A\x02\x05\x01R\vdescription\"?\n" +
 	"\tDirection\x12\x19\n" +
 	"\x15DIRECTION_UNSPECIFIED\x10\x00\x12\v\n" +
@@ -589,7 +629,8 @@ const file_origincloud_network_v1beta1_security_group_rule_proto_rawDesc = "" +
 	"\x03TCP\x10\x02\x12\a\n" +
 	"\x03UDP\x10\x03\x12\b\n" +
 	"\x04ICMP\x10\x04:\xab\x01\xeaA\xa7\x01\n" +
-	",network.origincloudapis.eu/SecurityGroupRule\x12Pprojects/{project}/regions/{region}/securityGroups/{security_group}/rules/{rule}*\x12securityGroupRules2\x11securityGroupRule\"h\n" +
+	",network.origincloudapis.eu/SecurityGroupRule\x12Pprojects/{project}/regions/{region}/securityGroups/{security_group}/rules/{rule}*\x12securityGroupRules2\x11securityGroupRuleB\x06\n" +
+	"\x04peer\"h\n" +
 	"\x1bGetSecurityGroupRuleRequest\x12I\n" +
 	"\x04name\x18\x01 \x01(\tB5\xe2A\x01\x02\xfaA.\n" +
 	",network.origincloudapis.eu/SecurityGroupRuleR\x04name\"\xb6\x01\n" +
@@ -668,6 +709,11 @@ func init() { file_origincloud_network_v1beta1_security_group_rule_proto_init() 
 func file_origincloud_network_v1beta1_security_group_rule_proto_init() {
 	if File_origincloud_network_v1beta1_security_group_rule_proto != nil {
 		return
+	}
+	file_origincloud_network_v1beta1_security_group_rule_proto_msgTypes[0].OneofWrappers = []any{
+		(*SecurityGroupRule_CidrBlock)(nil),
+		(*SecurityGroupRule_PeerSecurityGroup)(nil),
+		(*SecurityGroupRule_SameGroup)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
