@@ -25,7 +25,7 @@ const (
 )
 
 // A route: traffic to `destination` leaves through one gateway. Set exactly
-// one of `internet_gateway` and `nat_gateway`.
+// one of `internet_gateway` and `nat_gateway`: they are the oneof `target`.
 type Route struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The route's resource name.
@@ -34,15 +34,14 @@ type Route struct {
 	// address and prefix length 0, or the IPv6 one, `::/0`. A route table
 	// decides only where traffic to the internet goes.
 	Destination string `protobuf:"bytes,2,opt,name=destination,proto3" json:"destination,omitempty"`
-	// The full name of the internet gateway of the table's VPC to send the
-	// traffic to.
-	InternetGateway string `protobuf:"bytes,3,opt,name=internet_gateway,json=internetGateway,proto3" json:"internet_gateway,omitempty"`
-	// The full name of the NAT gateway in the table's VPC to send the traffic
-	// to, for the
-	// IPv4 default route only: a NAT gateway translates IPv4 only. Named in
-	// the gateway's own zone; a name with another zone is refused with
-	// `INVALID_ARGUMENT`.
-	NatGateway    string `protobuf:"bytes,4,opt,name=nat_gateway,json=natGateway,proto3" json:"nat_gateway,omitempty"`
+	// Where the traffic leaves: exactly one of these. None, or more than one,
+	// is refused with `INVALID_ARGUMENT`.
+	//
+	// Types that are valid to be assigned to Target:
+	//
+	//	*Route_InternetGateway
+	//	*Route_NatGateway
+	Target        isRoute_Target `protobuf_oneof:"target"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -91,19 +90,52 @@ func (x *Route) GetDestination() string {
 	return ""
 }
 
+func (x *Route) GetTarget() isRoute_Target {
+	if x != nil {
+		return x.Target
+	}
+	return nil
+}
+
 func (x *Route) GetInternetGateway() string {
 	if x != nil {
-		return x.InternetGateway
+		if x, ok := x.Target.(*Route_InternetGateway); ok {
+			return x.InternetGateway
+		}
 	}
 	return ""
 }
 
 func (x *Route) GetNatGateway() string {
 	if x != nil {
-		return x.NatGateway
+		if x, ok := x.Target.(*Route_NatGateway); ok {
+			return x.NatGateway
+		}
 	}
 	return ""
 }
+
+type isRoute_Target interface {
+	isRoute_Target()
+}
+
+type Route_InternetGateway struct {
+	// The full name of the internet gateway of the table's VPC to send the
+	// traffic to.
+	InternetGateway string `protobuf:"bytes,3,opt,name=internet_gateway,json=internetGateway,proto3,oneof"`
+}
+
+type Route_NatGateway struct {
+	// The full name of the NAT gateway in the table's VPC to send the
+	// traffic to, for the IPv4 default route only: a NAT gateway
+	// translates IPv4 only. Named in the gateway's own zone; a name with
+	// another zone is refused with `INVALID_ARGUMENT`.
+	NatGateway string `protobuf:"bytes,4,opt,name=nat_gateway,json=natGateway,proto3,oneof"`
+}
+
+func (*Route_InternetGateway) isRoute_Target() {}
+
+func (*Route_NatGateway) isRoute_Target() {}
 
 // The request for GetRoute.
 type GetRouteRequest struct {
@@ -398,16 +430,17 @@ var File_origincloud_network_v1beta1_route_proto protoreflect.FileDescriptor
 
 const file_origincloud_network_v1beta1_route_proto_rawDesc = "" +
 	"\n" +
-	"'origincloud/network/v1beta1/route.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x82\x03\n" +
+	"'origincloud/network/v1beta1/route.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x8e\x03\n" +
 	"\x05Route\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12'\n" +
-	"\vdestination\x18\x02 \x01(\tB\x05\xe2A\x02\x02\x05R\vdestination\x12_\n" +
-	"\x10internet_gateway\x18\x03 \x01(\tB4\xe2A\x02\x05\x01\xfaA,\n" +
-	"*network.origincloudapis.eu/InternetGatewayR\x0finternetGateway\x12P\n" +
-	"\vnat_gateway\x18\x04 \x01(\tB/\xe2A\x02\x05\x01\xfaA'\n" +
-	"%network.origincloudapis.eu/NatGatewayR\n" +
+	"\vdestination\x18\x02 \x01(\tB\x05\xe2A\x02\x02\x05R\vdestination\x12`\n" +
+	"\x10internet_gateway\x18\x03 \x01(\tB3\xe2A\x01\x05\xfaA,\n" +
+	"*network.origincloudapis.eu/InternetGatewayH\x00R\x0finternetGateway\x12Q\n" +
+	"\vnat_gateway\x18\x04 \x01(\tB.\xe2A\x01\x05\xfaA'\n" +
+	"%network.origincloudapis.eu/NatGatewayH\x00R\n" +
 	"natGateway:\x82\x01\xeaA\x7f\n" +
-	" network.origincloudapis.eu/Route\x12Lprojects/{project}/regions/{region}/routeTables/{route_table}/routes/{route}*\x06routes2\x05route\"P\n" +
+	" network.origincloudapis.eu/Route\x12Lprojects/{project}/regions/{region}/routeTables/{route_table}/routes/{route}*\x06routes2\x05routeB\b\n" +
+	"\x06target\"P\n" +
 	"\x0fGetRouteRequest\x12=\n" +
 	"\x04name\x18\x01 \x01(\tB)\xe2A\x01\x02\xfaA\"\n" +
 	" network.origincloudapis.eu/RouteR\x04name\"\x9e\x01\n" +
@@ -482,6 +515,10 @@ func init() { file_origincloud_network_v1beta1_route_proto_init() }
 func file_origincloud_network_v1beta1_route_proto_init() {
 	if File_origincloud_network_v1beta1_route_proto != nil {
 		return
+	}
+	file_origincloud_network_v1beta1_route_proto_msgTypes[0].OneofWrappers = []any{
+		(*Route_InternetGateway)(nil),
+		(*Route_NatGateway)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

@@ -158,7 +158,7 @@ func TestASecurityGroupRulesPeerRoundTripsThroughItsOperation(t *testing.T) {
 		Parent: group,
 		SecurityGroupRule: &networkv1beta1.SecurityGroupRule{
 			Direction: networkv1beta1.SecurityGroupRule_INGRESS, Protocol: networkv1beta1.SecurityGroupRule_TCP,
-			FirstPort: 22, LastPort: 22, PeerSecurityGroup: peer,
+			FirstPort: 22, LastPort: 22, Peer: &networkv1beta1.SecurityGroupRule_PeerSecurityGroup{PeerSecurityGroup: peer},
 		},
 	})
 	if err != nil {

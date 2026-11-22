@@ -122,24 +122,24 @@ func TestEachRoleBindingBindingIsSentAsItsHTTPRuleSays(t *testing.T) {
 	}
 }
 
-// The client secret is shown once, in the response that created the
-// service account.
-func TestCreateServiceAccountAnswersWithItsClientSecret(t *testing.T) {
-	rec := &recorder{body: `{"name":"organizations/o/serviceAccounts/s","displayName":"CI","member":"serviceAccount:s",` +
-		`"clientId":"sa-s","clientSecret":"shown-once","state":"ACTIVE"}`}
-	accounts := iamv1beta1.NewServiceAccountClient(newClient(t, rec))
+// The credentials file is shown once, in the response that created the
+// key.
+func TestCreateServiceAccountKeyAnswersWithItsCredentialsFile(t *testing.T) {
+	rec := &recorder{body: `{"name":"organizations/o/serviceAccounts/s/keys/k","algorithm":"ES256","state":"ACTIVE",` +
+		`"credentialsFile":"{\"type\":\"service_account_key\"}"}`}
+	keys := iamv1beta1.NewServiceAccountKeyClient(newClient(t, rec))
 
-	account, err := accounts.CreateServiceAccount(context.Background(), &iamv1beta1.CreateServiceAccountRequest{
-		Parent: "organizations/o", ServiceAccount: &iamv1beta1.ServiceAccount{DisplayName: "CI"},
+	key, err := keys.CreateServiceAccountKey(context.Background(), &iamv1beta1.CreateServiceAccountKeyRequest{
+		Parent: "organizations/o/serviceAccounts/s",
 	})
 	if err != nil {
 		t.Fatal(err)
 	}
-	if account.GetClientSecret() != "shown-once" || account.GetClientId() != "sa-s" || account.GetState() != iamv1beta1.ServiceAccount_ACTIVE {
-		t.Errorf("got %v", account)
+	if key.GetCredentialsFile() != `{"type":"service_account_key"}` || key.GetName() != "organizations/o/serviceAccounts/s/keys/k" {
+		t.Errorf("got %v", key)
 	}
-	if got := rec.calls[0]; got.method != "POST" || got.url.Path != "/v1beta1/organizations/o/serviceAccounts" ||
-		!sameJSON(got.body, `{"displayName":"CI"}`) || !uuid.MatchString(got.url.Query().Get("requestId")) || len(got.url.Query()) != 1 {
+	if got := rec.calls[0]; got.method != "POST" || got.url.Path != "/v1beta1/organizations/o/serviceAccounts/s/keys" ||
+		!uuid.MatchString(got.url.Query().Get("requestId")) || len(got.url.Query()) != 1 {
 		t.Errorf("create: %s %s %s", got.method, got.url, got.body)
 	}
 }
@@ -171,30 +171,30 @@ func (l *lostAnswer) RoundTrip(req *http.Request) (*http.Response, error) {
 }
 
 // A create whose answer was lost is sent again with the same request id.
-// The server already created the account then, and the client secret went
+// The server already created the key then, and its credentials file went
 // out with the lost answer: the repeat is refused with CONFLICT, naming
-// the account, and not sent a third time.
-func TestARepeatedCreateServiceAccountIsAConflictNamingTheAccount(t *testing.T) {
+// the key, and not sent a third time.
+func TestARepeatedCreateServiceAccountKeyIsAConflictNamingTheKey(t *testing.T) {
 	transport := &lostAnswer{status: http.StatusConflict, body: `{"error":{"code":409,"status":"FAILED_PRECONDITION",` +
-		`"message":"the service account organizations/o/serviceAccounts/s was created by an earlier request with this request_id; ` +
-		`its client secret was returned only to that request. To get a working secret, delete that account and create a new one",` +
+		`"message":"the service account key organizations/o/serviceAccounts/s/keys/k was created by an earlier request with this request_id; ` +
+		`its credentials file was returned only to that request. Delete that key and create a new one",` +
 		`"details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"CONFLICT","domain":"origincloudapis.eu",` +
-		`"metadata":{"serviceAccount":"organizations/o/serviceAccounts/s"}},` +
+		`"metadata":{"serviceAccountKey":"organizations/o/serviceAccounts/s/keys/k"}},` +
 		`{"@type":"type.googleapis.com/google.rpc.RequestInfo","requestId":"7d3c1a2b9e8f4051"}]}}`}
 	client, err := core.NewClient(context.Background(), core.WithCredentials(core.AccessToken("t")), core.WithHTTPClient(&http.Client{Transport: transport}))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	account, err := iamv1beta1.NewServiceAccountClient(client).CreateServiceAccount(context.Background(), &iamv1beta1.CreateServiceAccountRequest{
-		Parent: "organizations/o", ServiceAccount: &iamv1beta1.ServiceAccount{DisplayName: "CI"},
+	key, err := iamv1beta1.NewServiceAccountKeyClient(client).CreateServiceAccountKey(context.Background(), &iamv1beta1.CreateServiceAccountKeyRequest{
+		Parent: "organizations/o/serviceAccounts/s",
 	})
 	var apiErr *core.Error
 	if !errors.As(err, &apiErr) {
-		t.Fatalf("CreateServiceAccount = %v, %v; want a *core.Error", account, err)
+		t.Fatalf("CreateServiceAccountKey = %v, %v; want a *core.Error", key, err)
 	}
 	if apiErr.HTTPStatus != http.StatusConflict || apiErr.Reason != "CONFLICT" ||
-		apiErr.Metadata["serviceAccount"] != "organizations/o/serviceAccounts/s" {
+		apiErr.Metadata["serviceAccountKey"] != "organizations/o/serviceAccounts/s/keys/k" {
 		t.Errorf("error = %+v", apiErr)
 	}
 	if len(transport.calls) != 2 {
