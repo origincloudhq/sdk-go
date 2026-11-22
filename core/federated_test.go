@@ -398,22 +398,6 @@ func TestATokenFileComesBeforeTheGitHubActionsJobsToken(t *testing.T) {
 	}
 }
 
-func TestAServiceAccountInTheEnvironmentComesBeforeAJobToken(t *testing.T) {
-	clearCredentialEnv(t)
-	t.Setenv(envGitHubTokenURL, "https://github.test/idtoken?api-version=2.0")
-	t.Setenv(envGitHubRequestToken, gitHubRequestToken)
-	t.Setenv(envClientID, "id")
-	t.Setenv(envClientSecret, "secret")
-
-	credentials, err := DefaultCredentials(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, ok := credentials.(*ServiceAccountCredentials); !ok {
-		t.Fatalf("credentials = %T, want a service account's", credentials)
-	}
-}
-
 // A variable that is set but blank is still the credential, as in the
 // other SDKs: the job meant to hand over a token, so it hears that it's
 // empty instead of being sent to the next source.

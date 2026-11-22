@@ -223,34 +223,44 @@ var (
 	errSTSUnavailable  = errors.New("origincloud: the security token service can't check the CI job's OIDC token now (HTTP 503): try again later")
 )
 
-// exchange exchanges the job's token for an access token. A 503 is sent
-// again, up to stsAttempts in all.
+// exchange exchanges the job's token for an access token.
 func (c *FederatedCredentials) exchange(ctx context.Context, subject string) (grantedToken, error) {
 	endpoint := c.Endpoint
 	if endpoint == "" {
 		endpoint = STSEndpoint
 	}
-	endpoint = strings.TrimSuffix(endpoint, "/") + "/v1/token"
-	form := url.Values{
+	status, granted, err := exchangeAtSTS(ctx, c.HTTPClient, endpoint, url.Values{
 		"grant_type":         {tokenExchangeGrant},
 		"subject_token":      {subject},
 		"subject_token_type": {jwtTokenType},
+	})
+	if err != nil {
+		return grantedToken{}, err
 	}
+	if status == http.StatusServiceUnavailable {
+		return grantedToken{}, errSTSUnavailable
+	}
+	return granted, stsRefusal(status, granted)
+}
+
+// exchangeAtSTS sends form to the token endpoint of the security token
+// service at endpoint, and returns the answer's status and token. A 503 is
+// sent again, up to stsAttempts in all; the last one's status is returned
+// without an error, for the caller to say what was refused.
+func exchangeAtSTS(ctx context.Context, client *http.Client, endpoint string, form url.Values) (int, grantedToken, error) {
+	endpoint = strings.TrimSuffix(endpoint, "/") + "/v1/token"
 	delay := stsRetryDelay
 	for attempt := 1; ; attempt++ {
-		status, granted, err := postToken(ctx, c.HTTPClient, endpoint, form)
+		status, granted, err := postToken(ctx, client, endpoint, form)
 		if status != http.StatusServiceUnavailable {
-			if err != nil {
-				return grantedToken{}, err
-			}
-			return granted, stsRefusal(status, granted)
+			return status, granted, err
 		}
 		if attempt == stsAttempts {
-			return grantedToken{}, errSTSUnavailable
+			return status, grantedToken{}, nil
 		}
 		select {
 		case <-ctx.Done():
-			return grantedToken{}, fmt.Errorf("origincloud: exchanging the CI job's OIDC token: %w", ctx.Err())
+			return 0, grantedToken{}, fmt.Errorf("origincloud: exchanging a token at the security token service: %w", ctx.Err())
 		case <-time.After(delay):
 		}
 		delay *= 2

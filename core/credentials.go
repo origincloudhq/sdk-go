@@ -17,9 +17,8 @@ import (
 	"time"
 )
 
-// TokenURL is the identity provider's token endpoint, where service
-// account credentials and the CLI's session are exchanged for access
-// tokens.
+// TokenURL is the identity provider's token endpoint, where the CLI's
+// session is renewed.
 const TokenURL = "https://auth.origincloud.eu/realms/origincloud/protocol/openid-connect/token"
 
 // MetadataEndpoint is the instance's metadata service, which hands out the
@@ -27,9 +26,7 @@ const TokenURL = "https://auth.origincloud.eu/realms/origincloud/protocol/openid
 const MetadataEndpoint = "http://169.254.169.254"
 
 const (
-	envAccessToken  = "ORIGINCLOUD_ACCESS_TOKEN"
-	envClientID     = "ORIGINCLOUD_CLIENT_ID"
-	envClientSecret = "ORIGINCLOUD_CLIENT_SECRET"
+	envAccessToken = "ORIGINCLOUD_ACCESS_TOKEN"
 
 	envMetadataDisabled = "ORIGINCLOUD_METADATA_DISABLED"
 	envMetadataEndpoint = "ORIGINCLOUD_METADATA_ENDPOINT"
@@ -77,7 +74,7 @@ type Credentials interface {
 // holds any and ORIGINCLOUD_METADATA_DISABLED is true, and by
 // [InstanceMetadataCredentials.Token] when no Origin Cloud metadata service
 // answers.
-var ErrNoCredentials = errors.New("origincloud: no credentials: set ORIGINCLOUD_CLIENT_ID and ORIGINCLOUD_CLIENT_SECRET, set ORIGINCLOUD_ACCESS_TOKEN, run in a GitHub Actions job with `permissions: id-token: write`, set ORIGINCLOUD_OIDC_TOKEN_FILE or ORIGINCLOUD_OIDC_TOKEN, log in with `origin id login`, or run on an instance that runs as a service account")
+var ErrNoCredentials = errors.New("origincloud: no credentials: set ORIGINCLOUD_CREDENTIALS_FILE to a service account key's credentials file, set ORIGINCLOUD_ACCESS_TOKEN, run in a GitHub Actions job with `permissions: id-token: write`, set ORIGINCLOUD_OIDC_TOKEN_FILE or ORIGINCLOUD_OIDC_TOKEN, log in with `origin id login`, or run on an instance that runs as a service account")
 
 // DefaultCredentials returns the first credentials found, in the order
 // the package documentation lists. Neither a CI job's OIDC token nor the
@@ -87,12 +84,8 @@ func DefaultCredentials(ctx context.Context) (Credentials, error) {
 	if token := os.Getenv(envAccessToken); token != "" {
 		return AccessToken(token), nil
 	}
-	id, secret := os.Getenv(envClientID), os.Getenv(envClientSecret)
-	switch {
-	case id != "" && secret != "":
-		return ServiceAccount(id, secret), nil
-	case id != "" || secret != "":
-		return nil, fmt.Errorf("origincloud: %s and %s must be set together", envClientID, envClientSecret)
+	if path := os.Getenv(envCredentialsFile); path != "" {
+		return CredentialsFromFile(path)
 	}
 	if federated := federatedFromEnvironment(); federated != nil {
 		return federated, nil
@@ -120,42 +113,6 @@ func AccessToken(token string) Credentials {
 type staticToken string
 
 func (t staticToken) Token(context.Context) (string, error) { return string(t), nil }
-
-// ServiceAccount returns credentials that exchange a service account's
-// client ID and secret for access tokens, with the client credentials
-// grant, as they expire.
-func ServiceAccount(clientID, clientSecret string) Credentials {
-	return &ServiceAccountCredentials{ClientID: clientID, ClientSecret: clientSecret}
-}
-
-// ServiceAccountCredentials exchange a service account's client ID and
-// secret for access tokens as they expire.
-type ServiceAccountCredentials struct {
-	ClientID     string
-	ClientSecret string
-	// TokenURL is where tokens are requested; [TokenURL] when empty.
-	TokenURL string
-	// HTTPClient sends the token requests; [http.DefaultClient] when nil.
-	HTTPClient *http.Client
-
-	cache tokenCache
-}
-
-// Token returns the current access token, requesting a new one when it is
-// about to expire.
-func (c *ServiceAccountCredentials) Token(ctx context.Context) (string, error) {
-	return c.cache.get(func() (string, time.Time, error) {
-		granted, err := requestToken(ctx, c.HTTPClient, c.TokenURL, url.Values{
-			"grant_type":    {"client_credentials"},
-			"client_id":     {c.ClientID},
-			"client_secret": {c.ClientSecret},
-		})
-		if err != nil {
-			return "", time.Time{}, err
-		}
-		return granted.AccessToken, granted.expiry(), nil
-	})
-}
 
 // CLISession returns the session the origin CLI stored at its last login,
 // renewed from its refresh token when its access token has expired. The

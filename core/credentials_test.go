@@ -22,7 +22,7 @@ import (
 func clearCredentialEnv(t *testing.T) string {
 	t.Helper()
 	for _, name := range []string{
-		envAccessToken, envClientID, envClientSecret, envMetadataDisabled, envMetadataEndpoint, envRegion,
+		envAccessToken, envCredentialsFile, envMetadataDisabled, envMetadataEndpoint, envRegion,
 		envOIDCDisabled, envOIDCTokenFile, envOIDCToken, envOIDCAudience, envSTSEndpoint, envGitHubTokenURL, envGitHubRequestToken, envTFCToken, envTFCTag,
 	} {
 		t.Setenv(name, "")
@@ -43,9 +43,9 @@ func tokenServer(t *testing.T, expiresIn int) (*httptest.Server, *atomic.Int32, 
 			t.Errorf("parsing the token request: %v", err)
 		}
 		form.Store(r.PostForm)
-		if r.PostForm.Get("client_secret") == "wrong" {
-			w.WriteHeader(http.StatusUnauthorized)
-			_ = json.NewEncoder(w).Encode(map[string]string{"error": "unauthorized_client", "error_description": "Invalid client secret"})
+		if r.PostForm.Get("refresh_token") == "wrong" {
+			w.WriteHeader(http.StatusBadRequest)
+			_ = json.NewEncoder(w).Encode(map[string]string{"error": "invalid_grant", "error_description": "Token is not active"})
 			return
 		}
 		n := issued.Add(1)
@@ -63,8 +63,7 @@ func tokenServer(t *testing.T, expiresIn int) (*httptest.Server, *atomic.Int32, 
 func TestAnAccessTokenInTheEnvironmentComesFirst(t *testing.T) {
 	clearCredentialEnv(t)
 	t.Setenv(envAccessToken, "from-env")
-	t.Setenv(envClientID, "id")
-	t.Setenv(envClientSecret, "secret")
+	t.Setenv(envCredentialsFile, filepath.Join(t.TempDir(), "missing.json"))
 
 	credentials, err := DefaultCredentials(context.Background())
 	if err != nil {
@@ -72,31 +71,6 @@ func TestAnAccessTokenInTheEnvironmentComesFirst(t *testing.T) {
 	}
 	if token, _ := credentials.Token(context.Background()); token != "from-env" {
 		t.Fatalf("token = %q, want the environment's", token)
-	}
-}
-
-func TestAServiceAccountInTheEnvironmentComesBeforeTheCLISession(t *testing.T) {
-	dir := clearCredentialEnv(t)
-	writeSession(t, dir, time.Now().Add(time.Hour), time.Now().Add(time.Hour))
-	t.Setenv(envClientID, "id")
-	t.Setenv(envClientSecret, "secret")
-
-	credentials, err := DefaultCredentials(context.Background())
-	if err != nil {
-		t.Fatal(err)
-	}
-	if _, ok := credentials.(*ServiceAccountCredentials); !ok {
-		t.Fatalf("credentials = %T, want a service account's", credentials)
-	}
-}
-
-func TestHalfAServiceAccountIsRefused(t *testing.T) {
-	clearCredentialEnv(t)
-	t.Setenv(envClientID, "id")
-
-	_, err := DefaultCredentials(context.Background())
-	if err == nil || !strings.Contains(err.Error(), "must be set together") {
-		t.Fatalf("err = %v, want the pair refused", err)
 	}
 }
 
@@ -143,47 +117,12 @@ func TestTheMetadataEndpointCanBeMovedInTheEnvironment(t *testing.T) {
 	}
 }
 
-func TestAServiceAccountTokenIsReusedUntilItIsAboutToExpire(t *testing.T) {
-	server, issued, form := tokenServer(t, 300)
-	credentials := &ServiceAccountCredentials{ClientID: "id", ClientSecret: "secret", TokenURL: server.URL}
-
-	for range 3 {
-		if token, err := credentials.Token(context.Background()); err != nil || token != "token-1" {
-			t.Fatalf("Token() = %q, %v; want token-1", token, err)
-		}
-	}
-	if n := issued.Load(); n != 1 {
-		t.Fatalf("%d tokens requested, want 1", n)
-	}
-	got := form.Load().(url.Values)
-	if got["grant_type"][0] != "client_credentials" || got["client_id"][0] != "id" || got["client_secret"][0] != "secret" {
-		t.Fatalf("token request = %v", got)
-	}
-
-	// A token within the margin of its expiry is replaced.
-	expiring := &ServiceAccountCredentials{ClientID: "id", ClientSecret: "secret"}
-	tokenServerExpiry(t, expiring, 10)
-	if token, _ := expiring.Token(context.Background()); token != "token-1" {
-		t.Fatalf("token = %q", token)
-	}
-	if token, _ := expiring.Token(context.Background()); token != "token-2" {
-		t.Fatalf("a token about to expire was reused: %q", token)
-	}
-}
-
-// tokenServerExpiry points c at a token server whose tokens expire after
-// expiresIn seconds.
-func tokenServerExpiry(t *testing.T, c *ServiceAccountCredentials, expiresIn int) {
-	server, _, _ := tokenServer(t, expiresIn)
-	c.TokenURL = server.URL
-}
-
-func TestARefusedServiceAccountSaysWhy(t *testing.T) {
+func TestARefusedCLISessionRenewalSaysWhy(t *testing.T) {
 	server, _, _ := tokenServer(t, 300)
-	credentials := &ServiceAccountCredentials{ClientID: "id", ClientSecret: "wrong", TokenURL: server.URL}
+	credentials := &CLISessionCredentials{TokenURL: server.URL, refreshToken: "wrong", refreshExpiry: time.Now().Add(time.Hour)}
 
 	_, err := credentials.Token(context.Background())
-	if err == nil || !strings.Contains(err.Error(), "Invalid client secret") {
+	if err == nil || !strings.Contains(err.Error(), "Token is not active") {
 		t.Fatalf("err = %v, want the identity provider's reason", err)
 	}
 }

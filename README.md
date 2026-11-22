@@ -79,9 +79,10 @@ func main() {
 `core.NewClient` takes the first of:
 
 1. `ORIGINCLOUD_ACCESS_TOKEN`: an access token, sent as it is.
-2. `ORIGINCLOUD_CLIENT_ID` and `ORIGINCLOUD_CLIENT_SECRET`: a service account's
-   credential, exchanged for access tokens as they expire. This is what
-   automation outside CI should use.
+2. `ORIGINCLOUD_CREDENTIALS_FILE`: the path of a service account key's
+   credentials file (see [A service account key](#a-service-account-key)).
+   This is for automation that can present no OIDC token; CI should use the
+   next step.
 3. A CI job's OIDC token, exchanged at the security token service for a
    `WORKLOAD` service account's access tokens as they expire, with no secret in
    the CI system: the token in the file `ORIGINCLOUD_OIDC_TOKEN_FILE` names (any
@@ -107,6 +108,39 @@ func main() {
    `http://169.254.169.254`.
 
 `core.WithCredentials` sets them explicitly instead.
+
+### A service account key
+
+Creating a key for an `EXTERNAL` service account returns its private key
+once, in a credentials file: a JSON document naming the key (`name`), the
+account (`service_account`), the private key and the security token service
+(`sts_endpoint`). Save it as it is, readable only by the program that uses
+it, and point `ORIGINCLOUD_CREDENTIALS_FILE` at it:
+
+```sh
+export ORIGINCLOUD_CREDENTIALS_FILE=/etc/myapp/origincloud-key.json
+```
+
+Or hand it over in code, for instance from a secret manager:
+
+```go
+credentials, err := core.CredentialsFromJSON(secret) // or core.CredentialsFromFile(path)
+if err != nil {
+	log.Fatal(err)
+}
+client, err := core.NewClient(ctx, core.WithCredentials(credentials))
+```
+
+The SDK signs an `ES256` assertion with the key (RFC 7523: `kid` the key,
+`iss` and `sub` the account, `aud` the file's `sts_endpoint`, valid for five
+minutes, a fresh `jti` each time), exchanges it at the security token
+service's `/v1/token` for the account's access token, and exchanges a new
+one about a minute before that token expires; concurrent calls share one
+exchange. The credentials never print the private key.
+
+A key never expires. To replace one, create the new key, move the program to
+its file, then delete the old key; deleting a key stops its access tokens at
+their next call.
 
 ## Behaviour
 
@@ -144,7 +178,7 @@ func main() {
   media type in `ContentType`, as the API sent them.
 - **Errors.** A refused call returns a `*core.Error`; branch on its `Reason`,
   the platform's error code. Its `Metadata` carries what the API adds to the
-  reason, such as `serviceAccount`, the account a repeated create refused with
+  reason, such as `serviceAccountKey`, the key a repeated create refused with
   `CONFLICT` is about. Only an error the API answers as retryable is retried:
   a `CONFLICT` never is.
 
