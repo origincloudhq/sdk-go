@@ -16,8 +16,12 @@
 // Unless [WithCredentials] names them, [NewClient] takes the first of:
 //
 //  1. ORIGINCLOUD_ACCESS_TOKEN: an access token, sent as it is.
-//  2. ORIGINCLOUD_CLIENT_ID and ORIGINCLOUD_CLIENT_SECRET: a service
-//     account's credential, exchanged for access tokens as they expire.
+//  2. ORIGINCLOUD_CREDENTIALS_FILE: the path of a service account key's
+//     credentials file, the file creating the key returned. An assertion
+//     signed with its key is exchanged at the security token service for
+//     the account's access tokens as they expire. See
+//     [ServiceAccountKeyCredentials]; [CredentialsFromFile] and
+//     [CredentialsFromJSON] read a file the environment doesn't name.
 //  3. A CI job's OIDC token, exchanged at the security token service for a
 //     workload service account's access tokens as they expire: the token in
 //     the file ORIGINCLOUD_OIDC_TOKEN_FILE names, read again at every
@@ -69,6 +73,6 @@
 //
 //	var apiErr *core.Error
 //	if errors.As(err, &apiErr) && apiErr.Reason == "CONFLICT" {
-//		log.Printf("refused: %s already exists", apiErr.Metadata["serviceAccount"])
+//		log.Printf("refused: %s already exists", apiErr.Metadata["serviceAccountKey"])
 //	}
 package core

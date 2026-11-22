@@ -38,8 +38,8 @@ const badRequest = `{"error":{"code":400,"status":"INVALID_ARGUMENT","message":"
 	{"@type":"type.googleapis.com/google.rpc.RequestInfo","requestId":"4bf92f3577b34da6"},
 	{"@type":"type.googleapis.com/google.rpc.BadRequest","fieldViolations":[{"field":"volume.sizeGib","description":"must be at least 1"}]}]}}`
 
-const conflict = `{"error":{"code":409,"status":"FAILED_PRECONDITION","message":"the service account organizations/o/serviceAccounts/s was created by an earlier request with this request_id; its client secret was returned only to that request. To get a working secret, delete that account and create a new one","details":[
-	{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"CONFLICT","domain":"origincloudapis.eu","metadata":{"serviceAccount":"organizations/o/serviceAccounts/s"}},
+const conflict = `{"error":{"code":409,"status":"FAILED_PRECONDITION","message":"the service account key organizations/o/serviceAccounts/s/keys/k was created by an earlier request with this request_id; its credentials file was returned only to that request. Delete that key and create a new one","details":[
+	{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"CONFLICT","domain":"origincloudapis.eu","metadata":{"serviceAccountKey":"organizations/o/serviceAccounts/s/keys/k"}},
 	{"@type":"type.googleapis.com/google.rpc.RequestInfo","requestId":"7d3c1a2b9e8f4051"}]}}`
 
 func TestARequestCarriesItsCredentialsAndAgent(t *testing.T) {
@@ -210,7 +210,7 @@ func TestAConflictIsNotRetriedAndCarriesItsMetadata(t *testing.T) {
 		apiErr.RequestID != "7d3c1a2b9e8f4051" || apiErr.Retryable() {
 		t.Errorf("error = %+v", apiErr)
 	}
-	if len(apiErr.Metadata) != 1 || apiErr.Metadata["serviceAccount"] != "organizations/o/serviceAccounts/s" {
+	if len(apiErr.Metadata) != 1 || apiErr.Metadata["serviceAccountKey"] != "organizations/o/serviceAccounts/s/keys/k" {
 		t.Errorf("metadata = %#v", apiErr.Metadata)
 	}
 }
@@ -224,7 +224,7 @@ func TestMetadataThatIsntTextIsLeftOut(t *testing.T) {
 	err := client.Service("iam", false).Call(context.Background(), Request{Method: http.MethodGet, Path: "/x"}, &structpb.Struct{})
 	var apiErr *Error
 	if !errors.As(err, &apiErr) || apiErr.Reason != "CONFLICT" || len(apiErr.Metadata) != 1 ||
-		apiErr.Metadata["serviceAccount"] != "organizations/o/serviceAccounts/s" {
+		apiErr.Metadata["serviceAccountKey"] != "organizations/o/serviceAccounts/s/keys/k" {
 		t.Fatalf("err = %#v", err)
 	}
 }
