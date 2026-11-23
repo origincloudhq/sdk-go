@@ -24,6 +24,7 @@ func clearCredentialEnv(t *testing.T) string {
 	for _, name := range []string{
 		envAccessToken, envCredentialsFile, envMetadataDisabled, envMetadataEndpoint, envRegion,
 		envOIDCDisabled, envOIDCTokenFile, envOIDCToken, envOIDCAudience, envSTSEndpoint, envGitHubTokenURL, envGitHubRequestToken, envTFCToken, envTFCTag,
+		envImpersonateServiceAccount,
 	} {
 		t.Setenv(name, "")
 	}

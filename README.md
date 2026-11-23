@@ -109,6 +109,43 @@ func main() {
 
 `core.WithCredentials` sets them explicitly instead.
 
+### Impersonating a service account
+
+A person can act as a service account with narrower rights than their own,
+such as a deploy account, instead of with every permission they hold. Name the
+account by its full name in `ORIGINCLOUD_IMPERSONATE_SERVICE_ACCOUNT`, or with
+`core.WithImpersonateServiceAccount`, which overrides the variable (an empty
+name impersonates no one):
+
+```sh
+export ORIGINCLOUD_IMPERSONATE_SERVICE_ACCOUNT=//iam.origincloudapis.eu/organizations/my-org/serviceAccounts/deployer
+```
+
+```go
+client, err := core.NewClient(ctx,
+	core.WithImpersonateServiceAccount("//iam.origincloudapis.eu/organizations/my-org/serviceAccounts/deployer"))
+```
+
+The client takes the token of the credentials above (or of
+`core.WithCredentials`) and exchanges it at the security token service's
+`/v1/token` for the account's access token (RFC 8693: `subject_token` the
+caller's token, `subject_token_type`
+`urn:ietf:params:oauth:token-type:access_token`, `service_account` the
+account's full name). The account's token lives five minutes at most, and no
+longer than the caller's; the client exchanges a fresh one a minute before it
+expires, or halfway through a shorter lifetime, and concurrent calls share one
+exchange. `ORIGINCLOUD_STS_ENDPOINT` asks another service than
+`https://sts.origincloudapis.eu`, which must be https.
+
+The security token service hands the token out to a person who holds
+`iam.service_account.get_access_token` on the account, through the role
+`roles/iam.service-account-token-creator`, and only while the account exists
+and is active. A service account's own token can't impersonate another. The
+token names the account as its subject and the person as the one acting, and so
+does the audit log. A refused exchange is an error naming the account; the
+client never falls back to the caller's own token. `core.Impersonate(source,
+serviceAccount)` builds the same credentials around any others.
+
 ### A service account key
 
 Creating a key for an `EXTERNAL` service account returns its private key
