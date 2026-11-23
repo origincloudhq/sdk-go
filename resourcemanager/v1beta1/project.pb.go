@@ -300,10 +300,14 @@ type CreateProjectRequest struct {
 	Project *Project `protobuf:"bytes,1,opt,name=project,proto3" json:"project,omitempty"`
 	// The project's id, the last segment of its name: 6 to 16 lowercase
 	// letters, digits and hyphens, starting with a letter and not ending with
-	// a hyphen, such as `acme-prod`.
+	// a hyphen, such as `acme-prod`. An id is never used twice: one a project
+	// has or had is refused as a `CONFLICT`. Left out, the server generates
+	// one, such as `escots-052954863`, and the project returned carries it in
+	// its `name`.
 	ProjectId string `protobuf:"bytes,3,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
 	// A UUID; a repeat with the same id returns the project the first request
-	// created instead of creating a second one.
+	// created instead of creating a second one, with the id it was given or
+	// generated.
 	RequestId     string `protobuf:"bytes,2,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -598,7 +602,7 @@ const file_origincloud_resourcemanager_v1beta1_project_proto_rawDesc = "" +
 	"\x14CreateProjectRequest\x12L\n" +
 	"\aproject\x18\x01 \x01(\v2,.origincloud.resourcemanager.v1beta1.ProjectB\x04\xe2A\x01\x02R\aproject\x12#\n" +
 	"\n" +
-	"project_id\x18\x03 \x01(\tB\x04\xe2A\x01\x02R\tprojectId\x12+\n" +
+	"project_id\x18\x03 \x01(\tB\x04\xe2A\x01\x01R\tprojectId\x12+\n" +
 	"\n" +
 	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\xa7\x01\n" +
 	"\x14UpdateProjectRequest\x12L\n" +
@@ -614,13 +618,13 @@ const file_origincloud_resourcemanager_v1beta1_project_proto_rawDesc = "" +
 	"\x19UpdateProjectQuotaRequest\x12\\\n" +
 	"\rproject_quota\x18\x01 \x01(\v21.origincloud.resourcemanager.v1beta1.ProjectQuotaB\x04\xe2A\x01\x02R\fprojectQuota\x12A\n" +
 	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x04\xe2A\x01\x02R\n" +
-	"updateMask2\xb3\n" +
+	"updateMask2\xbd\n" +
 	"\n" +
 	"\x0eProjectService\x12\x9d\x01\n" +
 	"\n" +
 	"GetProject\x126.origincloud.resourcemanager.v1beta1.GetProjectRequest\x1a,.origincloud.resourcemanager.v1beta1.Project\")\xdaA\x04name\x82\xd3\xe4\x93\x02\x1c\x12\x1a/v1beta1/{name=projects/*}\x12\xad\x01\n" +
-	"\fListProjects\x128.origincloud.resourcemanager.v1beta1.ListProjectsRequest\x1a9.origincloud.resourcemanager.v1beta1.ListProjectsResponse\"(\xdaA\forganization\x82\xd3\xe4\x93\x02\x13\x12\x11/v1beta1/projects\x12\xb1\x01\n" +
-	"\rCreateProject\x129.origincloud.resourcemanager.v1beta1.CreateProjectRequest\x1a,.origincloud.resourcemanager.v1beta1.Project\"7\xdaA\x12project,project_id\x82\xd3\xe4\x93\x02\x1c:\aproject\"\x11/v1beta1/projects\x12\xc3\x01\n" +
+	"\fListProjects\x128.origincloud.resourcemanager.v1beta1.ListProjectsRequest\x1a9.origincloud.resourcemanager.v1beta1.ListProjectsResponse\"(\xdaA\forganization\x82\xd3\xe4\x93\x02\x13\x12\x11/v1beta1/projects\x12\xbb\x01\n" +
+	"\rCreateProject\x129.origincloud.resourcemanager.v1beta1.CreateProjectRequest\x1a,.origincloud.resourcemanager.v1beta1.Project\"A\xdaA\x12project,project_id\xdaA\aproject\x82\xd3\xe4\x93\x02\x1c:\aproject\"\x11/v1beta1/projects\x12\xc3\x01\n" +
 	"\rUpdateProject\x129.origincloud.resourcemanager.v1beta1.UpdateProjectRequest\x1a,.origincloud.resourcemanager.v1beta1.Project\"I\xdaA\x13project,update_mask\x82\xd3\xe4\x93\x02-:\aproject2\"/v1beta1/{project.name=projects/*}\x12\x8d\x01\n" +
 	"\rDeleteProject\x129.origincloud.resourcemanager.v1beta1.DeleteProjectRequest\x1a\x16.google.protobuf.Empty\")\xdaA\x04name\x82\xd3\xe4\x93\x02\x1c*\x1a/v1beta1/{name=projects/*}\x12\xb2\x01\n" +
 	"\x0fGetProjectQuota\x12;.origincloud.resourcemanager.v1beta1.GetProjectQuotaRequest\x1a1.origincloud.resourcemanager.v1beta1.ProjectQuota\"/\xdaA\x04name\x82\xd3\xe4\x93\x02\"\x12 /v1beta1/{name=projects/*/quota}\x12\xea\x01\n" +
