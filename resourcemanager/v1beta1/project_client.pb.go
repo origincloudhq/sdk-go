@@ -106,9 +106,10 @@ func (c *ProjectClient) AllProjects(ctx context.Context, req *ListProjectsReques
 }
 
 // CreateProject creates a project in an `ACTIVE` organization, under the id the caller
-// chooses. The caller becomes the project's owner, and the project is
-// billed to the organization's default billing account. An id in use, or
-// used by a project that was deleted, is refused as a `CONFLICT`.
+// chooses, or one the server generates when the caller leaves it out. The
+// caller becomes the project's owner, and the project is billed to the
+// organization's default billing account. An id in use, or used by a
+// project that was deleted, is refused as a `CONFLICT`.
 func (c *ProjectClient) CreateProject(ctx context.Context, req *CreateProjectRequest) (*Project, error) {
 	if req.GetRequestId() == "" {
 		req = proto.Clone(req).(*CreateProjectRequest)
