@@ -153,6 +153,59 @@ func (Volume_ResizeState) EnumDescriptor() ([]byte, []int) {
 	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{0, 1}
 }
 
+// The on-disk format of the encryption.
+type Encryption_Format int32
+
+const (
+	// Not set.
+	Encryption_FORMAT_UNSPECIFIED Encryption_Format = 0
+	// LUKS2: a persistent volume.
+	Encryption_LUKS2 Encryption_Format = 1
+	// LUKS inside a qcow2 file: a host-local volume.
+	Encryption_QCOW_LUKS Encryption_Format = 2
+)
+
+// Enum value maps for Encryption_Format.
+var (
+	Encryption_Format_name = map[int32]string{
+		0: "FORMAT_UNSPECIFIED",
+		1: "LUKS2",
+		2: "QCOW_LUKS",
+	}
+	Encryption_Format_value = map[string]int32{
+		"FORMAT_UNSPECIFIED": 0,
+		"LUKS2":              1,
+		"QCOW_LUKS":          2,
+	}
+)
+
+func (x Encryption_Format) Enum() *Encryption_Format {
+	p := new(Encryption_Format)
+	*p = x
+	return p
+}
+
+func (x Encryption_Format) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Encryption_Format) Descriptor() protoreflect.EnumDescriptor {
+	return file_origincloud_pvs_v1beta1_volume_proto_enumTypes[2].Descriptor()
+}
+
+func (Encryption_Format) Type() protoreflect.EnumType {
+	return &file_origincloud_pvs_v1beta1_volume_proto_enumTypes[2]
+}
+
+func (x Encryption_Format) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Encryption_Format.Descriptor instead.
+func (Encryption_Format) EnumDescriptor() ([]byte, []int) {
+	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{1, 0}
+}
+
 // A block storage volume in one zone.
 type Volume struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -200,7 +253,10 @@ type Volume struct {
 	Creator string `protobuf:"bytes,15,opt,name=creator,proto3" json:"creator,omitempty"`
 	// Labels of your own, at most 50. The `origin:name` tag is the name the
 	// console shows.
-	Tags          map[string]string `protobuf:"bytes,16,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Tags map[string]string `protobuf:"bytes,16,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// How the volume is encrypted at rest; unset for a volume that isn't
+	// encrypted.
+	Encryption    *Encryption `protobuf:"bytes,17,opt,name=encryption,proto3" json:"encryption,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -340,6 +396,71 @@ func (x *Volume) GetTags() map[string]string {
 	return nil
 }
 
+func (x *Volume) GetEncryption() *Encryption {
+	if x != nil {
+		return x.Encryption
+	}
+	return nil
+}
+
+// How a volume is encrypted at rest: with a data key of its own, which the
+// KMS key named here wraps. The data key itself is never shown.
+type Encryption struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The on-disk format.
+	Format Encryption_Format `protobuf:"varint,1,opt,name=format,proto3,enum=origincloud.pvs.v1beta1.Encryption_Format" json:"format,omitempty"`
+	// The full name of the KMS key that wraps the volume's data key, the
+	// project's volumes key:
+	// `//kms.origincloudapis.eu/projects/{project}/regions/{region}/keys/{key}`.
+	KmsKey        string `protobuf:"bytes,2,opt,name=kms_key,json=kmsKey,proto3" json:"kms_key,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Encryption) Reset() {
+	*x = Encryption{}
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Encryption) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Encryption) ProtoMessage() {}
+
+func (x *Encryption) ProtoReflect() protoreflect.Message {
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Encryption.ProtoReflect.Descriptor instead.
+func (*Encryption) Descriptor() ([]byte, []int) {
+	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *Encryption) GetFormat() Encryption_Format {
+	if x != nil {
+		return x.Format
+	}
+	return Encryption_FORMAT_UNSPECIFIED
+}
+
+func (x *Encryption) GetKmsKey() string {
+	if x != nil {
+		return x.KmsKey
+	}
+	return ""
+}
+
 // The request for GetVolume.
 type GetVolumeRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -351,7 +472,7 @@ type GetVolumeRequest struct {
 
 func (x *GetVolumeRequest) Reset() {
 	*x = GetVolumeRequest{}
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[1]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -363,7 +484,7 @@ func (x *GetVolumeRequest) String() string {
 func (*GetVolumeRequest) ProtoMessage() {}
 
 func (x *GetVolumeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[1]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -376,7 +497,7 @@ func (x *GetVolumeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetVolumeRequest.ProtoReflect.Descriptor instead.
 func (*GetVolumeRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{1}
+	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetVolumeRequest) GetName() string {
@@ -402,7 +523,7 @@ type ListVolumesRequest struct {
 
 func (x *ListVolumesRequest) Reset() {
 	*x = ListVolumesRequest{}
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[2]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -414,7 +535,7 @@ func (x *ListVolumesRequest) String() string {
 func (*ListVolumesRequest) ProtoMessage() {}
 
 func (x *ListVolumesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[2]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -427,7 +548,7 @@ func (x *ListVolumesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListVolumesRequest.ProtoReflect.Descriptor instead.
 func (*ListVolumesRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{2}
+	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListVolumesRequest) GetParent() string {
@@ -464,7 +585,7 @@ type ListVolumesResponse struct {
 
 func (x *ListVolumesResponse) Reset() {
 	*x = ListVolumesResponse{}
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[3]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -476,7 +597,7 @@ func (x *ListVolumesResponse) String() string {
 func (*ListVolumesResponse) ProtoMessage() {}
 
 func (x *ListVolumesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[3]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -489,7 +610,7 @@ func (x *ListVolumesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListVolumesResponse.ProtoReflect.Descriptor instead.
 func (*ListVolumesResponse) Descriptor() ([]byte, []int) {
-	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{3}
+	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListVolumesResponse) GetVolumes() []*Volume {
@@ -523,7 +644,7 @@ type CreateVolumeRequest struct {
 
 func (x *CreateVolumeRequest) Reset() {
 	*x = CreateVolumeRequest{}
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[4]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -535,7 +656,7 @@ func (x *CreateVolumeRequest) String() string {
 func (*CreateVolumeRequest) ProtoMessage() {}
 
 func (x *CreateVolumeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[4]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -548,7 +669,7 @@ func (x *CreateVolumeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateVolumeRequest.ProtoReflect.Descriptor instead.
 func (*CreateVolumeRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{4}
+	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CreateVolumeRequest) GetParent() string {
@@ -592,7 +713,7 @@ type ImportVolumeRequest struct {
 
 func (x *ImportVolumeRequest) Reset() {
 	*x = ImportVolumeRequest{}
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[5]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -604,7 +725,7 @@ func (x *ImportVolumeRequest) String() string {
 func (*ImportVolumeRequest) ProtoMessage() {}
 
 func (x *ImportVolumeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[5]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -617,7 +738,7 @@ func (x *ImportVolumeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ImportVolumeRequest.ProtoReflect.Descriptor instead.
 func (*ImportVolumeRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{5}
+	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ImportVolumeRequest) GetParent() string {
@@ -664,7 +785,7 @@ type UpdateVolumeRequest struct {
 
 func (x *UpdateVolumeRequest) Reset() {
 	*x = UpdateVolumeRequest{}
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[6]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -676,7 +797,7 @@ func (x *UpdateVolumeRequest) String() string {
 func (*UpdateVolumeRequest) ProtoMessage() {}
 
 func (x *UpdateVolumeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[6]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -689,7 +810,7 @@ func (x *UpdateVolumeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateVolumeRequest.ProtoReflect.Descriptor instead.
 func (*UpdateVolumeRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{6}
+	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UpdateVolumeRequest) GetVolume() *Volume {
@@ -727,7 +848,7 @@ type DeleteVolumeRequest struct {
 
 func (x *DeleteVolumeRequest) Reset() {
 	*x = DeleteVolumeRequest{}
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[7]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -739,7 +860,7 @@ func (x *DeleteVolumeRequest) String() string {
 func (*DeleteVolumeRequest) ProtoMessage() {}
 
 func (x *DeleteVolumeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[7]
+	mi := &file_origincloud_pvs_v1beta1_volume_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -752,7 +873,7 @@ func (x *DeleteVolumeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteVolumeRequest.ProtoReflect.Descriptor instead.
 func (*DeleteVolumeRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{7}
+	return file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *DeleteVolumeRequest) GetName() string {
@@ -773,7 +894,7 @@ var File_origincloud_pvs_v1beta1_volume_proto protoreflect.FileDescriptor
 
 const file_origincloud_pvs_v1beta1_volume_proto_rawDesc = "" +
 	"\n" +
-	"$origincloud/pvs/v1beta1/volume.proto\x12\x17origincloud.pvs.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x84\t\n" +
+	"$origincloud/pvs/v1beta1/volume.proto\x12\x17origincloud.pvs.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xcf\t\n" +
 	"\x06Volume\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12\x1f\n" +
 	"\bsize_gib\x18\x03 \x01(\x05B\x04\xe2A\x01\x02R\asizeGib\x12R\n" +
@@ -796,7 +917,10 @@ const file_origincloud_pvs_v1beta1_volume_proto_rawDesc = "" +
 	"\acreator\x18\x0f \x01(\tB\n" +
 	"\xe2A\x01\x03\xfaA\x03\n" +
 	"\x01*R\acreator\x12C\n" +
-	"\x04tags\x18\x10 \x03(\v2).origincloud.pvs.v1beta1.Volume.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x1a7\n" +
+	"\x04tags\x18\x10 \x03(\v2).origincloud.pvs.v1beta1.Volume.TagsEntryB\x04\xe2A\x01\x01R\x04tags\x12I\n" +
+	"\n" +
+	"encryption\x18\x11 \x01(\v2#.origincloud.pvs.v1beta1.EncryptionB\x04\xe2A\x01\x03R\n" +
+	"encryption\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"m\n" +
@@ -814,7 +938,16 @@ const file_origincloud_pvs_v1beta1_volume_proto_rawDesc = "" +
 	"\x10RESIZE_COMPLETED\x10\x01\x12\f\n" +
 	"\bRESIZING\x10\x02\x12\x11\n" +
 	"\rRESIZE_FAILED\x10\x03:e\xeaAb\n" +
-	"\x1dpvs.origincloudapis.eu/Volume\x120projects/{project}/zones/{zone}/volumes/{volume}*\avolumes2\x06volume\"N\n" +
+	"\x1dpvs.origincloudapis.eu/Volume\x120projects/{project}/zones/{zone}/volumes/{volume}*\avolumes2\x06volume\"\xd0\x01\n" +
+	"\n" +
+	"Encryption\x12H\n" +
+	"\x06format\x18\x01 \x01(\x0e2*.origincloud.pvs.v1beta1.Encryption.FormatB\x04\xe2A\x01\x03R\x06format\x12<\n" +
+	"\akms_key\x18\x02 \x01(\tB#\xe2A\x01\x03\xfaA\x1c\n" +
+	"\x1akms.origincloudapis.eu/KeyR\x06kmsKey\":\n" +
+	"\x06Format\x12\x16\n" +
+	"\x12FORMAT_UNSPECIFIED\x10\x00\x12\t\n" +
+	"\x05LUKS2\x10\x01\x12\r\n" +
+	"\tQCOW_LUKS\x10\x02\"N\n" +
 	"\x10GetVolumeRequest\x12:\n" +
 	"\x04name\x18\x01 \x01(\tB&\xe2A\x01\x02\xfaA\x1f\n" +
 	"\x1dpvs.origincloudapis.eu/VolumeR\x04name\"\x9c\x01\n" +
@@ -874,49 +1007,53 @@ func file_origincloud_pvs_v1beta1_volume_proto_rawDescGZIP() []byte {
 	return file_origincloud_pvs_v1beta1_volume_proto_rawDescData
 }
 
-var file_origincloud_pvs_v1beta1_volume_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_origincloud_pvs_v1beta1_volume_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_origincloud_pvs_v1beta1_volume_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_origincloud_pvs_v1beta1_volume_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_origincloud_pvs_v1beta1_volume_proto_goTypes = []any{
 	(Volume_State)(0),               // 0: origincloud.pvs.v1beta1.Volume.State
 	(Volume_ResizeState)(0),         // 1: origincloud.pvs.v1beta1.Volume.ResizeState
-	(*Volume)(nil),                  // 2: origincloud.pvs.v1beta1.Volume
-	(*GetVolumeRequest)(nil),        // 3: origincloud.pvs.v1beta1.GetVolumeRequest
-	(*ListVolumesRequest)(nil),      // 4: origincloud.pvs.v1beta1.ListVolumesRequest
-	(*ListVolumesResponse)(nil),     // 5: origincloud.pvs.v1beta1.ListVolumesResponse
-	(*CreateVolumeRequest)(nil),     // 6: origincloud.pvs.v1beta1.CreateVolumeRequest
-	(*ImportVolumeRequest)(nil),     // 7: origincloud.pvs.v1beta1.ImportVolumeRequest
-	(*UpdateVolumeRequest)(nil),     // 8: origincloud.pvs.v1beta1.UpdateVolumeRequest
-	(*DeleteVolumeRequest)(nil),     // 9: origincloud.pvs.v1beta1.DeleteVolumeRequest
-	nil,                             // 10: origincloud.pvs.v1beta1.Volume.TagsEntry
-	(*fieldmaskpb.FieldMask)(nil),   // 11: google.protobuf.FieldMask
-	(*longrunningpb.Operation)(nil), // 12: google.longrunning.Operation
+	(Encryption_Format)(0),          // 2: origincloud.pvs.v1beta1.Encryption.Format
+	(*Volume)(nil),                  // 3: origincloud.pvs.v1beta1.Volume
+	(*Encryption)(nil),              // 4: origincloud.pvs.v1beta1.Encryption
+	(*GetVolumeRequest)(nil),        // 5: origincloud.pvs.v1beta1.GetVolumeRequest
+	(*ListVolumesRequest)(nil),      // 6: origincloud.pvs.v1beta1.ListVolumesRequest
+	(*ListVolumesResponse)(nil),     // 7: origincloud.pvs.v1beta1.ListVolumesResponse
+	(*CreateVolumeRequest)(nil),     // 8: origincloud.pvs.v1beta1.CreateVolumeRequest
+	(*ImportVolumeRequest)(nil),     // 9: origincloud.pvs.v1beta1.ImportVolumeRequest
+	(*UpdateVolumeRequest)(nil),     // 10: origincloud.pvs.v1beta1.UpdateVolumeRequest
+	(*DeleteVolumeRequest)(nil),     // 11: origincloud.pvs.v1beta1.DeleteVolumeRequest
+	nil,                             // 12: origincloud.pvs.v1beta1.Volume.TagsEntry
+	(*fieldmaskpb.FieldMask)(nil),   // 13: google.protobuf.FieldMask
+	(*longrunningpb.Operation)(nil), // 14: google.longrunning.Operation
 }
 var file_origincloud_pvs_v1beta1_volume_proto_depIdxs = []int32{
 	0,  // 0: origincloud.pvs.v1beta1.Volume.state:type_name -> origincloud.pvs.v1beta1.Volume.State
 	1,  // 1: origincloud.pvs.v1beta1.Volume.resize_state:type_name -> origincloud.pvs.v1beta1.Volume.ResizeState
-	10, // 2: origincloud.pvs.v1beta1.Volume.tags:type_name -> origincloud.pvs.v1beta1.Volume.TagsEntry
-	2,  // 3: origincloud.pvs.v1beta1.ListVolumesResponse.volumes:type_name -> origincloud.pvs.v1beta1.Volume
-	2,  // 4: origincloud.pvs.v1beta1.CreateVolumeRequest.volume:type_name -> origincloud.pvs.v1beta1.Volume
-	2,  // 5: origincloud.pvs.v1beta1.ImportVolumeRequest.volume:type_name -> origincloud.pvs.v1beta1.Volume
-	2,  // 6: origincloud.pvs.v1beta1.UpdateVolumeRequest.volume:type_name -> origincloud.pvs.v1beta1.Volume
-	11, // 7: origincloud.pvs.v1beta1.UpdateVolumeRequest.update_mask:type_name -> google.protobuf.FieldMask
-	3,  // 8: origincloud.pvs.v1beta1.VolumeService.GetVolume:input_type -> origincloud.pvs.v1beta1.GetVolumeRequest
-	4,  // 9: origincloud.pvs.v1beta1.VolumeService.ListVolumes:input_type -> origincloud.pvs.v1beta1.ListVolumesRequest
-	6,  // 10: origincloud.pvs.v1beta1.VolumeService.CreateVolume:input_type -> origincloud.pvs.v1beta1.CreateVolumeRequest
-	7,  // 11: origincloud.pvs.v1beta1.VolumeService.ImportVolume:input_type -> origincloud.pvs.v1beta1.ImportVolumeRequest
-	8,  // 12: origincloud.pvs.v1beta1.VolumeService.UpdateVolume:input_type -> origincloud.pvs.v1beta1.UpdateVolumeRequest
-	9,  // 13: origincloud.pvs.v1beta1.VolumeService.DeleteVolume:input_type -> origincloud.pvs.v1beta1.DeleteVolumeRequest
-	2,  // 14: origincloud.pvs.v1beta1.VolumeService.GetVolume:output_type -> origincloud.pvs.v1beta1.Volume
-	5,  // 15: origincloud.pvs.v1beta1.VolumeService.ListVolumes:output_type -> origincloud.pvs.v1beta1.ListVolumesResponse
-	12, // 16: origincloud.pvs.v1beta1.VolumeService.CreateVolume:output_type -> google.longrunning.Operation
-	12, // 17: origincloud.pvs.v1beta1.VolumeService.ImportVolume:output_type -> google.longrunning.Operation
-	12, // 18: origincloud.pvs.v1beta1.VolumeService.UpdateVolume:output_type -> google.longrunning.Operation
-	12, // 19: origincloud.pvs.v1beta1.VolumeService.DeleteVolume:output_type -> google.longrunning.Operation
-	14, // [14:20] is the sub-list for method output_type
-	8,  // [8:14] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	12, // 2: origincloud.pvs.v1beta1.Volume.tags:type_name -> origincloud.pvs.v1beta1.Volume.TagsEntry
+	4,  // 3: origincloud.pvs.v1beta1.Volume.encryption:type_name -> origincloud.pvs.v1beta1.Encryption
+	2,  // 4: origincloud.pvs.v1beta1.Encryption.format:type_name -> origincloud.pvs.v1beta1.Encryption.Format
+	3,  // 5: origincloud.pvs.v1beta1.ListVolumesResponse.volumes:type_name -> origincloud.pvs.v1beta1.Volume
+	3,  // 6: origincloud.pvs.v1beta1.CreateVolumeRequest.volume:type_name -> origincloud.pvs.v1beta1.Volume
+	3,  // 7: origincloud.pvs.v1beta1.ImportVolumeRequest.volume:type_name -> origincloud.pvs.v1beta1.Volume
+	3,  // 8: origincloud.pvs.v1beta1.UpdateVolumeRequest.volume:type_name -> origincloud.pvs.v1beta1.Volume
+	13, // 9: origincloud.pvs.v1beta1.UpdateVolumeRequest.update_mask:type_name -> google.protobuf.FieldMask
+	5,  // 10: origincloud.pvs.v1beta1.VolumeService.GetVolume:input_type -> origincloud.pvs.v1beta1.GetVolumeRequest
+	6,  // 11: origincloud.pvs.v1beta1.VolumeService.ListVolumes:input_type -> origincloud.pvs.v1beta1.ListVolumesRequest
+	8,  // 12: origincloud.pvs.v1beta1.VolumeService.CreateVolume:input_type -> origincloud.pvs.v1beta1.CreateVolumeRequest
+	9,  // 13: origincloud.pvs.v1beta1.VolumeService.ImportVolume:input_type -> origincloud.pvs.v1beta1.ImportVolumeRequest
+	10, // 14: origincloud.pvs.v1beta1.VolumeService.UpdateVolume:input_type -> origincloud.pvs.v1beta1.UpdateVolumeRequest
+	11, // 15: origincloud.pvs.v1beta1.VolumeService.DeleteVolume:input_type -> origincloud.pvs.v1beta1.DeleteVolumeRequest
+	3,  // 16: origincloud.pvs.v1beta1.VolumeService.GetVolume:output_type -> origincloud.pvs.v1beta1.Volume
+	7,  // 17: origincloud.pvs.v1beta1.VolumeService.ListVolumes:output_type -> origincloud.pvs.v1beta1.ListVolumesResponse
+	14, // 18: origincloud.pvs.v1beta1.VolumeService.CreateVolume:output_type -> google.longrunning.Operation
+	14, // 19: origincloud.pvs.v1beta1.VolumeService.ImportVolume:output_type -> google.longrunning.Operation
+	14, // 20: origincloud.pvs.v1beta1.VolumeService.UpdateVolume:output_type -> google.longrunning.Operation
+	14, // 21: origincloud.pvs.v1beta1.VolumeService.DeleteVolume:output_type -> google.longrunning.Operation
+	16, // [16:22] is the sub-list for method output_type
+	10, // [10:16] is the sub-list for method input_type
+	10, // [10:10] is the sub-list for extension type_name
+	10, // [10:10] is the sub-list for extension extendee
+	0,  // [0:10] is the sub-list for field type_name
 }
 
 func init() { file_origincloud_pvs_v1beta1_volume_proto_init() }
@@ -929,8 +1066,8 @@ func file_origincloud_pvs_v1beta1_volume_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_origincloud_pvs_v1beta1_volume_proto_rawDesc), len(file_origincloud_pvs_v1beta1_volume_proto_rawDesc)),
-			NumEnums:      2,
-			NumMessages:   9,
+			NumEnums:      3,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
