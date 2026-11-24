@@ -43,6 +43,17 @@
 //     ORIGINCLOUD_METADATA_ENDPOINT asks another address than
 //     [MetadataEndpoint].
 //
+// # Impersonation
+//
+// ORIGINCLOUD_IMPERSONATE_SERVICE_ACCOUNT, or [WithImpersonateServiceAccount],
+// names a service account by its full name for the client to act as: the
+// token of its credentials, a person's, is exchanged at the security token
+// service for the account's, renewed before it expires. The person needs
+// iam.service_account.get_access_token on the account (the role
+// roles/iam.service-account-token-creator). A refused exchange is an error
+// naming the account, never a call with the person's own token. See
+// [ImpersonatedCredentials]; [Impersonate] wraps any credentials.
+//
 // # Endpoints
 //
 // Every service answers at {service}.origincloudapis.eu, which serves every

@@ -11,7 +11,7 @@ import (
 )
 
 // Version is this SDK's version, sent in the User-Agent header.
-const Version = "0.51.0"
+const Version = "0.52.0"
 
 const (
 	envRegion = "ORIGINCLOUD_REGION"
@@ -44,12 +44,23 @@ type settings struct {
 	httpClient  *http.Client
 	userAgent   string
 	maxAttempts int
+	impersonate *string
 }
 
 // WithCredentials sets the credentials, instead of taking them from the
 // environment or the CLI's session.
 func WithCredentials(credentials Credentials) Option {
 	return func(s *settings) { s.credentials = credentials }
+}
+
+// WithImpersonateServiceAccount acts as the service account named by its
+// full name, //iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}:
+// the token of the client's credentials, a person's, is exchanged at the
+// security token service for the account's, as [Impersonate] does. It
+// overrides ORIGINCLOUD_IMPERSONATE_SERVICE_ACCOUNT; an empty name
+// impersonates no one.
+func WithImpersonateServiceAccount(serviceAccount string) Option {
+	return func(s *settings) { s.impersonate = &serviceAccount }
 }
 
 // WithRegion sends calls to a region's front door,
@@ -66,8 +77,9 @@ func WithEndpoint(endpoint string) Option {
 	return func(s *settings) { s.endpoint = endpoint }
 }
 
-// WithHTTPClient sets the HTTP client calls are sent with; by default it
-// is [http.DefaultClient]. Its timeout, if any, bounds each attempt; the
+// WithHTTPClient sets the HTTP client calls are sent with, and the
+// exchanges of [WithImpersonateServiceAccount]; by default it is
+// [http.DefaultClient]. Its timeout, if any, bounds each attempt; the
 // context bounds a call.
 func WithHTTPClient(client *http.Client) Option {
 	return func(s *settings) { s.httpClient = client }
@@ -135,6 +147,19 @@ func NewClient(ctx context.Context, opts ...Option) (*Client, error) {
 			return nil, err
 		}
 		c.credentials = credentials
+	}
+	serviceAccount := os.Getenv(envImpersonateServiceAccount)
+	if s.impersonate != nil {
+		serviceAccount = *s.impersonate
+	}
+	if serviceAccount != "" {
+		impersonated, err := Impersonate(c.credentials, serviceAccount)
+		if err != nil {
+			return nil, err
+		}
+		impersonated.Endpoint = os.Getenv(envSTSEndpoint)
+		impersonated.HTTPClient = s.httpClient
+		c.credentials = impersonated
 	}
 	return c, nil
 }
