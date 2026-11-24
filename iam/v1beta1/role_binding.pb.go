@@ -99,7 +99,8 @@ type RoleBinding struct {
 	// or a platform service agent,
 	// `//iam.origincloudapis.eu/serviceAgents/{service_agent}`. A pending
 	// binding's member is `user:{email}`, the address it was granted to,
-	// until it becomes active.
+	// as typed, until it becomes active. On create, `user:{email}` names a
+	// user by email address: see CreateRoleBinding.
 	Member string `protobuf:"bytes,3,opt,name=member,proto3" json:"member,omitempty"`
 	// The full name of the role granted,
 	// `//iam.origincloudapis.eu/roles/{role}`.
