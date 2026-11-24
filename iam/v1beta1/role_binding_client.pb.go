@@ -35,6 +35,15 @@ import (
 //
 // A user known only by an email address is found with
 // `UserService.LookupUser`, which answers their name.
+//
+// A binding is `ACTIVE` or `PENDING`. A pending binding is an invitation:
+// a role granted to an email address that has no account yet. It grants
+// nothing and counts toward no permission check. When someone signs up
+// with that address and verifies it, the binding becomes active under the
+// same name, and its member becomes the new user. It is activated only
+// while whoever created it still holds every permission of the role in
+// the organization; otherwise it is dropped. A pending binding is always
+// on the whole organization.
 type RoleBindingClient struct {
 	service *core.Service
 }
@@ -80,11 +89,11 @@ func (c *RoleBindingClient) GetRoleBinding(ctx context.Context, req *GetRoleBind
 	return out, nil
 }
 
-// ListRoleBindings lists an organization's role bindings, oldest first, optionally only a
-// member's or a project's. Needs `iam.member.list` on the organization.
-// With the parent `organizations/-` it lists the caller's own bindings in
-// every organization and needs no permission; `member` must be empty
-// there.
+// ListRoleBindings lists an organization's role bindings, active and pending, oldest
+// first, optionally only a member's or a project's. Needs
+// `iam.member.list` on the organization. With the parent
+// `organizations/-` it lists the caller's own active bindings in every
+// organization and needs no permission; `member` must be empty there.
 func (c *RoleBindingClient) ListRoleBindings(ctx context.Context, req *ListRoleBindingsRequest) (*ListRoleBindingsResponse, error) {
 	n1, err := c.service.RelativeName("parent", req.GetParent(), "resourcemanager")
 	if err != nil {
@@ -187,7 +196,9 @@ func (c *RoleBindingClient) CreateRoleBinding(ctx context.Context, req *CreateRo
 // and every permission of the role at the binding's scope, as
 // CreateRoleBinding does. Refused with `CONFLICT`, removing nothing,
 // when it is the organization's last organization-wide binding of
-// `roles/owner`: bind another owner first.
+// `roles/owner`: bind another owner first. Deleting a pending binding
+// withdraws the invitation: signing up with its address afterwards
+// grants nothing.
 func (c *RoleBindingClient) DeleteRoleBinding(ctx context.Context, req *DeleteRoleBindingRequest) (*emptypb.Empty, error) {
 	if req.GetRequestId() == "" {
 		req = proto.Clone(req).(*DeleteRoleBindingRequest)
