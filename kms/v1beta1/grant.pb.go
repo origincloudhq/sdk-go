@@ -96,8 +96,9 @@ type Grant struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// What the host may do with the key.
 	Operation Grant_Operation `protobuf:"varint,2,opt,name=operation,proto3,enum=origincloud.kms.v1beta1.Grant_Operation" json:"operation,omitempty"`
-	// The platform host the grant is for, by the SPIFFE ID its certificate
-	// names, which ends in `/zones/{zone}/hosts/{host}`.
+	// The platform host or zone workload the grant is for, by the SPIFFE ID
+	// its certificate names, which ends in `/zones/{zone}/hosts/{host}` or
+	// `/zones/{zone}/workloads/{workload}`.
 	Grantee string `protobuf:"bytes,3,opt,name=grantee,proto3" json:"grantee,omitempty"`
 	// The encryption context a use must carry, exactly; never empty.
 	EncryptionContext map[string]string `protobuf:"bytes,4,rep,name=encryption_context,json=encryptionContext,proto3" json:"encryption_context,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
