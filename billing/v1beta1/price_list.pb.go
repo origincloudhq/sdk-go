@@ -44,7 +44,7 @@ type PriceList struct {
 	// catalog order: `compute_instance`, `network_floating_ip`,
 	// `network_nat_gateway`, `network_vpc_egress`, `network_vpc_ingress`,
 	// `network_vpc_internal`, `storage_volume`, `storage_snapshot`,
-	// `observability_custom_metric`, `observability_api_request`,
+	// `storage_host_local`, `observability_custom_metric`, `observability_api_request`,
 	// `observability_ingested_sample`, `dns_hosted_zone`, `dns_query`.
 	Families      []*PriceFamily `protobuf:"bytes,4,rep,name=families,proto3" json:"families,omitempty"`
 	unknownFields protoimpl.UnknownFields
