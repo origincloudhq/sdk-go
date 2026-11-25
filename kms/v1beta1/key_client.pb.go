@@ -245,8 +245,8 @@ func (c *KeyClient) DeleteKey(ctx context.Context, req *DeleteKeyRequest) (*Key,
 // UndeleteKey restores a deleted key whose material isn't destroyed yet: it becomes
 // `DISABLED`, to be enabled with UpdateKey. Refused with `CONFLICT` for a
 // key that isn't deleted, or whose `purge_time` has passed, and with
-// `FORBIDDEN` for a key the platform manages. Needs `kms.key.delete` on
-// the project.
+// `FORBIDDEN` for a key the platform manages. Needs `kms.key.undelete` on
+// the project, which `kms.key.delete` doesn't include.
 func (c *KeyClient) UndeleteKey(ctx context.Context, req *UndeleteKeyRequest) (*Key, error) {
 	if req.GetRequestId() == "" {
 		req = proto.Clone(req).(*UndeleteKeyRequest)
