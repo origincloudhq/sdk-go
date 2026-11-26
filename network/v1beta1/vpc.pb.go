@@ -46,8 +46,10 @@ type Vpc struct {
 	// of the `172.16` private block when left empty. Subnets are carved from
 	// it in equal sizes.
 	Ipv4CidrBlock string `protobuf:"bytes,3,opt,name=ipv4_cidr_block,json=ipv4CidrBlock,proto3" json:"ipv4_cidr_block,omitempty"`
-	// The IPv6 range the platform assigned, a `/56`. Each subnet gets a
-	// `/72` of it.
+	// The private IPv6 range, unique local space (RFC 4193) from `/48` to
+	// `/60`, overlapping none of the organization's other VPCs. A globally
+	// routable `/56` from the zone's pool when left empty. Each subnet gets a
+	// range 16 bits longer: a `/64` of a `/48`, a `/72` of a `/56`.
 	Ipv6CidrBlock string `protobuf:"bytes,4,opt,name=ipv6_cidr_block,json=ipv6CidrBlock,proto3" json:"ipv6_cidr_block,omitempty"`
 	// The prefix length of every subnet's IPv4 range.
 	SubnetIpv4PrefixLength int32 `protobuf:"varint,5,opt,name=subnet_ipv4_prefix_length,json=subnetIpv4PrefixLength,proto3" json:"subnet_ipv4_prefix_length,omitempty"`
@@ -542,11 +544,11 @@ var File_origincloud_network_v1beta1_vpc_proto protoreflect.FileDescriptor
 
 const file_origincloud_network_v1beta1_vpc_proto_rawDesc = "" +
 	"\n" +
-	"%origincloud/network/v1beta1/vpc.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xad\x06\n" +
+	"%origincloud/network/v1beta1/vpc.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xae\x06\n" +
 	"\x03Vpc\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12-\n" +
-	"\x0fipv4_cidr_block\x18\x03 \x01(\tB\x05\xe2A\x02\x05\x01R\ripv4CidrBlock\x12,\n" +
-	"\x0fipv6_cidr_block\x18\x04 \x01(\tB\x04\xe2A\x01\x03R\ripv6CidrBlock\x12?\n" +
+	"\x0fipv4_cidr_block\x18\x03 \x01(\tB\x05\xe2A\x02\x05\x01R\ripv4CidrBlock\x12-\n" +
+	"\x0fipv6_cidr_block\x18\x04 \x01(\tB\x05\xe2A\x02\x05\x01R\ripv6CidrBlock\x12?\n" +
 	"\x19subnet_ipv4_prefix_length\x18\x05 \x01(\x05B\x04\xe2A\x01\x03R\x16subnetIpv4PrefixLength\x12:\n" +
 	"\x16available_subnet_count\x18\x06 \x01(\x05B\x04\xe2A\x01\x03R\x14availableSubnetCount\x12[\n" +
 	"\x0fresolver_policy\x18\a \x01(\tB2\xe2A\x01\x03\xfaA+\n" +
