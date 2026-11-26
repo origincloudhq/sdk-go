@@ -246,9 +246,21 @@ type TestIamPermissionsRequest struct {
 	Resource string `protobuf:"bytes,1,opt,name=resource,proto3" json:"resource,omitempty"`
 	// The permissions to test, by their keys, such as `pvs.volume.create`;
 	// at most 100.
-	Permissions   []string `protobuf:"bytes,2,rep,name=permissions,proto3" json:"permissions,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	Permissions []string `protobuf:"bytes,2,rep,name=permissions,proto3" json:"permissions,omitempty"`
+	// The full name of one resource in `resource` to test the permissions on
+	// instead, such as
+	// `//secretmanager.origincloudapis.eu/projects/{project}/regions/{region}/secrets/{secret}`:
+	// the answer is what a call on that resource is allowed, counting the
+	// role bindings that list it as well as those on its organization or
+	// project. Refused with `BAD_REQUEST` when it isn't a full name, isn't in
+	// `resource` (in the organization, or in the project), or names a kind
+	// of resource a role binding can't list: only the bindings on its
+	// organization or project apply to such a resource, so testing on the
+	// project answers for it. The resource need not exist. Empty to test on
+	// `resource` itself.
+	FullResourceName string `protobuf:"bytes,3,opt,name=full_resource_name,json=fullResourceName,proto3" json:"full_resource_name,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *TestIamPermissionsRequest) Reset() {
@@ -293,6 +305,13 @@ func (x *TestIamPermissionsRequest) GetPermissions() []string {
 		return x.Permissions
 	}
 	return nil
+}
+
+func (x *TestIamPermissionsRequest) GetFullResourceName() string {
+	if x != nil {
+		return x.FullResourceName
+	}
+	return ""
 }
 
 // The response for TestIamPermissions.
@@ -360,12 +379,15 @@ const file_origincloud_iam_v1beta1_permission_proto_rawDesc = "" +
 	"!iam.origincloudapis.eu/PermissionR\x04name\"\x18\n" +
 	"\x16ListPermissionsRequest\"`\n" +
 	"\x17ListPermissionsResponse\x12E\n" +
-	"\vpermissions\x18\x01 \x03(\v2#.origincloud.iam.v1beta1.PermissionR\vpermissions\"k\n" +
+	"\vpermissions\x18\x01 \x03(\v2#.origincloud.iam.v1beta1.PermissionR\vpermissions\"\xa5\x01\n" +
 	"\x19TestIamPermissionsRequest\x12&\n" +
 	"\bresource\x18\x01 \x01(\tB\n" +
 	"\xe2A\x01\x02\xfaA\x03\n" +
 	"\x01*R\bresource\x12&\n" +
-	"\vpermissions\x18\x02 \x03(\tB\x04\xe2A\x01\x02R\vpermissions\">\n" +
+	"\vpermissions\x18\x02 \x03(\tB\x04\xe2A\x01\x02R\vpermissions\x128\n" +
+	"\x12full_resource_name\x18\x03 \x01(\tB\n" +
+	"\xe2A\x01\x01\xfaA\x03\n" +
+	"\x01*R\x10fullResourceName\">\n" +
 	"\x1aTestIamPermissionsResponse\x12 \n" +
 	"\vpermissions\x18\x01 \x03(\tR\vpermissions2\x91\x04\n" +
 	"\x11PermissionService\x12\x91\x01\n" +

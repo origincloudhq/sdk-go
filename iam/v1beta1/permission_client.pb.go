@@ -82,11 +82,14 @@ func (c *PermissionClient) ListPermissions(ctx context.Context, req *ListPermiss
 }
 
 // TestIamPermissions returns the subset of `permissions` the caller holds on an organization
-// or a project. A permission held on the organization counts for each of
-// its projects; one held on a project counts only there. Every resource
-// in a project is governed by the project's permissions, so asking about
-// the project answers for each of its resources. A permission the
-// catalog doesn't name is never held.
+// or a project, or on one resource in it. A permission held on the
+// organization counts for each of its projects; one held on a project
+// counts only there. A role binding limited to a list of resources counts
+// only for the resources it lists, never for the organization or the
+// project itself, so asking about the project answers for each of its
+// resources only as far as bindings on the whole project go: name the
+// resource in `full_resource_name` to have it answered as a call on that
+// resource is. A permission the catalog doesn't name is never held.
 func (c *PermissionClient) TestIamPermissions(ctx context.Context, req *TestIamPermissionsRequest) (*TestIamPermissionsResponse, error) {
 	n1, err := c.service.RelativeName("resource", req.GetResource(), "*")
 	if err != nil {
