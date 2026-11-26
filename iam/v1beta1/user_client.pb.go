@@ -16,7 +16,9 @@ import (
 // or by their own id; the role bindings they hold are listed by
 // ListRoleBindings with the parent `organizations/-`. Anyone who may grant
 // roles in an organization can look a user up by email address, to name
-// them in a role binding.
+// them in a role binding. A client calls ActivatePendingRoleBindings once a
+// user has signed in, so the role bindings pending for their address become
+// theirs.
 type UserClient struct {
 	service *core.Service
 }
@@ -82,6 +84,39 @@ func (c *UserClient) LookupUser(ctx context.Context, req *LookupUserRequest) (*U
 		Path:       "/v1beta1/users:lookup",
 		Query:      query,
 		Idempotent: true,
+	}, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// ActivatePendingRoleBindings activates the role bindings pending for the caller's email address,
+// once the caller's account has verified it, and returns the caller's
+// profile, as GetUser does. Each binding becomes active under its own
+// name with the caller as its member, while whoever created it still
+// holds every permission of its role in the organization; otherwise it
+// is dropped. An address not yet verified activates nothing. Calling it
+// again activates only what has been granted to the address since. A
+// service account caller is refused with `BAD_REQUEST`; any user but the
+// caller is `NOT_FOUND`.
+func (c *UserClient) ActivatePendingRoleBindings(ctx context.Context, req *ActivatePendingRoleBindingsRequest) (*User, error) {
+	n1, err := c.service.RelativeName("name", req.GetName(), "iam")
+	if err != nil {
+		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "users/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*ActivatePendingRoleBindingsRequest)
+		req.Name = n1
+	}
+	out := new(User)
+	if err := c.service.Call(ctx, core.Request{
+		Method: http.MethodPost,
+		Path:   "/v1beta1/" + p1 + ":activatePendingRoleBindings",
+		Body:   req,
 	}, out); err != nil {
 		return nil, err
 	}
