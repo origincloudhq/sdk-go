@@ -8,7 +8,7 @@
 //
 // A role is a predefined, named set of permissions; a role binding grants
 // one to a user, a service account or a platform service agent,
-// organization-wide or in one project.
+// organization-wide, in one project or on one service account.
 // An organization's audit log records each change to who may do what in it.
 
 package iamv1beta1
@@ -85,8 +85,9 @@ func (RoleBinding_State) EnumDescriptor() ([]byte, []int) {
 	return file_origincloud_iam_v1beta1_role_binding_proto_rawDescGZIP(), []int{0, 0}
 }
 
-// One role granted to one member, organization-wide or in one project. A
-// binding can't be changed: delete it and create another.
+// One role granted to one member, organization-wide, in one project or on
+// one service account. A binding can't be changed: delete it and create
+// another.
 type RoleBinding struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The binding's resource name. A pending binding keeps its name when it
@@ -108,8 +109,19 @@ type RoleBinding struct {
 	// The full name of the project the binding is limited to, one of the
 	// organization's: `//resourcemanager.origincloudapis.eu/projects/{project}`.
 	// Empty for a binding on the whole organization, which covers every
-	// project in it.
+	// project in it, and for a binding on one service account.
 	Project string `protobuf:"bytes,5,opt,name=project,proto3" json:"project,omitempty"`
+	// The full name of the service account the binding is limited to, one of
+	// the organization's active accounts:
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`.
+	// Such a binding grants its role on that account alone, and nothing on
+	// the organization or its projects. Only a role whose every permission
+	// acts on one service account can be bound so:
+	// `roles/iam.service-account-token-creator`, which lets the member get an
+	// access token for that account and no other. Empty for a binding on the
+	// whole organization or a project; never set together with `project`.
+	// The binding is removed when the account is deleted.
+	ServiceAccount string `protobuf:"bytes,9,opt,name=service_account,json=serviceAccount,proto3" json:"service_account,omitempty"`
 	// The full name of who created the binding: `//iam.origincloudapis.eu/users/{user}`,
 	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`,
 	// `//iam.origincloudapis.eu/serviceAgents/{service_agent}` for a platform
@@ -178,6 +190,13 @@ func (x *RoleBinding) GetRole() string {
 func (x *RoleBinding) GetProject() string {
 	if x != nil {
 		return x.Project
+	}
+	return ""
+}
+
+func (x *RoleBinding) GetServiceAccount() string {
+	if x != nil {
+		return x.ServiceAccount
 	}
 	return ""
 }
@@ -276,9 +295,18 @@ type ListRoleBindingsRequest struct {
 	// default.
 	PageSize int32 `protobuf:"varint,4,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
 	// A previous response's `next_page_token`, for the page after it.
-	PageToken     string `protobuf:"bytes,5,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	PageToken string `protobuf:"bytes,5,opt,name=page_token,json=pageToken,proto3" json:"page_token,omitempty"`
+	// Only the bindings limited to this service account, by its full name,
+	// `//iam.origincloudapis.eu/organizations/{organization}/serviceAccounts/{service_account}`.
+	// Every binding, whatever its scope, when empty. Can't be set together
+	// with `project`: no binding is limited to both.
+	//
+	// (-- api-linter: core::0132::request-unknown-fields=disabled
+	//
+	//	aip.dev/not-precedent: a typed filter, in place of a filter string. --)
+	ServiceAccount string `protobuf:"bytes,6,opt,name=service_account,json=serviceAccount,proto3" json:"service_account,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *ListRoleBindingsRequest) Reset() {
@@ -346,6 +374,13 @@ func (x *ListRoleBindingsRequest) GetPageToken() string {
 	return ""
 }
 
+func (x *ListRoleBindingsRequest) GetServiceAccount() string {
+	if x != nil {
+		return x.ServiceAccount
+	}
+	return ""
+}
+
 // The response for ListRoleBindings.
 type ListRoleBindingsResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -408,7 +443,7 @@ type CreateRoleBindingRequest struct {
 	// `organizations/{organization}`.
 	Parent string `protobuf:"bytes,1,opt,name=parent,proto3" json:"parent,omitempty"`
 	// The binding to create: its member and role, and optionally its
-	// project.
+	// project or its service account.
 	RoleBinding *RoleBinding `protobuf:"bytes,2,opt,name=role_binding,json=roleBinding,proto3" json:"role_binding,omitempty"`
 	// A UUID. A repeat of the request with the same `request_id` within a
 	// day returns the binding the first request created, as it is now,
@@ -529,7 +564,7 @@ var File_origincloud_iam_v1beta1_role_binding_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\n" +
-	"*origincloud/iam/v1beta1/role_binding.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbf\x04\n" +
+	"*origincloud/iam/v1beta1/role_binding.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x99\x05\n" +
 	"\vRoleBinding\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12#\n" +
 	"\x06member\x18\x03 \x01(\tB\v\xe2A\x02\x02\x05\xfaA\x03\n" +
@@ -537,7 +572,9 @@ const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\x04role\x18\x04 \x01(\tB%\xe2A\x02\x02\x05\xfaA\x1d\n" +
 	"\x1biam.origincloudapis.eu/RoleR\x04role\x12N\n" +
 	"\aproject\x18\x05 \x01(\tB4\xe2A\x02\x01\x05\xfaA,\n" +
-	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12$\n" +
+	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12X\n" +
+	"\x0fservice_account\x18\t \x01(\tB/\xe2A\x02\x01\x05\xfaA'\n" +
+	"%iam.origincloudapis.eu/ServiceAccountR\x0eserviceAccount\x12$\n" +
 	"\acreator\x18\x06 \x01(\tB\n" +
 	"\xe2A\x01\x03\xfaA\x03\n" +
 	"\x01*R\acreator\x12A\n" +
@@ -552,7 +589,7 @@ const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\"iam.origincloudapis.eu/RoleBinding\x128organizations/{organization}/roleBindings/{role_binding}*\froleBindings2\vroleBinding\"X\n" +
 	"\x15GetRoleBindingRequest\x12?\n" +
 	"\x04name\x18\x01 \x01(\tB+\xe2A\x01\x02\xfaA$\n" +
-	"\"iam.origincloudapis.eu/RoleBindingR\x04name\"\x99\x02\n" +
+	"\"iam.origincloudapis.eu/RoleBindingR\x04name\"\xf2\x02\n" +
 	"\x17ListRoleBindingsRequest\x12C\n" +
 	"\x06parent\x18\x01 \x01(\tB+\xe2A\x01\x02\xfaA$\x12\"iam.origincloudapis.eu/RoleBindingR\x06parent\x12\"\n" +
 	"\x06member\x18\x02 \x01(\tB\n" +
@@ -562,7 +599,9 @@ const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"*resourcemanager.origincloudapis.eu/ProjectR\aproject\x12!\n" +
 	"\tpage_size\x18\x04 \x01(\x05B\x04\xe2A\x01\x01R\bpageSize\x12#\n" +
 	"\n" +
-	"page_token\x18\x05 \x01(\tB\x04\xe2A\x01\x01R\tpageToken\"\x8d\x01\n" +
+	"page_token\x18\x05 \x01(\tB\x04\xe2A\x01\x01R\tpageToken\x12W\n" +
+	"\x0fservice_account\x18\x06 \x01(\tB.\xe2A\x01\x01\xfaA'\n" +
+	"%iam.origincloudapis.eu/ServiceAccountR\x0eserviceAccount\"\x8d\x01\n" +
 	"\x18ListRoleBindingsResponse\x12I\n" +
 	"\rrole_bindings\x18\x01 \x03(\v2$.origincloud.iam.v1beta1.RoleBindingR\froleBindings\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xdb\x01\n" +
