@@ -18,8 +18,10 @@ import (
 // organization, in one of its projects or on one of its service accounts.
 // A binding on an organization or a project can be limited further, to a
 // list of resources within it. A member's access is the union
-// of its bindings. Each binding is managed on its own, so creating or
-// deleting one never touches another, whoever made it.
+// of its bindings. Each binding is managed on its own, so creating,
+// updating or deleting one never touches another, whoever made it. Of a
+// binding, only `resources` can change; its member, role and scope never
+// do.
 //
 // A binding's `resources` lists the full names of the resources it grants
 // its role on, such as one secret of a project. A binding with `resources`
@@ -271,6 +273,61 @@ func (c *RoleBindingClient) DeleteRoleBinding(ctx context.Context, req *DeleteRo
 	if err := c.service.Call(ctx, core.Request{
 		Method:     http.MethodDelete,
 		Path:       "/v1beta1/" + p1,
+		Query:      query,
+		Idempotent: true,
+	}, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// UpdateRoleBinding replaces the list of resources a binding is limited to, and answers
+// with the binding as it is now. `update_mask` must be `resources`: no
+// other field of a binding can change. The new list replaces the old one
+// at once: the member keeps the role on every entry in both throughout,
+// gains it on the entries added and loses it on those removed. An empty
+// list widens the binding to its whole scope. The new list is checked as
+// on CreateRoleBinding, and refused with `BAD_REQUEST` for the same
+// entries.
+//
+// Needs `iam.role.assign` on the organization, and every permission of
+// the role on each resource of the new list and of the old one, as
+// CreateRoleBinding and DeleteRoleBinding need: a permission held on the
+// binding's scope counts, and so does one held through a binding that
+// lists the resource; for a binding on its whole scope, only one held on
+// that scope counts. Refused with `NOT_FOUND` when the organization has no
+// such binding, and with `BAD_REQUEST` when `update_mask` is empty or names
+// another field, and for a pending binding, which is on the whole
+// organization until it is active. Recorded in the audit log, naming the
+// entries added and removed, unless the list stayed the same. Repeated
+// under its `request_id`, the call answers with the binding as it is now
+// and changes nothing.
+func (c *RoleBindingClient) UpdateRoleBinding(ctx context.Context, req *UpdateRoleBindingRequest) (*RoleBinding, error) {
+	if req.GetRequestId() == "" {
+		req = proto.Clone(req).(*UpdateRoleBindingRequest)
+		req.RequestId = core.NewRequestID()
+	}
+	n1, err := c.service.RelativeName("roleBinding.name", req.GetRoleBinding().GetName(), "iam")
+	if err != nil {
+		return nil, err
+	}
+	p1, err := core.PathValue("roleBinding.name", n1, "organizations/*/roleBindings/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetRoleBinding().GetName() {
+		req = proto.Clone(req).(*UpdateRoleBindingRequest)
+		req.RoleBinding.Name = n1
+	}
+	query, err := core.Query(req, "roleBinding.name", "roleBinding")
+	if err != nil {
+		return nil, err
+	}
+	out := new(RoleBinding)
+	if err := c.service.Call(ctx, core.Request{
+		Method:     http.MethodPatch,
+		Path:       "/v1beta1/" + p1,
+		Body:       req.GetRoleBinding(),
 		Query:      query,
 		Idempotent: true,
 	}, out); err != nil {
