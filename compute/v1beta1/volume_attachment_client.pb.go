@@ -16,8 +16,8 @@ import (
 // VolumeAttachmentClient calls VolumeAttachmentService.
 //
 // Volume attachments: which volumes of the persistent volume service an
-// instance holds, and the device names its guest sees them under. Creating
-// one attaches a volume, deleting it detaches the volume.
+// instance holds, and the slot each one takes on the instance. Creating one
+// attaches a volume, deleting it detaches the volume.
 type VolumeAttachmentClient struct {
 	service *core.Service
 }

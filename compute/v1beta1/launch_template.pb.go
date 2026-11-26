@@ -895,9 +895,12 @@ type LocalDisk struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The size in GiB, at least 1.
 	SizeGib int32 `protobuf:"varint,1,opt,name=size_gib,json=sizeGib,proto3" json:"size_gib,omitempty"`
-	// The device name the guest sees the disk under, `vda` to `vdz` but
-	// `vdc`, and none the boot volume or another local disk has. The first
-	// free one, in the order the disks are listed, when left empty.
+	// The slot the disk takes on the instance, `vda` to `vdz` but `vdc`, and
+	// none the boot volume or another local disk has; the first free one, in
+	// the order the disks are listed, when left empty. It is a hint at most,
+	// not the name the guest gives the disk. In the guest, the disk's serial
+	// is its volume's id, which a Linux guest links as
+	// `/dev/disk/by-id/virtio-<volume-id>`.
 	Device        string `protobuf:"bytes,2,opt,name=device,proto3" json:"device,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
