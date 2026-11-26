@@ -18,6 +18,7 @@ import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	fieldmaskpb "google.golang.org/protobuf/types/known/fieldmaskpb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
@@ -86,8 +87,9 @@ func (RoleBinding_State) EnumDescriptor() ([]byte, []int) {
 }
 
 // One role granted to one member, organization-wide, in one project or on
-// one service account, optionally only on a list of resources there. A
-// binding can't be changed: delete it and create another.
+// one service account, optionally only on a list of resources there. Only
+// its list of resources can be changed, with UpdateRoleBinding; to change
+// anything else, delete the binding and create another.
 type RoleBinding struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The binding's resource name. A pending binding keeps its name when it
@@ -143,6 +145,7 @@ type RoleBinding struct {
 	// listed. Never set together with `service_account`, nor on a pending
 	// binding. A resource deleted after the binding was created stays listed,
 	// and the binding covers a resource created later under the same name.
+	// The one field UpdateRoleBinding changes.
 	Resources     []string `protobuf:"bytes,10,rep,name=resources,proto3" json:"resources,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -546,6 +549,73 @@ func (x *CreateRoleBindingRequest) GetRequestId() string {
 	return ""
 }
 
+// The request for UpdateRoleBinding.
+type UpdateRoleBindingRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The binding to change, by its `name`, with the list of resources to
+	// limit it to in `resources`. Its other fields are ignored.
+	RoleBinding *RoleBinding `protobuf:"bytes,1,opt,name=role_binding,json=roleBinding,proto3" json:"role_binding,omitempty"`
+	// The fields to change: `resources`, the only field that can.
+	UpdateMask *fieldmaskpb.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
+	// A UUID. A repeat of the request with the same `request_id` within a
+	// day answers with the binding as it is now, instead of changing it
+	// again.
+	RequestId     string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateRoleBindingRequest) Reset() {
+	*x = UpdateRoleBindingRequest{}
+	mi := &file_origincloud_iam_v1beta1_role_binding_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateRoleBindingRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateRoleBindingRequest) ProtoMessage() {}
+
+func (x *UpdateRoleBindingRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_origincloud_iam_v1beta1_role_binding_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateRoleBindingRequest.ProtoReflect.Descriptor instead.
+func (*UpdateRoleBindingRequest) Descriptor() ([]byte, []int) {
+	return file_origincloud_iam_v1beta1_role_binding_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *UpdateRoleBindingRequest) GetRoleBinding() *RoleBinding {
+	if x != nil {
+		return x.RoleBinding
+	}
+	return nil
+}
+
+func (x *UpdateRoleBindingRequest) GetUpdateMask() *fieldmaskpb.FieldMask {
+	if x != nil {
+		return x.UpdateMask
+	}
+	return nil
+}
+
+func (x *UpdateRoleBindingRequest) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
 // The request for DeleteRoleBinding.
 type DeleteRoleBindingRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -560,7 +630,7 @@ type DeleteRoleBindingRequest struct {
 
 func (x *DeleteRoleBindingRequest) Reset() {
 	*x = DeleteRoleBindingRequest{}
-	mi := &file_origincloud_iam_v1beta1_role_binding_proto_msgTypes[5]
+	mi := &file_origincloud_iam_v1beta1_role_binding_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -572,7 +642,7 @@ func (x *DeleteRoleBindingRequest) String() string {
 func (*DeleteRoleBindingRequest) ProtoMessage() {}
 
 func (x *DeleteRoleBindingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_iam_v1beta1_role_binding_proto_msgTypes[5]
+	mi := &file_origincloud_iam_v1beta1_role_binding_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -585,7 +655,7 @@ func (x *DeleteRoleBindingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteRoleBindingRequest.ProtoReflect.Descriptor instead.
 func (*DeleteRoleBindingRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_iam_v1beta1_role_binding_proto_rawDescGZIP(), []int{5}
+	return file_origincloud_iam_v1beta1_role_binding_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DeleteRoleBindingRequest) GetName() string {
@@ -606,7 +676,7 @@ var File_origincloud_iam_v1beta1_role_binding_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\n" +
-	"*origincloud/iam/v1beta1/role_binding.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc4\x05\n" +
+	"*origincloud/iam/v1beta1/role_binding.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc3\x05\n" +
 	"\vRoleBinding\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12#\n" +
 	"\x06member\x18\x03 \x01(\tB\v\xe2A\x02\x02\x05\xfaA\x03\n" +
@@ -622,9 +692,10 @@ const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\x01*R\acreator\x12A\n" +
 	"\vcreate_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime\x12F\n" +
-	"\x05state\x18\b \x01(\x0e2*.origincloud.iam.v1beta1.RoleBinding.StateB\x04\xe2A\x01\x03R\x05state\x12)\n" +
+	"\x05state\x18\b \x01(\x0e2*.origincloud.iam.v1beta1.RoleBinding.StateB\x04\xe2A\x01\x03R\x05state\x12(\n" +
 	"\tresources\x18\n" +
-	" \x03(\tB\v\xe2A\x02\x01\x05\xfaA\x03\n" +
+	" \x03(\tB\n" +
+	"\xe2A\x01\x01\xfaA\x03\n" +
 	"\x01*R\tresources\"7\n" +
 	"\x05State\x12\x15\n" +
 	"\x11STATE_UNSPECIFIED\x10\x00\x12\n" +
@@ -657,17 +728,24 @@ const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\x06parent\x18\x01 \x01(\tB+\xe2A\x01\x02\xfaA$\x12\"iam.origincloudapis.eu/RoleBindingR\x06parent\x12M\n" +
 	"\frole_binding\x18\x02 \x01(\v2$.origincloud.iam.v1beta1.RoleBindingB\x04\xe2A\x01\x02R\vroleBinding\x12+\n" +
 	"\n" +
+	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\xd9\x01\n" +
+	"\x18UpdateRoleBindingRequest\x12M\n" +
+	"\frole_binding\x18\x01 \x01(\v2$.origincloud.iam.v1beta1.RoleBindingB\x04\xe2A\x01\x02R\vroleBinding\x12A\n" +
+	"\vupdate_mask\x18\x02 \x01(\v2\x1a.google.protobuf.FieldMaskB\x04\xe2A\x01\x02R\n" +
+	"updateMask\x12+\n" +
+	"\n" +
 	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\x88\x01\n" +
 	"\x18DeleteRoleBindingRequest\x12?\n" +
 	"\x04name\x18\x01 \x01(\tB+\xe2A\x01\x02\xfaA$\n" +
 	"\"iam.origincloudapis.eu/RoleBindingR\x04name\x12+\n" +
 	"\n" +
-	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId2\xfd\x05\n" +
+	"request_id\x18\x02 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId2\xda\a\n" +
 	"\x12RoleBindingService\x12\xa5\x01\n" +
 	"\x0eGetRoleBinding\x12..origincloud.iam.v1beta1.GetRoleBindingRequest\x1a$.origincloud.iam.v1beta1.RoleBinding\"=\xdaA\x04name\x82\xd3\xe4\x93\x020\x12./v1beta1/{name=organizations/*/roleBindings/*}\x12\xb8\x01\n" +
 	"\x10ListRoleBindings\x120.origincloud.iam.v1beta1.ListRoleBindingsRequest\x1a1.origincloud.iam.v1beta1.ListRoleBindingsResponse\"?\xdaA\x06parent\x82\xd3\xe4\x93\x020\x12./v1beta1/{parent=organizations/*}/roleBindings\x12\xc8\x01\n" +
 	"\x11CreateRoleBinding\x121.origincloud.iam.v1beta1.CreateRoleBindingRequest\x1a$.origincloud.iam.v1beta1.RoleBinding\"Z\xdaA\x13parent,role_binding\x82\xd3\xe4\x93\x02>:\frole_binding\"./v1beta1/{parent=organizations/*}/roleBindings\x12\x9d\x01\n" +
-	"\x11DeleteRoleBinding\x121.origincloud.iam.v1beta1.DeleteRoleBindingRequest\x1a\x16.google.protobuf.Empty\"=\xdaA\x04name\x82\xd3\xe4\x93\x020*./v1beta1/{name=organizations/*/roleBindings/*}\x1a\x19\xcaA\x16iam.origincloudapis.eub\x06proto3"
+	"\x11DeleteRoleBinding\x121.origincloud.iam.v1beta1.DeleteRoleBindingRequest\x1a\x16.google.protobuf.Empty\"=\xdaA\x04name\x82\xd3\xe4\x93\x020*./v1beta1/{name=organizations/*/roleBindings/*}\x12\xda\x01\n" +
+	"\x11UpdateRoleBinding\x121.origincloud.iam.v1beta1.UpdateRoleBindingRequest\x1a$.origincloud.iam.v1beta1.RoleBinding\"l\xdaA\x18role_binding,update_mask\x82\xd3\xe4\x93\x02K:\frole_binding2;/v1beta1/{role_binding.name=organizations/*/roleBindings/*}\x1a\x19\xcaA\x16iam.origincloudapis.eub\x06proto3"
 
 var (
 	file_origincloud_iam_v1beta1_role_binding_proto_rawDescOnce sync.Once
@@ -682,7 +760,7 @@ func file_origincloud_iam_v1beta1_role_binding_proto_rawDescGZIP() []byte {
 }
 
 var file_origincloud_iam_v1beta1_role_binding_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_origincloud_iam_v1beta1_role_binding_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
+var file_origincloud_iam_v1beta1_role_binding_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
 var file_origincloud_iam_v1beta1_role_binding_proto_goTypes = []any{
 	(RoleBinding_State)(0),           // 0: origincloud.iam.v1beta1.RoleBinding.State
 	(*RoleBinding)(nil),              // 1: origincloud.iam.v1beta1.RoleBinding
@@ -690,28 +768,34 @@ var file_origincloud_iam_v1beta1_role_binding_proto_goTypes = []any{
 	(*ListRoleBindingsRequest)(nil),  // 3: origincloud.iam.v1beta1.ListRoleBindingsRequest
 	(*ListRoleBindingsResponse)(nil), // 4: origincloud.iam.v1beta1.ListRoleBindingsResponse
 	(*CreateRoleBindingRequest)(nil), // 5: origincloud.iam.v1beta1.CreateRoleBindingRequest
-	(*DeleteRoleBindingRequest)(nil), // 6: origincloud.iam.v1beta1.DeleteRoleBindingRequest
-	(*timestamppb.Timestamp)(nil),    // 7: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),            // 8: google.protobuf.Empty
+	(*UpdateRoleBindingRequest)(nil), // 6: origincloud.iam.v1beta1.UpdateRoleBindingRequest
+	(*DeleteRoleBindingRequest)(nil), // 7: origincloud.iam.v1beta1.DeleteRoleBindingRequest
+	(*timestamppb.Timestamp)(nil),    // 8: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),    // 9: google.protobuf.FieldMask
+	(*emptypb.Empty)(nil),            // 10: google.protobuf.Empty
 }
 var file_origincloud_iam_v1beta1_role_binding_proto_depIdxs = []int32{
-	7, // 0: origincloud.iam.v1beta1.RoleBinding.create_time:type_name -> google.protobuf.Timestamp
-	0, // 1: origincloud.iam.v1beta1.RoleBinding.state:type_name -> origincloud.iam.v1beta1.RoleBinding.State
-	1, // 2: origincloud.iam.v1beta1.ListRoleBindingsResponse.role_bindings:type_name -> origincloud.iam.v1beta1.RoleBinding
-	1, // 3: origincloud.iam.v1beta1.CreateRoleBindingRequest.role_binding:type_name -> origincloud.iam.v1beta1.RoleBinding
-	2, // 4: origincloud.iam.v1beta1.RoleBindingService.GetRoleBinding:input_type -> origincloud.iam.v1beta1.GetRoleBindingRequest
-	3, // 5: origincloud.iam.v1beta1.RoleBindingService.ListRoleBindings:input_type -> origincloud.iam.v1beta1.ListRoleBindingsRequest
-	5, // 6: origincloud.iam.v1beta1.RoleBindingService.CreateRoleBinding:input_type -> origincloud.iam.v1beta1.CreateRoleBindingRequest
-	6, // 7: origincloud.iam.v1beta1.RoleBindingService.DeleteRoleBinding:input_type -> origincloud.iam.v1beta1.DeleteRoleBindingRequest
-	1, // 8: origincloud.iam.v1beta1.RoleBindingService.GetRoleBinding:output_type -> origincloud.iam.v1beta1.RoleBinding
-	4, // 9: origincloud.iam.v1beta1.RoleBindingService.ListRoleBindings:output_type -> origincloud.iam.v1beta1.ListRoleBindingsResponse
-	1, // 10: origincloud.iam.v1beta1.RoleBindingService.CreateRoleBinding:output_type -> origincloud.iam.v1beta1.RoleBinding
-	8, // 11: origincloud.iam.v1beta1.RoleBindingService.DeleteRoleBinding:output_type -> google.protobuf.Empty
-	8, // [8:12] is the sub-list for method output_type
-	4, // [4:8] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	8,  // 0: origincloud.iam.v1beta1.RoleBinding.create_time:type_name -> google.protobuf.Timestamp
+	0,  // 1: origincloud.iam.v1beta1.RoleBinding.state:type_name -> origincloud.iam.v1beta1.RoleBinding.State
+	1,  // 2: origincloud.iam.v1beta1.ListRoleBindingsResponse.role_bindings:type_name -> origincloud.iam.v1beta1.RoleBinding
+	1,  // 3: origincloud.iam.v1beta1.CreateRoleBindingRequest.role_binding:type_name -> origincloud.iam.v1beta1.RoleBinding
+	1,  // 4: origincloud.iam.v1beta1.UpdateRoleBindingRequest.role_binding:type_name -> origincloud.iam.v1beta1.RoleBinding
+	9,  // 5: origincloud.iam.v1beta1.UpdateRoleBindingRequest.update_mask:type_name -> google.protobuf.FieldMask
+	2,  // 6: origincloud.iam.v1beta1.RoleBindingService.GetRoleBinding:input_type -> origincloud.iam.v1beta1.GetRoleBindingRequest
+	3,  // 7: origincloud.iam.v1beta1.RoleBindingService.ListRoleBindings:input_type -> origincloud.iam.v1beta1.ListRoleBindingsRequest
+	5,  // 8: origincloud.iam.v1beta1.RoleBindingService.CreateRoleBinding:input_type -> origincloud.iam.v1beta1.CreateRoleBindingRequest
+	7,  // 9: origincloud.iam.v1beta1.RoleBindingService.DeleteRoleBinding:input_type -> origincloud.iam.v1beta1.DeleteRoleBindingRequest
+	6,  // 10: origincloud.iam.v1beta1.RoleBindingService.UpdateRoleBinding:input_type -> origincloud.iam.v1beta1.UpdateRoleBindingRequest
+	1,  // 11: origincloud.iam.v1beta1.RoleBindingService.GetRoleBinding:output_type -> origincloud.iam.v1beta1.RoleBinding
+	4,  // 12: origincloud.iam.v1beta1.RoleBindingService.ListRoleBindings:output_type -> origincloud.iam.v1beta1.ListRoleBindingsResponse
+	1,  // 13: origincloud.iam.v1beta1.RoleBindingService.CreateRoleBinding:output_type -> origincloud.iam.v1beta1.RoleBinding
+	10, // 14: origincloud.iam.v1beta1.RoleBindingService.DeleteRoleBinding:output_type -> google.protobuf.Empty
+	1,  // 15: origincloud.iam.v1beta1.RoleBindingService.UpdateRoleBinding:output_type -> origincloud.iam.v1beta1.RoleBinding
+	11, // [11:16] is the sub-list for method output_type
+	6,  // [6:11] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_origincloud_iam_v1beta1_role_binding_proto_init() }
@@ -725,7 +809,7 @@ func file_origincloud_iam_v1beta1_role_binding_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_origincloud_iam_v1beta1_role_binding_proto_rawDesc), len(file_origincloud_iam_v1beta1_role_binding_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   6,
+			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
