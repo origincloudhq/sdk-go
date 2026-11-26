@@ -86,8 +86,8 @@ func (RoleBinding_State) EnumDescriptor() ([]byte, []int) {
 }
 
 // One role granted to one member, organization-wide, in one project or on
-// one service account. A binding can't be changed: delete it and create
-// another.
+// one service account, optionally only on a list of resources there. A
+// binding can't be changed: delete it and create another.
 type RoleBinding struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The binding's resource name. A pending binding keeps its name when it
@@ -131,7 +131,19 @@ type RoleBinding struct {
 	// When the binding was created.
 	CreateTime *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
 	// Whether the binding grants its role yet.
-	State         RoleBinding_State `protobuf:"varint,8,opt,name=state,proto3,enum=origincloud.iam.v1beta1.RoleBinding_State" json:"state,omitempty"`
+	State RoleBinding_State `protobuf:"varint,8,opt,name=state,proto3,enum=origincloud.iam.v1beta1.RoleBinding_State" json:"state,omitempty"`
+	// The full names of the resources the binding is limited to within its
+	// organization or project, such as
+	// `//secretmanager.origincloudapis.eu/projects/{project}/regions/{region}/secrets/{secret}`,
+	// in name order; at most 100. The binding grants its role on these
+	// resources alone, and nothing on the rest of its scope or on the
+	// organization or the project itself. Empty for a binding on its whole
+	// scope. Each entry must be a resource of the binding's organization, in
+	// the binding's project if `project` is set, of a kind that can be
+	// listed. Never set together with `service_account`, nor on a pending
+	// binding. A resource deleted after the binding was created stays listed,
+	// and the binding covers a resource created later under the same name.
+	Resources     []string `protobuf:"bytes,10,rep,name=resources,proto3" json:"resources,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -222,6 +234,13 @@ func (x *RoleBinding) GetState() RoleBinding_State {
 	return RoleBinding_STATE_UNSPECIFIED
 }
 
+func (x *RoleBinding) GetResources() []string {
+	if x != nil {
+		return x.Resources
+	}
+	return nil
+}
+
 // The request for GetRoleBinding.
 type GetRoleBindingRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -305,8 +324,24 @@ type ListRoleBindingsRequest struct {
 	//
 	//	aip.dev/not-precedent: a typed filter, in place of a filter string. --)
 	ServiceAccount string `protobuf:"bytes,6,opt,name=service_account,json=serviceAccount,proto3" json:"service_account,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	// Only the active bindings that apply to this resource, by its full
+	// name, such as
+	// `//secretmanager.origincloudapis.eu/projects/{project}/regions/{region}/secrets/{secret}`:
+	// those that list it in `resources`, and those with `resources` empty on
+	// the organization or on the resource's project, which cover it as a
+	// whole. A binding on a service account applies to no resource here, and
+	// a pending binding to none until it is active. Every binding when empty.
+	// Combines with the other filters. Refused with `BAD_REQUEST` when it
+	// isn't a full name or names a kind of resource a binding can't list:
+	// only the bindings on its organization or project apply to such a
+	// resource, which the `project` filter, or none, lists.
+	//
+	// (-- api-linter: core::0132::request-unknown-fields=disabled
+	//
+	//	aip.dev/not-precedent: a typed filter, in place of a filter string. --)
+	Resource      string `protobuf:"bytes,7,opt,name=resource,proto3" json:"resource,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ListRoleBindingsRequest) Reset() {
@@ -377,6 +412,13 @@ func (x *ListRoleBindingsRequest) GetPageToken() string {
 func (x *ListRoleBindingsRequest) GetServiceAccount() string {
 	if x != nil {
 		return x.ServiceAccount
+	}
+	return ""
+}
+
+func (x *ListRoleBindingsRequest) GetResource() string {
+	if x != nil {
+		return x.Resource
 	}
 	return ""
 }
@@ -564,7 +606,7 @@ var File_origincloud_iam_v1beta1_role_binding_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\n" +
-	"*origincloud/iam/v1beta1/role_binding.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x99\x05\n" +
+	"*origincloud/iam/v1beta1/role_binding.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc4\x05\n" +
 	"\vRoleBinding\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12#\n" +
 	"\x06member\x18\x03 \x01(\tB\v\xe2A\x02\x02\x05\xfaA\x03\n" +
@@ -580,7 +622,10 @@ const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\x01*R\acreator\x12A\n" +
 	"\vcreate_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime\x12F\n" +
-	"\x05state\x18\b \x01(\x0e2*.origincloud.iam.v1beta1.RoleBinding.StateB\x04\xe2A\x01\x03R\x05state\"7\n" +
+	"\x05state\x18\b \x01(\x0e2*.origincloud.iam.v1beta1.RoleBinding.StateB\x04\xe2A\x01\x03R\x05state\x12)\n" +
+	"\tresources\x18\n" +
+	" \x03(\tB\v\xe2A\x02\x01\x05\xfaA\x03\n" +
+	"\x01*R\tresources\"7\n" +
 	"\x05State\x12\x15\n" +
 	"\x11STATE_UNSPECIFIED\x10\x00\x12\n" +
 	"\n" +
@@ -589,7 +634,7 @@ const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\"iam.origincloudapis.eu/RoleBinding\x128organizations/{organization}/roleBindings/{role_binding}*\froleBindings2\vroleBinding\"X\n" +
 	"\x15GetRoleBindingRequest\x12?\n" +
 	"\x04name\x18\x01 \x01(\tB+\xe2A\x01\x02\xfaA$\n" +
-	"\"iam.origincloudapis.eu/RoleBindingR\x04name\"\xf2\x02\n" +
+	"\"iam.origincloudapis.eu/RoleBindingR\x04name\"\x9a\x03\n" +
 	"\x17ListRoleBindingsRequest\x12C\n" +
 	"\x06parent\x18\x01 \x01(\tB+\xe2A\x01\x02\xfaA$\x12\"iam.origincloudapis.eu/RoleBindingR\x06parent\x12\"\n" +
 	"\x06member\x18\x02 \x01(\tB\n" +
@@ -601,7 +646,10 @@ const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\n" +
 	"page_token\x18\x05 \x01(\tB\x04\xe2A\x01\x01R\tpageToken\x12W\n" +
 	"\x0fservice_account\x18\x06 \x01(\tB.\xe2A\x01\x01\xfaA'\n" +
-	"%iam.origincloudapis.eu/ServiceAccountR\x0eserviceAccount\"\x8d\x01\n" +
+	"%iam.origincloudapis.eu/ServiceAccountR\x0eserviceAccount\x12&\n" +
+	"\bresource\x18\a \x01(\tB\n" +
+	"\xe2A\x01\x01\xfaA\x03\n" +
+	"\x01*R\bresource\"\x8d\x01\n" +
 	"\x18ListRoleBindingsResponse\x12I\n" +
 	"\rrole_bindings\x18\x01 \x03(\v2$.origincloud.iam.v1beta1.RoleBindingR\froleBindings\x12&\n" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"\xdb\x01\n" +

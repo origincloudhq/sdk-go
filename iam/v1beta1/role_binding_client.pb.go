@@ -16,9 +16,21 @@ import (
 //
 // Role bindings: each grants one role to one member, in a whole
 // organization, in one of its projects or on one of its service accounts.
-// A member's access is the union
+// A binding on an organization or a project can be limited further, to a
+// list of resources within it. A member's access is the union
 // of its bindings. Each binding is managed on its own, so creating or
 // deleting one never touches another, whoever made it.
+//
+// A binding's `resources` lists the full names of the resources it grants
+// its role on, such as one secret of a project. A binding with `resources`
+// empty covers its whole scope: every resource in the organization or the
+// project, and the organization or the project itself. A binding with
+// `resources` set covers exactly the resources it lists, and neither the
+// rest of its scope nor the organization or the project itself. A binding
+// grants on a resource's name: deleting a listed resource keeps the
+// binding, and a resource created later under the same name is covered by
+// it again. Only some kinds of resource can be listed; a service that
+// offers per-resource access says which of its resources can.
 //
 // A member is named by its full name, one of:
 //   - `//iam.origincloudapis.eu/users/{user}`: a user, by the id of their
@@ -96,7 +108,8 @@ func (c *RoleBindingClient) GetRoleBinding(ctx context.Context, req *GetRoleBind
 }
 
 // ListRoleBindings lists an organization's role bindings, active and pending, oldest
-// first, optionally only a member's, a project's or a service account's.
+// first, optionally only a member's, a project's or a service account's,
+// or only those that apply to one resource.
 // Needs
 // `iam.member.list` on the organization. With the parent
 // `organizations/-` it lists the caller's own active bindings in every
@@ -158,12 +171,23 @@ func (c *RoleBindingClient) AllRoleBindings(ctx context.Context, req *ListRoleBi
 // CreateRoleBinding grants a role to a member. Needs `iam.role.assign` on the
 // organization, for a project binding as well, and every permission of
 // the role at the binding's scope: a permission held on the organization
-// counts for any scope, one held on a project only for that project.
+// counts for any scope, one held on a project only for that project. A
+// binding with `resources` needs every permission of the role on each
+// resource it lists: a permission held on the resource's scope counts,
+// and so does one held through a binding that lists the resource.
 // Refused with `NOT_FOUND` when `member` names a user without an enabled
 // account or a service account of another organization, and when
 // `service_account` names an account the organization doesn't have.
 // Refused with `CONFLICT` when the member already holds the role at that
-// scope, and with `BAD_REQUEST` when the member is a deleted service
+// scope with the same `resources`, and, for now, also with other
+// `resources`: a member holds a role at one scope in one binding. Refused
+// with `BAD_REQUEST`, naming the entry, when an entry of `resources` isn't
+// a full name, is a resource of a kind that can't be listed, is outside
+// the binding's organization or project, or is listed twice; when
+// `resources` has more than 100 entries, is set together with
+// `service_account`, or lists a kind of resource none of the role's
+// permissions applies to. Refused with `BAD_REQUEST` when the member is a
+// deleted service
 // account, names no service agent the platform has, or is a service
 // agent and the role isn't one its service needs; when both `project`
 // and `service_account` are set; when `service_account` names a deleted
@@ -175,8 +199,8 @@ func (c *RoleBindingClient) AllRoleBindings(ctx context.Context, req *ListRoleBi
 // address is bound, as above. If no enabled account has verified it, the
 // binding is created `PENDING`, organization-wide, and an invitation
 // email is sent to the address. That also needs `iam.member.create` on
-// the organization, and is refused with `BAD_REQUEST` when `project` or
-// `service_account` is set and with `CONFLICT` when the address already holds a pending
+// the organization, and is refused with `BAD_REQUEST` when `project`,
+// `service_account` or `resources` is set and with `CONFLICT` when the address already holds a pending
 // binding of the role in the organization. An address more than one
 // account has verified is refused with `CONFLICT`. Repeated under its
 // `request_id`, the call answers with the binding it created, pending or
