@@ -31,7 +31,10 @@ const (
 	AuditLogEntry_OUTCOME_UNSPECIFIED AuditLogEntry_Outcome = 0
 	// It was made.
 	AuditLogEntry_SUCCEEDED AuditLogEntry_Outcome = 1
-	// It was refused for lack of a permission.
+	// It was refused for lack of a permission: an attempted change the actor
+	// holds no permission for. `action` is the permission, `target` what it
+	// was checked on, and `details` names both. The same denial again within
+	// a minute is not recorded again.
 	AuditLogEntry_DENIED AuditLogEntry_Outcome = 2
 	// It was attempted and refused for another reason, which `details`
 	// names in `reason`, such as a key asked to decrypt under the wrong
