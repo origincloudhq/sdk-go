@@ -163,8 +163,8 @@ func (x *PublicImage) GetFamilyCurrent() bool {
 // A disk of a public image.
 type PublicImageBlockDevice struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The device name the disk appears under on every instance launched from
-	// the image.
+	// The slot the disk takes on every instance launched from the image. It
+	// is a hint at most, not the name the guest gives the disk.
 	Device string `protobuf:"bytes,1,opt,name=device,proto3" json:"device,omitempty"`
 	// The disk's size in GiB.
 	SizeGib       int32 `protobuf:"varint,2,opt,name=size_gib,json=sizeGib,proto3" json:"size_gib,omitempty"`

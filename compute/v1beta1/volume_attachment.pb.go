@@ -105,8 +105,12 @@ type VolumeAttachment struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The volume's full name, in the instance's project and zone.
 	Volume string `protobuf:"bytes,3,opt,name=volume,proto3" json:"volume,omitempty"`
-	// The device name the guest sees the volume under, `vda` to `vdz`. The
-	// first free one when left empty.
+	// The slot the volume's disk takes on the instance, `vda` to `vdz` but
+	// `vdc`; the first free one when left empty. It is a hint at most, not
+	// the name the guest gives the disk: a guest names its disks in the
+	// order it finds them, so a disk attached to a running instance often
+	// gets another name. In the guest, the disk's serial is the volume's id,
+	// which a Linux guest links as `/dev/disk/by-id/virtio-<volume-id>`.
 	Device string `protobuf:"bytes,4,opt,name=device,proto3" json:"device,omitempty"`
 	// Whether this is the instance's boot volume, which was attached at
 	// launch and can't be detached.

@@ -310,8 +310,11 @@ func (x *Image) GetTags() map[string]string {
 // A disk of an image.
 type ImageBlockDevice struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// The device name the disk appears under on every instance launched from
-	// the image: `vda` to `vdz` but `vdc`, unique within the image.
+	// The slot the disk takes on every instance launched from the image:
+	// `vda` to `vdz` but `vdc`, unique within the image. It is a hint at
+	// most, not the name the guest gives the disk. In the guest, the disk's
+	// serial is its volume's id, which a Linux guest links as
+	// `/dev/disk/by-id/virtio-<volume-id>`.
 	Device string `protobuf:"bytes,1,opt,name=device,proto3" json:"device,omitempty"`
 	// The disk's size in GiB, at least the snapshot's.
 	SizeGib int32 `protobuf:"varint,2,opt,name=size_gib,json=sizeGib,proto3" json:"size_gib,omitempty"`
