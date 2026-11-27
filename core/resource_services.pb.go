@@ -14,5 +14,6 @@ var resourceServices = []string{
 	"network",
 	"pvs",
 	"resourcemanager",
+	"secretmanager",
 	"support",
 }

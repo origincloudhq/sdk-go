@@ -441,9 +441,13 @@ type Instance struct {
 	// disk, snapshotted, resized or detached, and an instance with one isn't
 	// moved to another machine while it runs. Each appears among the
 	// instance's volume attachments.
-	LocalDisks    []*LocalDisk `protobuf:"bytes,19,rep,name=local_disks,json=localDisks,proto3" json:"local_disks,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	LocalDisks []*LocalDisk `protobuf:"bytes,19,rep,name=local_disks,json=localDisks,proto3" json:"local_disks,omitempty"`
+	// What happens when the instance's operating system shuts it down: it
+	// stops, or it is terminated. `STOP` when left unspecified at launch.
+	// Changeable at any time before the instance is terminated.
+	ShutdownBehavior ShutdownBehavior `protobuf:"varint,20,opt,name=shutdown_behavior,json=shutdownBehavior,proto3,enum=origincloud.compute.v1beta1.ShutdownBehavior" json:"shutdown_behavior,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *Instance) Reset() {
@@ -600,6 +604,13 @@ func (x *Instance) GetLocalDisks() []*LocalDisk {
 		return x.LocalDisks
 	}
 	return nil
+}
+
+func (x *Instance) GetShutdownBehavior() ShutdownBehavior {
+	if x != nil {
+		return x.ShutdownBehavior
+	}
+	return ShutdownBehavior_SHUTDOWN_BEHAVIOR_UNSPECIFIED
 }
 
 // An instance's boot volume.
@@ -1192,9 +1203,10 @@ type UpdateInstanceRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The instance, by its name, with the fields to change.
 	Instance *Instance `protobuf:"bytes,1,opt,name=instance,proto3" json:"instance,omitempty"`
-	// The fields to change: any of `instance_type`, `tags` and
-	// `service_account`. `*` is all three, so an empty `service_account`
-	// under it removes the instance's.
+	// The fields to change: any of `instance_type`, `tags`,
+	// `service_account` and `shutdown_behavior`. `*` is all four, so an empty
+	// `service_account` under it removes the instance's, and an unspecified
+	// `shutdown_behavior` is `STOP`.
 	UpdateMask *fieldmaskpb.FieldMask `protobuf:"bytes,2,opt,name=update_mask,json=updateMask,proto3" json:"update_mask,omitempty"`
 	// A UUID; a repeat with the same id returns the first request's
 	// operation instead of changing the instance again.
@@ -1426,7 +1438,7 @@ var File_origincloud_compute_v1beta1_instance_proto protoreflect.FileDescriptor
 
 const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"\n" +
-	"*origincloud/compute/v1beta1/instance.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a1origincloud/compute/v1beta1/launch_template.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xdc\f\n" +
+	"*origincloud/compute/v1beta1/instance.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a1origincloud/compute/v1beta1/launch_template.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xbe\r\n" +
 	"\bInstance\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12U\n" +
 	"\rinstance_type\x18\x03 \x01(\tB0\xe2A\x01\x02\xfaA)\n" +
@@ -1459,7 +1471,8 @@ const file_origincloud_compute_v1beta1_instance_proto_rawDesc = "" +
 	"\x0flaunch_template\x18\x12 \x01(\tB2\xe2A\x01\x03\xfaA+\n" +
 	")compute.origincloudapis.eu/LaunchTemplateR\x0elaunchTemplate\x12N\n" +
 	"\vlocal_disks\x18\x13 \x03(\v2&.origincloud.compute.v1beta1.LocalDiskB\x05\xe2A\x02\x05\x01R\n" +
-	"localDisks\x1a7\n" +
+	"localDisks\x12`\n" +
+	"\x11shutdown_behavior\x18\x14 \x01(\x0e2-.origincloud.compute.v1beta1.ShutdownBehaviorB\x04\xe2A\x01\x01R\x10shutdownBehavior\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x94\x01\n" +
@@ -1618,9 +1631,10 @@ var file_origincloud_compute_v1beta1_instance_proto_goTypes = []any{
 	nil,                              // 19: origincloud.compute.v1beta1.Instance.TagsEntry
 	(*timestamppb.Timestamp)(nil),    // 20: google.protobuf.Timestamp
 	(*LocalDisk)(nil),                // 21: origincloud.compute.v1beta1.LocalDisk
-	(*LaunchTemplateData)(nil),       // 22: origincloud.compute.v1beta1.LaunchTemplateData
-	(*fieldmaskpb.FieldMask)(nil),    // 23: google.protobuf.FieldMask
-	(*longrunningpb.Operation)(nil),  // 24: google.longrunning.Operation
+	(ShutdownBehavior)(0),            // 22: origincloud.compute.v1beta1.ShutdownBehavior
+	(*LaunchTemplateData)(nil),       // 23: origincloud.compute.v1beta1.LaunchTemplateData
+	(*fieldmaskpb.FieldMask)(nil),    // 24: google.protobuf.FieldMask
+	(*longrunningpb.Operation)(nil),  // 25: google.longrunning.Operation
 }
 var file_origincloud_compute_v1beta1_instance_proto_depIdxs = []int32{
 	6,  // 0: origincloud.compute.v1beta1.Instance.boot_volume:type_name -> origincloud.compute.v1beta1.BootVolume
@@ -1630,38 +1644,39 @@ var file_origincloud_compute_v1beta1_instance_proto_depIdxs = []int32{
 	19, // 4: origincloud.compute.v1beta1.Instance.tags:type_name -> origincloud.compute.v1beta1.Instance.TagsEntry
 	7,  // 5: origincloud.compute.v1beta1.Instance.interface_addresses:type_name -> origincloud.compute.v1beta1.InterfaceAddresses
 	21, // 6: origincloud.compute.v1beta1.Instance.local_disks:type_name -> origincloud.compute.v1beta1.LocalDisk
-	1,  // 7: origincloud.compute.v1beta1.InstanceHealth.availability:type_name -> origincloud.compute.v1beta1.InstanceHealth.Availability
-	9,  // 8: origincloud.compute.v1beta1.InstanceHealth.checks:type_name -> origincloud.compute.v1beta1.HealthCheck
-	2,  // 9: origincloud.compute.v1beta1.HealthCheck.kind:type_name -> origincloud.compute.v1beta1.HealthCheck.Kind
-	3,  // 10: origincloud.compute.v1beta1.HealthCheck.category:type_name -> origincloud.compute.v1beta1.HealthCheck.Category
-	4,  // 11: origincloud.compute.v1beta1.HealthCheck.outcome:type_name -> origincloud.compute.v1beta1.HealthCheck.Outcome
-	20, // 12: origincloud.compute.v1beta1.HealthCheck.change_time:type_name -> google.protobuf.Timestamp
-	5,  // 13: origincloud.compute.v1beta1.ListInstancesResponse.instances:type_name -> origincloud.compute.v1beta1.Instance
-	5,  // 14: origincloud.compute.v1beta1.CreateInstanceRequest.instance:type_name -> origincloud.compute.v1beta1.Instance
-	22, // 15: origincloud.compute.v1beta1.LaunchInstanceRequest.launch_template_data:type_name -> origincloud.compute.v1beta1.LaunchTemplateData
-	5,  // 16: origincloud.compute.v1beta1.UpdateInstanceRequest.instance:type_name -> origincloud.compute.v1beta1.Instance
-	23, // 17: origincloud.compute.v1beta1.UpdateInstanceRequest.update_mask:type_name -> google.protobuf.FieldMask
-	10, // 18: origincloud.compute.v1beta1.InstanceService.GetInstance:input_type -> origincloud.compute.v1beta1.GetInstanceRequest
-	11, // 19: origincloud.compute.v1beta1.InstanceService.ListInstances:input_type -> origincloud.compute.v1beta1.ListInstancesRequest
-	13, // 20: origincloud.compute.v1beta1.InstanceService.CreateInstance:input_type -> origincloud.compute.v1beta1.CreateInstanceRequest
-	14, // 21: origincloud.compute.v1beta1.InstanceService.LaunchInstance:input_type -> origincloud.compute.v1beta1.LaunchInstanceRequest
-	15, // 22: origincloud.compute.v1beta1.InstanceService.UpdateInstance:input_type -> origincloud.compute.v1beta1.UpdateInstanceRequest
-	16, // 23: origincloud.compute.v1beta1.InstanceService.DeleteInstance:input_type -> origincloud.compute.v1beta1.DeleteInstanceRequest
-	17, // 24: origincloud.compute.v1beta1.InstanceService.StartInstance:input_type -> origincloud.compute.v1beta1.StartInstanceRequest
-	18, // 25: origincloud.compute.v1beta1.InstanceService.StopInstance:input_type -> origincloud.compute.v1beta1.StopInstanceRequest
-	5,  // 26: origincloud.compute.v1beta1.InstanceService.GetInstance:output_type -> origincloud.compute.v1beta1.Instance
-	12, // 27: origincloud.compute.v1beta1.InstanceService.ListInstances:output_type -> origincloud.compute.v1beta1.ListInstancesResponse
-	24, // 28: origincloud.compute.v1beta1.InstanceService.CreateInstance:output_type -> google.longrunning.Operation
-	24, // 29: origincloud.compute.v1beta1.InstanceService.LaunchInstance:output_type -> google.longrunning.Operation
-	24, // 30: origincloud.compute.v1beta1.InstanceService.UpdateInstance:output_type -> google.longrunning.Operation
-	24, // 31: origincloud.compute.v1beta1.InstanceService.DeleteInstance:output_type -> google.longrunning.Operation
-	24, // 32: origincloud.compute.v1beta1.InstanceService.StartInstance:output_type -> google.longrunning.Operation
-	24, // 33: origincloud.compute.v1beta1.InstanceService.StopInstance:output_type -> google.longrunning.Operation
-	26, // [26:34] is the sub-list for method output_type
-	18, // [18:26] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	22, // 7: origincloud.compute.v1beta1.Instance.shutdown_behavior:type_name -> origincloud.compute.v1beta1.ShutdownBehavior
+	1,  // 8: origincloud.compute.v1beta1.InstanceHealth.availability:type_name -> origincloud.compute.v1beta1.InstanceHealth.Availability
+	9,  // 9: origincloud.compute.v1beta1.InstanceHealth.checks:type_name -> origincloud.compute.v1beta1.HealthCheck
+	2,  // 10: origincloud.compute.v1beta1.HealthCheck.kind:type_name -> origincloud.compute.v1beta1.HealthCheck.Kind
+	3,  // 11: origincloud.compute.v1beta1.HealthCheck.category:type_name -> origincloud.compute.v1beta1.HealthCheck.Category
+	4,  // 12: origincloud.compute.v1beta1.HealthCheck.outcome:type_name -> origincloud.compute.v1beta1.HealthCheck.Outcome
+	20, // 13: origincloud.compute.v1beta1.HealthCheck.change_time:type_name -> google.protobuf.Timestamp
+	5,  // 14: origincloud.compute.v1beta1.ListInstancesResponse.instances:type_name -> origincloud.compute.v1beta1.Instance
+	5,  // 15: origincloud.compute.v1beta1.CreateInstanceRequest.instance:type_name -> origincloud.compute.v1beta1.Instance
+	23, // 16: origincloud.compute.v1beta1.LaunchInstanceRequest.launch_template_data:type_name -> origincloud.compute.v1beta1.LaunchTemplateData
+	5,  // 17: origincloud.compute.v1beta1.UpdateInstanceRequest.instance:type_name -> origincloud.compute.v1beta1.Instance
+	24, // 18: origincloud.compute.v1beta1.UpdateInstanceRequest.update_mask:type_name -> google.protobuf.FieldMask
+	10, // 19: origincloud.compute.v1beta1.InstanceService.GetInstance:input_type -> origincloud.compute.v1beta1.GetInstanceRequest
+	11, // 20: origincloud.compute.v1beta1.InstanceService.ListInstances:input_type -> origincloud.compute.v1beta1.ListInstancesRequest
+	13, // 21: origincloud.compute.v1beta1.InstanceService.CreateInstance:input_type -> origincloud.compute.v1beta1.CreateInstanceRequest
+	14, // 22: origincloud.compute.v1beta1.InstanceService.LaunchInstance:input_type -> origincloud.compute.v1beta1.LaunchInstanceRequest
+	15, // 23: origincloud.compute.v1beta1.InstanceService.UpdateInstance:input_type -> origincloud.compute.v1beta1.UpdateInstanceRequest
+	16, // 24: origincloud.compute.v1beta1.InstanceService.DeleteInstance:input_type -> origincloud.compute.v1beta1.DeleteInstanceRequest
+	17, // 25: origincloud.compute.v1beta1.InstanceService.StartInstance:input_type -> origincloud.compute.v1beta1.StartInstanceRequest
+	18, // 26: origincloud.compute.v1beta1.InstanceService.StopInstance:input_type -> origincloud.compute.v1beta1.StopInstanceRequest
+	5,  // 27: origincloud.compute.v1beta1.InstanceService.GetInstance:output_type -> origincloud.compute.v1beta1.Instance
+	12, // 28: origincloud.compute.v1beta1.InstanceService.ListInstances:output_type -> origincloud.compute.v1beta1.ListInstancesResponse
+	25, // 29: origincloud.compute.v1beta1.InstanceService.CreateInstance:output_type -> google.longrunning.Operation
+	25, // 30: origincloud.compute.v1beta1.InstanceService.LaunchInstance:output_type -> google.longrunning.Operation
+	25, // 31: origincloud.compute.v1beta1.InstanceService.UpdateInstance:output_type -> google.longrunning.Operation
+	25, // 32: origincloud.compute.v1beta1.InstanceService.DeleteInstance:output_type -> google.longrunning.Operation
+	25, // 33: origincloud.compute.v1beta1.InstanceService.StartInstance:output_type -> google.longrunning.Operation
+	25, // 34: origincloud.compute.v1beta1.InstanceService.StopInstance:output_type -> google.longrunning.Operation
+	27, // [27:35] is the sub-list for method output_type
+	19, // [19:27] is the sub-list for method input_type
+	19, // [19:19] is the sub-list for extension type_name
+	19, // [19:19] is the sub-list for extension extendee
+	0,  // [0:19] is the sub-list for field type_name
 }
 
 func init() { file_origincloud_compute_v1beta1_instance_proto_init() }

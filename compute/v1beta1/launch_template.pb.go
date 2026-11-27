@@ -7,6 +7,7 @@
 package computev1beta1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -24,6 +25,63 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
+
+// What happens to an instance when its own operating system shuts it down,
+// such as with `poweroff` inside it. A stop through the API, and one the
+// platform makes, always stops the instance, and a guest that crashed is
+// `STOPPED` with a `state_reason` saying so.
+type ShutdownBehavior int32
+
+const (
+	// Not set: `STOP`.
+	ShutdownBehavior_SHUTDOWN_BEHAVIOR_UNSPECIFIED ShutdownBehavior = 0
+	// The instance stops, keeping its volumes and addresses.
+	ShutdownBehavior_STOP ShutdownBehavior = 1
+	// The instance is terminated, and its resources released, as
+	// `DeleteInstance` terminates it.
+	ShutdownBehavior_TERMINATE ShutdownBehavior = 2
+)
+
+// Enum value maps for ShutdownBehavior.
+var (
+	ShutdownBehavior_name = map[int32]string{
+		0: "SHUTDOWN_BEHAVIOR_UNSPECIFIED",
+		1: "STOP",
+		2: "TERMINATE",
+	}
+	ShutdownBehavior_value = map[string]int32{
+		"SHUTDOWN_BEHAVIOR_UNSPECIFIED": 0,
+		"STOP":                          1,
+		"TERMINATE":                     2,
+	}
+)
+
+func (x ShutdownBehavior) Enum() *ShutdownBehavior {
+	p := new(ShutdownBehavior)
+	*p = x
+	return p
+}
+
+func (x ShutdownBehavior) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ShutdownBehavior) Descriptor() protoreflect.EnumDescriptor {
+	return file_origincloud_compute_v1beta1_launch_template_proto_enumTypes[0].Descriptor()
+}
+
+func (ShutdownBehavior) Type() protoreflect.EnumType {
+	return &file_origincloud_compute_v1beta1_launch_template_proto_enumTypes[0]
+}
+
+func (x ShutdownBehavior) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ShutdownBehavior.Descriptor instead.
+func (ShutdownBehavior) EnumDescriptor() ([]byte, []int) {
+	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP(), []int{0}
+}
 
 // A recipe kept under a name: numbered versions of it, and the one that is
 // the default.
@@ -785,9 +843,12 @@ type LaunchTemplateData struct {
 	// created blank at launch; at most 16. A local disk is temporary: it
 	// comes back empty after every stop and start and after its machine
 	// restarts, and it is deleted with the instance.
-	LocalDisks    []*LocalDisk `protobuf:"bytes,10,rep,name=local_disks,json=localDisks,proto3" json:"local_disks,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	LocalDisks []*LocalDisk `protobuf:"bytes,10,rep,name=local_disks,json=localDisks,proto3" json:"local_disks,omitempty"`
+	// What happens when the instance's operating system shuts it down. `STOP`
+	// when left unspecified.
+	ShutdownBehavior ShutdownBehavior `protobuf:"varint,11,opt,name=shutdown_behavior,json=shutdownBehavior,proto3,enum=origincloud.compute.v1beta1.ShutdownBehavior" json:"shutdown_behavior,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *LaunchTemplateData) Reset() {
@@ -888,6 +949,13 @@ func (x *LaunchTemplateData) GetLocalDisks() []*LocalDisk {
 		return x.LocalDisks
 	}
 	return nil
+}
+
+func (x *LaunchTemplateData) GetShutdownBehavior() ShutdownBehavior {
+	if x != nil {
+		return x.ShutdownBehavior
+	}
+	return ShutdownBehavior_SHUTDOWN_BEHAVIOR_UNSPECIFIED
 }
 
 // A disk on the machine an instance runs on.
@@ -1172,7 +1240,7 @@ var File_origincloud_compute_v1beta1_launch_template_proto protoreflect.FileDesc
 
 const file_origincloud_compute_v1beta1_launch_template_proto_rawDesc = "" +
 	"\n" +
-	"1origincloud/compute/v1beta1/launch_template.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xde\x05\n" +
+	"1origincloud/compute/v1beta1/launch_template.proto\x12\x1borigincloud.compute.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xde\x05\n" +
 	"\x0eLaunchTemplate\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12h\n" +
 	"\x14launch_template_data\x18\x02 \x01(\v2/.origincloud.compute.v1beta1.LaunchTemplateDataB\x05\xe2A\x02\x02\x05R\x12launchTemplateData\x12-\n" +
@@ -1228,7 +1296,7 @@ const file_origincloud_compute_v1beta1_launch_template_proto_rawDesc = "" +
 	"\x0fnext_page_token\x18\x02 \x01(\tR\rnextPageToken\"l\n" +
 	"\"DeleteLaunchTemplateVersionRequest\x12F\n" +
 	"\x04name\x18\x01 \x01(\tB2\xe2A\x01\x02\xfaA+\n" +
-	")compute.origincloudapis.eu/LaunchTemplateR\x04name\"\xf3\x06\n" +
+	")compute.origincloudapis.eu/LaunchTemplateR\x04name\"\xd5\a\n" +
 	"\x12LaunchTemplateData\x12U\n" +
 	"\rinstance_type\x18\x01 \x01(\tB0\xe2A\x01\x02\xfaA)\n" +
 	"'compute.origincloudapis.eu/InstanceTypeR\finstanceType\x12?\n" +
@@ -1248,7 +1316,8 @@ const file_origincloud_compute_v1beta1_launch_template_proto_rawDesc = "" +
 	"\x12network_interfaces\x18\t \x03(\v2;.origincloud.compute.v1beta1.LaunchTemplateNetworkInterfaceB\x04\xe2A\x01\x01R\x11networkInterfaces\x12M\n" +
 	"\vlocal_disks\x18\n" +
 	" \x03(\v2&.origincloud.compute.v1beta1.LocalDiskB\x04\xe2A\x01\x01R\n" +
-	"localDisks\x1a7\n" +
+	"localDisks\x12`\n" +
+	"\x11shutdown_behavior\x18\v \x01(\x0e2-.origincloud.compute.v1beta1.ShutdownBehaviorB\x04\xe2A\x01\x01R\x10shutdownBehavior\x1a7\n" +
 	"\tTagsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"J\n" +
@@ -1258,17 +1327,21 @@ const file_origincloud_compute_v1beta1_launch_template_proto_rawDesc = "" +
 	"\x18LaunchTemplateBootVolume\x12\x1f\n" +
 	"\bsize_gib\x18\x01 \x01(\x05B\x04\xe2A\x01\x01R\asizeGib\x12Q\n" +
 	"\rstorage_class\x18\x02 \x01(\tB,\xe2A\x01\x01\xfaA%\n" +
-	"#pvs.origincloudapis.eu/StorageClassR\fstorageClass\"\xde\x01\n" +
+	"#pvs.origincloudapis.eu/StorageClassR\fstorageClass\"\xe5\x01\n" +
 	"\x1eLaunchTemplateNetworkInterface\x12M\n" +
 	"\x04spec\x18\x01 \x01(\v21.origincloud.compute.v1beta1.NetworkInterfaceSpecB\x04\xe2A\x01\x02H\x00R\x04spec\x12c\n" +
 	"\x11network_interface\x18\x02 \x01(\tB4\xe2A\x01\x02\xfaA-\n" +
-	"+network.origincloudapis.eu/NetworkInterfaceH\x00R\x10networkInterfaceB\b\n" +
-	"\x06source\"\xb6\x01\n" +
+	"+network.origincloudapis.eu/NetworkInterfaceH\x00R\x10networkInterfaceB\x0f\n" +
+	"\x06source\x12\x05\xbaH\x02\b\x01\"\xb6\x01\n" +
 	"\x14NetworkInterfaceSpec\x12B\n" +
 	"\x06subnet\x18\x01 \x01(\tB*\xe2A\x01\x01\xfaA#\n" +
 	"!network.origincloudapis.eu/SubnetR\x06subnet\x12Z\n" +
 	"\x0fsecurity_groups\x18\x02 \x03(\tB1\xe2A\x01\x01\xfaA*\n" +
-	"(network.origincloudapis.eu/SecurityGroupR\x0esecurityGroups2\xd3\r\n" +
+	"(network.origincloudapis.eu/SecurityGroupR\x0esecurityGroups*N\n" +
+	"\x10ShutdownBehavior\x12!\n" +
+	"\x1dSHUTDOWN_BEHAVIOR_UNSPECIFIED\x10\x00\x12\b\n" +
+	"\x04STOP\x10\x01\x12\r\n" +
+	"\tTERMINATE\x10\x022\xd3\r\n" +
 	"\x15LaunchTemplateService\x12\xb4\x01\n" +
 	"\x11GetLaunchTemplate\x125.origincloud.compute.v1beta1.GetLaunchTemplateRequest\x1a+.origincloud.compute.v1beta1.LaunchTemplate\";\xdaA\x04name\x82\xd3\xe4\x93\x02.\x12,/v1beta1/{name=projects/*/launchTemplates/*}\x12\xc7\x01\n" +
 	"\x13ListLaunchTemplates\x127.origincloud.compute.v1beta1.ListLaunchTemplatesRequest\x1a8.origincloud.compute.v1beta1.ListLaunchTemplatesResponse\"=\xdaA\x06parent\x82\xd3\xe4\x93\x02.\x12,/v1beta1/{parent=projects/*}/launchTemplates\x12\xdd\x01\n" +
@@ -1291,67 +1364,70 @@ func file_origincloud_compute_v1beta1_launch_template_proto_rawDescGZIP() []byte
 	return file_origincloud_compute_v1beta1_launch_template_proto_rawDescData
 }
 
+var file_origincloud_compute_v1beta1_launch_template_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_origincloud_compute_v1beta1_launch_template_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
 var file_origincloud_compute_v1beta1_launch_template_proto_goTypes = []any{
-	(*LaunchTemplate)(nil),                     // 0: origincloud.compute.v1beta1.LaunchTemplate
-	(*GetLaunchTemplateRequest)(nil),           // 1: origincloud.compute.v1beta1.GetLaunchTemplateRequest
-	(*ListLaunchTemplatesRequest)(nil),         // 2: origincloud.compute.v1beta1.ListLaunchTemplatesRequest
-	(*ListLaunchTemplatesResponse)(nil),        // 3: origincloud.compute.v1beta1.ListLaunchTemplatesResponse
-	(*CreateLaunchTemplateRequest)(nil),        // 4: origincloud.compute.v1beta1.CreateLaunchTemplateRequest
-	(*UpdateLaunchTemplateRequest)(nil),        // 5: origincloud.compute.v1beta1.UpdateLaunchTemplateRequest
-	(*DeleteLaunchTemplateRequest)(nil),        // 6: origincloud.compute.v1beta1.DeleteLaunchTemplateRequest
-	(*CreateLaunchTemplateVersionRequest)(nil), // 7: origincloud.compute.v1beta1.CreateLaunchTemplateVersionRequest
-	(*ListLaunchTemplateVersionsRequest)(nil),  // 8: origincloud.compute.v1beta1.ListLaunchTemplateVersionsRequest
-	(*ListLaunchTemplateVersionsResponse)(nil), // 9: origincloud.compute.v1beta1.ListLaunchTemplateVersionsResponse
-	(*DeleteLaunchTemplateVersionRequest)(nil), // 10: origincloud.compute.v1beta1.DeleteLaunchTemplateVersionRequest
-	(*LaunchTemplateData)(nil),                 // 11: origincloud.compute.v1beta1.LaunchTemplateData
-	(*LocalDisk)(nil),                          // 12: origincloud.compute.v1beta1.LocalDisk
-	(*LaunchTemplateBootVolume)(nil),           // 13: origincloud.compute.v1beta1.LaunchTemplateBootVolume
-	(*LaunchTemplateNetworkInterface)(nil),     // 14: origincloud.compute.v1beta1.LaunchTemplateNetworkInterface
-	(*NetworkInterfaceSpec)(nil),               // 15: origincloud.compute.v1beta1.NetworkInterfaceSpec
-	nil,                                        // 16: origincloud.compute.v1beta1.LaunchTemplate.TagsEntry
-	nil,                                        // 17: origincloud.compute.v1beta1.LaunchTemplateData.TagsEntry
-	(*timestamppb.Timestamp)(nil),              // 18: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),              // 19: google.protobuf.FieldMask
-	(*emptypb.Empty)(nil),                      // 20: google.protobuf.Empty
+	(ShutdownBehavior)(0),                      // 0: origincloud.compute.v1beta1.ShutdownBehavior
+	(*LaunchTemplate)(nil),                     // 1: origincloud.compute.v1beta1.LaunchTemplate
+	(*GetLaunchTemplateRequest)(nil),           // 2: origincloud.compute.v1beta1.GetLaunchTemplateRequest
+	(*ListLaunchTemplatesRequest)(nil),         // 3: origincloud.compute.v1beta1.ListLaunchTemplatesRequest
+	(*ListLaunchTemplatesResponse)(nil),        // 4: origincloud.compute.v1beta1.ListLaunchTemplatesResponse
+	(*CreateLaunchTemplateRequest)(nil),        // 5: origincloud.compute.v1beta1.CreateLaunchTemplateRequest
+	(*UpdateLaunchTemplateRequest)(nil),        // 6: origincloud.compute.v1beta1.UpdateLaunchTemplateRequest
+	(*DeleteLaunchTemplateRequest)(nil),        // 7: origincloud.compute.v1beta1.DeleteLaunchTemplateRequest
+	(*CreateLaunchTemplateVersionRequest)(nil), // 8: origincloud.compute.v1beta1.CreateLaunchTemplateVersionRequest
+	(*ListLaunchTemplateVersionsRequest)(nil),  // 9: origincloud.compute.v1beta1.ListLaunchTemplateVersionsRequest
+	(*ListLaunchTemplateVersionsResponse)(nil), // 10: origincloud.compute.v1beta1.ListLaunchTemplateVersionsResponse
+	(*DeleteLaunchTemplateVersionRequest)(nil), // 11: origincloud.compute.v1beta1.DeleteLaunchTemplateVersionRequest
+	(*LaunchTemplateData)(nil),                 // 12: origincloud.compute.v1beta1.LaunchTemplateData
+	(*LocalDisk)(nil),                          // 13: origincloud.compute.v1beta1.LocalDisk
+	(*LaunchTemplateBootVolume)(nil),           // 14: origincloud.compute.v1beta1.LaunchTemplateBootVolume
+	(*LaunchTemplateNetworkInterface)(nil),     // 15: origincloud.compute.v1beta1.LaunchTemplateNetworkInterface
+	(*NetworkInterfaceSpec)(nil),               // 16: origincloud.compute.v1beta1.NetworkInterfaceSpec
+	nil,                                        // 17: origincloud.compute.v1beta1.LaunchTemplate.TagsEntry
+	nil,                                        // 18: origincloud.compute.v1beta1.LaunchTemplateData.TagsEntry
+	(*timestamppb.Timestamp)(nil),              // 19: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),              // 20: google.protobuf.FieldMask
+	(*emptypb.Empty)(nil),                      // 21: google.protobuf.Empty
 }
 var file_origincloud_compute_v1beta1_launch_template_proto_depIdxs = []int32{
-	11, // 0: origincloud.compute.v1beta1.LaunchTemplate.launch_template_data:type_name -> origincloud.compute.v1beta1.LaunchTemplateData
-	18, // 1: origincloud.compute.v1beta1.LaunchTemplate.create_time:type_name -> google.protobuf.Timestamp
-	16, // 2: origincloud.compute.v1beta1.LaunchTemplate.tags:type_name -> origincloud.compute.v1beta1.LaunchTemplate.TagsEntry
-	18, // 3: origincloud.compute.v1beta1.LaunchTemplate.version_create_time:type_name -> google.protobuf.Timestamp
-	0,  // 4: origincloud.compute.v1beta1.ListLaunchTemplatesResponse.launch_templates:type_name -> origincloud.compute.v1beta1.LaunchTemplate
-	0,  // 5: origincloud.compute.v1beta1.CreateLaunchTemplateRequest.launch_template:type_name -> origincloud.compute.v1beta1.LaunchTemplate
-	0,  // 6: origincloud.compute.v1beta1.UpdateLaunchTemplateRequest.launch_template:type_name -> origincloud.compute.v1beta1.LaunchTemplate
-	19, // 7: origincloud.compute.v1beta1.UpdateLaunchTemplateRequest.update_mask:type_name -> google.protobuf.FieldMask
-	11, // 8: origincloud.compute.v1beta1.CreateLaunchTemplateVersionRequest.launch_template_data:type_name -> origincloud.compute.v1beta1.LaunchTemplateData
-	0,  // 9: origincloud.compute.v1beta1.ListLaunchTemplateVersionsResponse.launch_templates:type_name -> origincloud.compute.v1beta1.LaunchTemplate
-	13, // 10: origincloud.compute.v1beta1.LaunchTemplateData.boot_volume:type_name -> origincloud.compute.v1beta1.LaunchTemplateBootVolume
-	17, // 11: origincloud.compute.v1beta1.LaunchTemplateData.tags:type_name -> origincloud.compute.v1beta1.LaunchTemplateData.TagsEntry
-	14, // 12: origincloud.compute.v1beta1.LaunchTemplateData.network_interfaces:type_name -> origincloud.compute.v1beta1.LaunchTemplateNetworkInterface
-	12, // 13: origincloud.compute.v1beta1.LaunchTemplateData.local_disks:type_name -> origincloud.compute.v1beta1.LocalDisk
-	15, // 14: origincloud.compute.v1beta1.LaunchTemplateNetworkInterface.spec:type_name -> origincloud.compute.v1beta1.NetworkInterfaceSpec
-	1,  // 15: origincloud.compute.v1beta1.LaunchTemplateService.GetLaunchTemplate:input_type -> origincloud.compute.v1beta1.GetLaunchTemplateRequest
-	2,  // 16: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplates:input_type -> origincloud.compute.v1beta1.ListLaunchTemplatesRequest
-	4,  // 17: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplate:input_type -> origincloud.compute.v1beta1.CreateLaunchTemplateRequest
-	5,  // 18: origincloud.compute.v1beta1.LaunchTemplateService.UpdateLaunchTemplate:input_type -> origincloud.compute.v1beta1.UpdateLaunchTemplateRequest
-	6,  // 19: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplate:input_type -> origincloud.compute.v1beta1.DeleteLaunchTemplateRequest
-	7,  // 20: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplateVersion:input_type -> origincloud.compute.v1beta1.CreateLaunchTemplateVersionRequest
-	8,  // 21: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplateVersions:input_type -> origincloud.compute.v1beta1.ListLaunchTemplateVersionsRequest
-	10, // 22: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplateVersion:input_type -> origincloud.compute.v1beta1.DeleteLaunchTemplateVersionRequest
-	0,  // 23: origincloud.compute.v1beta1.LaunchTemplateService.GetLaunchTemplate:output_type -> origincloud.compute.v1beta1.LaunchTemplate
-	3,  // 24: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplates:output_type -> origincloud.compute.v1beta1.ListLaunchTemplatesResponse
-	0,  // 25: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplate:output_type -> origincloud.compute.v1beta1.LaunchTemplate
-	0,  // 26: origincloud.compute.v1beta1.LaunchTemplateService.UpdateLaunchTemplate:output_type -> origincloud.compute.v1beta1.LaunchTemplate
-	20, // 27: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplate:output_type -> google.protobuf.Empty
-	0,  // 28: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplateVersion:output_type -> origincloud.compute.v1beta1.LaunchTemplate
-	9,  // 29: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplateVersions:output_type -> origincloud.compute.v1beta1.ListLaunchTemplateVersionsResponse
-	20, // 30: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplateVersion:output_type -> google.protobuf.Empty
-	23, // [23:31] is the sub-list for method output_type
-	15, // [15:23] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	12, // 0: origincloud.compute.v1beta1.LaunchTemplate.launch_template_data:type_name -> origincloud.compute.v1beta1.LaunchTemplateData
+	19, // 1: origincloud.compute.v1beta1.LaunchTemplate.create_time:type_name -> google.protobuf.Timestamp
+	17, // 2: origincloud.compute.v1beta1.LaunchTemplate.tags:type_name -> origincloud.compute.v1beta1.LaunchTemplate.TagsEntry
+	19, // 3: origincloud.compute.v1beta1.LaunchTemplate.version_create_time:type_name -> google.protobuf.Timestamp
+	1,  // 4: origincloud.compute.v1beta1.ListLaunchTemplatesResponse.launch_templates:type_name -> origincloud.compute.v1beta1.LaunchTemplate
+	1,  // 5: origincloud.compute.v1beta1.CreateLaunchTemplateRequest.launch_template:type_name -> origincloud.compute.v1beta1.LaunchTemplate
+	1,  // 6: origincloud.compute.v1beta1.UpdateLaunchTemplateRequest.launch_template:type_name -> origincloud.compute.v1beta1.LaunchTemplate
+	20, // 7: origincloud.compute.v1beta1.UpdateLaunchTemplateRequest.update_mask:type_name -> google.protobuf.FieldMask
+	12, // 8: origincloud.compute.v1beta1.CreateLaunchTemplateVersionRequest.launch_template_data:type_name -> origincloud.compute.v1beta1.LaunchTemplateData
+	1,  // 9: origincloud.compute.v1beta1.ListLaunchTemplateVersionsResponse.launch_templates:type_name -> origincloud.compute.v1beta1.LaunchTemplate
+	14, // 10: origincloud.compute.v1beta1.LaunchTemplateData.boot_volume:type_name -> origincloud.compute.v1beta1.LaunchTemplateBootVolume
+	18, // 11: origincloud.compute.v1beta1.LaunchTemplateData.tags:type_name -> origincloud.compute.v1beta1.LaunchTemplateData.TagsEntry
+	15, // 12: origincloud.compute.v1beta1.LaunchTemplateData.network_interfaces:type_name -> origincloud.compute.v1beta1.LaunchTemplateNetworkInterface
+	13, // 13: origincloud.compute.v1beta1.LaunchTemplateData.local_disks:type_name -> origincloud.compute.v1beta1.LocalDisk
+	0,  // 14: origincloud.compute.v1beta1.LaunchTemplateData.shutdown_behavior:type_name -> origincloud.compute.v1beta1.ShutdownBehavior
+	16, // 15: origincloud.compute.v1beta1.LaunchTemplateNetworkInterface.spec:type_name -> origincloud.compute.v1beta1.NetworkInterfaceSpec
+	2,  // 16: origincloud.compute.v1beta1.LaunchTemplateService.GetLaunchTemplate:input_type -> origincloud.compute.v1beta1.GetLaunchTemplateRequest
+	3,  // 17: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplates:input_type -> origincloud.compute.v1beta1.ListLaunchTemplatesRequest
+	5,  // 18: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplate:input_type -> origincloud.compute.v1beta1.CreateLaunchTemplateRequest
+	6,  // 19: origincloud.compute.v1beta1.LaunchTemplateService.UpdateLaunchTemplate:input_type -> origincloud.compute.v1beta1.UpdateLaunchTemplateRequest
+	7,  // 20: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplate:input_type -> origincloud.compute.v1beta1.DeleteLaunchTemplateRequest
+	8,  // 21: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplateVersion:input_type -> origincloud.compute.v1beta1.CreateLaunchTemplateVersionRequest
+	9,  // 22: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplateVersions:input_type -> origincloud.compute.v1beta1.ListLaunchTemplateVersionsRequest
+	11, // 23: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplateVersion:input_type -> origincloud.compute.v1beta1.DeleteLaunchTemplateVersionRequest
+	1,  // 24: origincloud.compute.v1beta1.LaunchTemplateService.GetLaunchTemplate:output_type -> origincloud.compute.v1beta1.LaunchTemplate
+	4,  // 25: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplates:output_type -> origincloud.compute.v1beta1.ListLaunchTemplatesResponse
+	1,  // 26: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplate:output_type -> origincloud.compute.v1beta1.LaunchTemplate
+	1,  // 27: origincloud.compute.v1beta1.LaunchTemplateService.UpdateLaunchTemplate:output_type -> origincloud.compute.v1beta1.LaunchTemplate
+	21, // 28: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplate:output_type -> google.protobuf.Empty
+	1,  // 29: origincloud.compute.v1beta1.LaunchTemplateService.CreateLaunchTemplateVersion:output_type -> origincloud.compute.v1beta1.LaunchTemplate
+	10, // 30: origincloud.compute.v1beta1.LaunchTemplateService.ListLaunchTemplateVersions:output_type -> origincloud.compute.v1beta1.ListLaunchTemplateVersionsResponse
+	21, // 31: origincloud.compute.v1beta1.LaunchTemplateService.DeleteLaunchTemplateVersion:output_type -> google.protobuf.Empty
+	24, // [24:32] is the sub-list for method output_type
+	16, // [16:24] is the sub-list for method input_type
+	16, // [16:16] is the sub-list for extension type_name
+	16, // [16:16] is the sub-list for extension extendee
+	0,  // [0:16] is the sub-list for field type_name
 }
 
 func init() { file_origincloud_compute_v1beta1_launch_template_proto_init() }
@@ -1368,13 +1444,14 @@ func file_origincloud_compute_v1beta1_launch_template_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_origincloud_compute_v1beta1_launch_template_proto_rawDesc), len(file_origincloud_compute_v1beta1_launch_template_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_origincloud_compute_v1beta1_launch_template_proto_goTypes,
 		DependencyIndexes: file_origincloud_compute_v1beta1_launch_template_proto_depIdxs,
+		EnumInfos:         file_origincloud_compute_v1beta1_launch_template_proto_enumTypes,
 		MessageInfos:      file_origincloud_compute_v1beta1_launch_template_proto_msgTypes,
 	}.Build()
 	File_origincloud_compute_v1beta1_launch_template_proto = out.File

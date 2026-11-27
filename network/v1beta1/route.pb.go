@@ -7,6 +7,7 @@
 package networkv1beta1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	longrunningpb "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	_ "go.origincloud.eu/sdk/longrunning/v1beta1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -430,17 +431,17 @@ var File_origincloud_network_v1beta1_route_proto protoreflect.FileDescriptor
 
 const file_origincloud_network_v1beta1_route_proto_rawDesc = "" +
 	"\n" +
-	"'origincloud/network/v1beta1/route.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x8e\x03\n" +
+	"'origincloud/network/v1beta1/route.proto\x12\x1borigincloud.network.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\x97\x03\n" +
 	"\x05Route\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12'\n" +
-	"\vdestination\x18\x02 \x01(\tB\x05\xe2A\x02\x02\x05R\vdestination\x12`\n" +
-	"\x10internet_gateway\x18\x03 \x01(\tB3\xe2A\x01\x05\xfaA,\n" +
-	"*network.origincloudapis.eu/InternetGatewayH\x00R\x0finternetGateway\x12Q\n" +
-	"\vnat_gateway\x18\x04 \x01(\tB.\xe2A\x01\x05\xfaA'\n" +
+	"\vdestination\x18\x02 \x01(\tB\x05\xe2A\x02\x02\x05R\vdestination\x12a\n" +
+	"\x10internet_gateway\x18\x03 \x01(\tB4\xe2A\x02\x02\x05\xfaA,\n" +
+	"*network.origincloudapis.eu/InternetGatewayH\x00R\x0finternetGateway\x12R\n" +
+	"\vnat_gateway\x18\x04 \x01(\tB/\xe2A\x02\x02\x05\xfaA'\n" +
 	"%network.origincloudapis.eu/NatGatewayH\x00R\n" +
 	"natGateway:\x82\x01\xeaA\x7f\n" +
-	" network.origincloudapis.eu/Route\x12Lprojects/{project}/regions/{region}/routeTables/{route_table}/routes/{route}*\x06routes2\x05routeB\b\n" +
-	"\x06target\"P\n" +
+	" network.origincloudapis.eu/Route\x12Lprojects/{project}/regions/{region}/routeTables/{route_table}/routes/{route}*\x06routes2\x05routeB\x0f\n" +
+	"\x06target\x12\x05\xbaH\x02\b\x01\"P\n" +
 	"\x0fGetRouteRequest\x12=\n" +
 	"\x04name\x18\x01 \x01(\tB)\xe2A\x01\x02\xfaA\"\n" +
 	" network.origincloudapis.eu/RouteR\x04name\"\x9e\x01\n" +
