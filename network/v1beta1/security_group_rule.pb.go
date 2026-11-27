@@ -7,6 +7,7 @@
 package networkv1beta1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	longrunningpb "cloud.google.com/go/longrunning/autogen/longrunningpb"
 	_ "go.origincloud.eu/sdk/longrunning/v1beta1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
@@ -603,20 +604,20 @@ var File_origincloud_network_v1beta1_security_group_rule_proto protoreflect.File
 
 const file_origincloud_network_v1beta1_security_group_rule_proto_rawDesc = "" +
 	"\n" +
-	"5origincloud/network/v1beta1/security_group_rule.proto\x12\x1borigincloud.network.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xd0\x06\n" +
+	"5origincloud/network/v1beta1/security_group_rule.proto\x12\x1borigincloud.network.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a#google/longrunning/operations.proto\x1a0origincloud/longrunning/v1beta1/operations.proto\"\xda\x06\n" +
 	"\x11SecurityGroupRule\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12]\n" +
 	"\tdirection\x18\x02 \x01(\x0e28.origincloud.network.v1beta1.SecurityGroupRule.DirectionB\x05\xe2A\x02\x02\x05R\tdirection\x12Z\n" +
 	"\bprotocol\x18\x03 \x01(\x0e27.origincloud.network.v1beta1.SecurityGroupRule.ProtocolB\x05\xe2A\x02\x02\x05R\bprotocol\x12$\n" +
 	"\n" +
 	"first_port\x18\x04 \x01(\x05B\x05\xe2A\x02\x05\x01R\tfirstPort\x12\"\n" +
-	"\tlast_port\x18\x05 \x01(\x05B\x05\xe2A\x02\x05\x01R\blastPort\x12%\n" +
+	"\tlast_port\x18\x05 \x01(\x05B\x05\xe2A\x02\x05\x01R\blastPort\x12&\n" +
 	"\n" +
-	"cidr_block\x18\x06 \x01(\tB\x04\xe2A\x01\x05H\x00R\tcidrBlock\x12c\n" +
-	"\x13peer_security_group\x18\a \x01(\tB1\xe2A\x01\x05\xfaA*\n" +
-	"(network.origincloudapis.eu/SecurityGroupH\x00R\x11peerSecurityGroup\x12%\n" +
+	"cidr_block\x18\x06 \x01(\tB\x05\xe2A\x02\x02\x05H\x00R\tcidrBlock\x12d\n" +
+	"\x13peer_security_group\x18\a \x01(\tB2\xe2A\x02\x02\x05\xfaA*\n" +
+	"(network.origincloudapis.eu/SecurityGroupH\x00R\x11peerSecurityGroup\x12&\n" +
 	"\n" +
-	"same_group\x18\b \x01(\bB\x04\xe2A\x01\x05H\x00R\tsameGroup\x12'\n" +
+	"same_group\x18\b \x01(\bB\x05\xe2A\x02\x02\x05H\x00R\tsameGroup\x12'\n" +
 	"\vdescription\x18\t \x01(\tB\x05\xe2A\x02\x05\x01R\vdescription\"?\n" +
 	"\tDirection\x12\x19\n" +
 	"\x15DIRECTION_UNSPECIFIED\x10\x00\x12\v\n" +
@@ -629,8 +630,8 @@ const file_origincloud_network_v1beta1_security_group_rule_proto_rawDesc = "" +
 	"\x03TCP\x10\x02\x12\a\n" +
 	"\x03UDP\x10\x03\x12\b\n" +
 	"\x04ICMP\x10\x04:\xab\x01\xeaA\xa7\x01\n" +
-	",network.origincloudapis.eu/SecurityGroupRule\x12Pprojects/{project}/regions/{region}/securityGroups/{security_group}/rules/{rule}*\x12securityGroupRules2\x11securityGroupRuleB\x06\n" +
-	"\x04peer\"h\n" +
+	",network.origincloudapis.eu/SecurityGroupRule\x12Pprojects/{project}/regions/{region}/securityGroups/{security_group}/rules/{rule}*\x12securityGroupRules2\x11securityGroupRuleB\r\n" +
+	"\x04peer\x12\x05\xbaH\x02\b\x01\"h\n" +
 	"\x1bGetSecurityGroupRuleRequest\x12I\n" +
 	"\x04name\x18\x01 \x01(\tB5\xe2A\x01\x02\xfaA.\n" +
 	",network.origincloudapis.eu/SecurityGroupRuleR\x04name\"\xb6\x01\n" +

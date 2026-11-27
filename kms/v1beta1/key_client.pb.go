@@ -310,11 +310,52 @@ func (c *KeyClient) RotateKey(ctx context.Context, req *RotateKeyRequest) (*Key,
 	return out, nil
 }
 
+// RetireEncryptionContext retires an encryption context on a key the platform manages, for good:
+// from then on every zone refuses Encrypt, Decrypt and GenerateDataKey
+// under exactly that context, and the making, renewal and use of a grant
+// constrained to it, each with `FORBIDDEN`. A ciphertext made under it,
+// wherever a copy of it is kept, never decrypts again. Only the platform
+// retires a context: the storage service retires a deleted volume's
+// `volume` context. Retiring a context already retired succeeds and
+// changes nothing. Refused with `FORBIDDEN` for a key the platform doesn't
+// manage and for anyone but a platform service agent, and with
+// `BAD_REQUEST` for an empty context. Needs `kms.key.retire_context` on
+// the project, which no customer role holds.
+func (c *KeyClient) RetireEncryptionContext(ctx context.Context, req *RetireEncryptionContextRequest) (*Key, error) {
+	if req.GetRequestId() == "" {
+		req = proto.Clone(req).(*RetireEncryptionContextRequest)
+		req.RequestId = core.NewRequestID()
+	}
+	n1, err := c.service.RelativeName("name", req.GetName(), "kms")
+	if err != nil {
+		return nil, err
+	}
+	p1, err := core.PathValue("name", n1, "projects/*/regions/*/keys/*")
+	if err != nil {
+		return nil, err
+	}
+	if n1 != req.GetName() {
+		req = proto.Clone(req).(*RetireEncryptionContextRequest)
+		req.Name = n1
+	}
+	out := new(Key)
+	if err := c.service.Call(ctx, core.Request{
+		Method:     http.MethodPost,
+		Path:       "/v1beta1/" + p1 + ":retireEncryptionContext",
+		Body:       req,
+		Idempotent: true,
+	}, out); err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Encrypt encrypts up to 64 KiB with an `ENCRYPT_DECRYPT` key's primary version,
 // bound to the encryption context. For more data, encrypt it yourself
 // with a data key from GenerateDataKey. Refused with `CONFLICT` for a key
-// that isn't enabled, and with `BAD_REQUEST` for a signing key. Needs
-// `kms.key.encrypt` on the project.
+// that isn't enabled, with `BAD_REQUEST` for a signing key, and with
+// `FORBIDDEN` under a context retired on the key. Needs `kms.key.encrypt`
+// on the project.
 func (c *KeyClient) Encrypt(ctx context.Context, req *EncryptRequest) (*EncryptResponse, error) {
 	n1, err := c.service.RelativeName("name", req.GetName(), "kms")
 	if err != nil {
@@ -341,9 +382,10 @@ func (c *KeyClient) Encrypt(ctx context.Context, req *EncryptRequest) (*EncryptR
 
 // Decrypt decrypts a ciphertext Encrypt or GenerateDataKey made with this key,
 // given the same encryption context. Refused with `BAD_REQUEST` for a
-// ciphertext that doesn't decrypt under this key and context, and with
-// `CONFLICT` for a key that isn't enabled. Needs `kms.key.decrypt` on the
-// project.
+// ciphertext that doesn't decrypt under this key and context, with
+// `CONFLICT` for a key that isn't enabled, and with `FORBIDDEN` under a
+// context retired on the key, whatever the ciphertext. Needs
+// `kms.key.decrypt` on the project.
 func (c *KeyClient) Decrypt(ctx context.Context, req *DecryptRequest) (*DecryptResponse, error) {
 	n1, err := c.service.RelativeName("name", req.GetName(), "kms")
 	if err != nil {
@@ -371,7 +413,8 @@ func (c *KeyClient) Decrypt(ctx context.Context, req *DecryptRequest) (*DecryptR
 // GenerateDataKey returns a new random 256-bit data key, in plaintext and encrypted under
 // an `ENCRYPT_DECRYPT` key's primary version with the encryption context.
 // Encrypt your data with the plaintext, keep only the ciphertext beside
-// it, and recover the data key with Decrypt when you need it. Needs
+// it, and recover the data key with Decrypt when you need it. Refused
+// with `FORBIDDEN` under a context retired on the key. Needs
 // `kms.key.generate_data_key` on the project.
 func (c *KeyClient) GenerateDataKey(ctx context.Context, req *GenerateDataKeyRequest) (*GenerateDataKeyResponse, error) {
 	n1, err := c.service.RelativeName("name", req.GetName(), "kms")

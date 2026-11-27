@@ -676,7 +676,7 @@ var File_origincloud_iam_v1beta1_role_binding_proto protoreflect.FileDescriptor
 
 const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\n" +
-	"*origincloud/iam/v1beta1/role_binding.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc3\x05\n" +
+	"*origincloud/iam/v1beta1/role_binding.proto\x12\x17origincloud.iam.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc4\x05\n" +
 	"\vRoleBinding\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12#\n" +
 	"\x06member\x18\x03 \x01(\tB\v\xe2A\x02\x02\x05\xfaA\x03\n" +
@@ -692,10 +692,9 @@ const file_origincloud_iam_v1beta1_role_binding_proto_rawDesc = "" +
 	"\x01*R\acreator\x12A\n" +
 	"\vcreate_time\x18\a \x01(\v2\x1a.google.protobuf.TimestampB\x04\xe2A\x01\x03R\n" +
 	"createTime\x12F\n" +
-	"\x05state\x18\b \x01(\x0e2*.origincloud.iam.v1beta1.RoleBinding.StateB\x04\xe2A\x01\x03R\x05state\x12(\n" +
+	"\x05state\x18\b \x01(\x0e2*.origincloud.iam.v1beta1.RoleBinding.StateB\x04\xe2A\x01\x03R\x05state\x12)\n" +
 	"\tresources\x18\n" +
-	" \x03(\tB\n" +
-	"\xe2A\x01\x01\xfaA\x03\n" +
+	" \x03(\tB\v\xe2A\x02\x01\x06\xfaA\x03\n" +
 	"\x01*R\tresources\"7\n" +
 	"\x05State\x12\x15\n" +
 	"\x11STATE_UNSPECIFIED\x10\x00\x12\n" +

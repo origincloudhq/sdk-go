@@ -749,6 +749,71 @@ func (x *DeleteKeyRequest) GetRequestId() string {
 	return ""
 }
 
+// The request for RetireEncryptionContext.
+type RetireEncryptionContextRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The platform-managed key to retire the context on.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The encryption context to retire, exactly: at least one pair.
+	EncryptionContext map[string]string `protobuf:"bytes,2,rep,name=encryption_context,json=encryptionContext,proto3" json:"encryption_context,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	// A UUID; a repeat with the same id within a day returns the key as the
+	// first request left it.
+	RequestId     string `protobuf:"bytes,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RetireEncryptionContextRequest) Reset() {
+	*x = RetireEncryptionContextRequest{}
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RetireEncryptionContextRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RetireEncryptionContextRequest) ProtoMessage() {}
+
+func (x *RetireEncryptionContextRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RetireEncryptionContextRequest.ProtoReflect.Descriptor instead.
+func (*RetireEncryptionContextRequest) Descriptor() ([]byte, []int) {
+	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *RetireEncryptionContextRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *RetireEncryptionContextRequest) GetEncryptionContext() map[string]string {
+	if x != nil {
+		return x.EncryptionContext
+	}
+	return nil
+}
+
+func (x *RetireEncryptionContextRequest) GetRequestId() string {
+	if x != nil {
+		return x.RequestId
+	}
+	return ""
+}
+
 // The request for UndeleteKey.
 type UndeleteKeyRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
@@ -763,7 +828,7 @@ type UndeleteKeyRequest struct {
 
 func (x *UndeleteKeyRequest) Reset() {
 	*x = UndeleteKeyRequest{}
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[8]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -775,7 +840,7 @@ func (x *UndeleteKeyRequest) String() string {
 func (*UndeleteKeyRequest) ProtoMessage() {}
 
 func (x *UndeleteKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[8]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -788,7 +853,7 @@ func (x *UndeleteKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UndeleteKeyRequest.ProtoReflect.Descriptor instead.
 func (*UndeleteKeyRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{8}
+	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UndeleteKeyRequest) GetName() string {
@@ -819,7 +884,7 @@ type RotateKeyRequest struct {
 
 func (x *RotateKeyRequest) Reset() {
 	*x = RotateKeyRequest{}
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[9]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -831,7 +896,7 @@ func (x *RotateKeyRequest) String() string {
 func (*RotateKeyRequest) ProtoMessage() {}
 
 func (x *RotateKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[9]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -844,7 +909,7 @@ func (x *RotateKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RotateKeyRequest.ProtoReflect.Descriptor instead.
 func (*RotateKeyRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{9}
+	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *RotateKeyRequest) GetName() string {
@@ -878,7 +943,7 @@ type EncryptRequest struct {
 
 func (x *EncryptRequest) Reset() {
 	*x = EncryptRequest{}
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[10]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -890,7 +955,7 @@ func (x *EncryptRequest) String() string {
 func (*EncryptRequest) ProtoMessage() {}
 
 func (x *EncryptRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[10]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -903,7 +968,7 @@ func (x *EncryptRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EncryptRequest.ProtoReflect.Descriptor instead.
 func (*EncryptRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{10}
+	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *EncryptRequest) GetName() string {
@@ -940,7 +1005,7 @@ type EncryptResponse struct {
 
 func (x *EncryptResponse) Reset() {
 	*x = EncryptResponse{}
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[11]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -952,7 +1017,7 @@ func (x *EncryptResponse) String() string {
 func (*EncryptResponse) ProtoMessage() {}
 
 func (x *EncryptResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[11]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -965,7 +1030,7 @@ func (x *EncryptResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EncryptResponse.ProtoReflect.Descriptor instead.
 func (*EncryptResponse) Descriptor() ([]byte, []int) {
-	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{11}
+	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *EncryptResponse) GetCiphertext() []byte {
@@ -997,7 +1062,7 @@ type DecryptRequest struct {
 
 func (x *DecryptRequest) Reset() {
 	*x = DecryptRequest{}
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[12]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1009,7 +1074,7 @@ func (x *DecryptRequest) String() string {
 func (*DecryptRequest) ProtoMessage() {}
 
 func (x *DecryptRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[12]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1022,7 +1087,7 @@ func (x *DecryptRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DecryptRequest.ProtoReflect.Descriptor instead.
 func (*DecryptRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{12}
+	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *DecryptRequest) GetName() string {
@@ -1059,7 +1124,7 @@ type DecryptResponse struct {
 
 func (x *DecryptResponse) Reset() {
 	*x = DecryptResponse{}
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[13]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1071,7 +1136,7 @@ func (x *DecryptResponse) String() string {
 func (*DecryptResponse) ProtoMessage() {}
 
 func (x *DecryptResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[13]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1084,7 +1149,7 @@ func (x *DecryptResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DecryptResponse.ProtoReflect.Descriptor instead.
 func (*DecryptResponse) Descriptor() ([]byte, []int) {
-	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{13}
+	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *DecryptResponse) GetPlaintext() []byte {
@@ -1114,7 +1179,7 @@ type GenerateDataKeyRequest struct {
 
 func (x *GenerateDataKeyRequest) Reset() {
 	*x = GenerateDataKeyRequest{}
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[14]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1126,7 +1191,7 @@ func (x *GenerateDataKeyRequest) String() string {
 func (*GenerateDataKeyRequest) ProtoMessage() {}
 
 func (x *GenerateDataKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[14]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1139,7 +1204,7 @@ func (x *GenerateDataKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateDataKeyRequest.ProtoReflect.Descriptor instead.
 func (*GenerateDataKeyRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{14}
+	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *GenerateDataKeyRequest) GetName() string {
@@ -1172,7 +1237,7 @@ type GenerateDataKeyResponse struct {
 
 func (x *GenerateDataKeyResponse) Reset() {
 	*x = GenerateDataKeyResponse{}
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[15]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1184,7 +1249,7 @@ func (x *GenerateDataKeyResponse) String() string {
 func (*GenerateDataKeyResponse) ProtoMessage() {}
 
 func (x *GenerateDataKeyResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[15]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1197,7 +1262,7 @@ func (x *GenerateDataKeyResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GenerateDataKeyResponse.ProtoReflect.Descriptor instead.
 func (*GenerateDataKeyResponse) Descriptor() ([]byte, []int) {
-	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{15}
+	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *GenerateDataKeyResponse) GetPlaintext() []byte {
@@ -1242,7 +1307,7 @@ type SignRequest struct {
 
 func (x *SignRequest) Reset() {
 	*x = SignRequest{}
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[16]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1254,7 +1319,7 @@ func (x *SignRequest) String() string {
 func (*SignRequest) ProtoMessage() {}
 
 func (x *SignRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[16]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1267,7 +1332,7 @@ func (x *SignRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignRequest.ProtoReflect.Descriptor instead.
 func (*SignRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{16}
+	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *SignRequest) GetName() string {
@@ -1305,7 +1370,7 @@ type SignResponse struct {
 
 func (x *SignResponse) Reset() {
 	*x = SignResponse{}
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[17]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1317,7 +1382,7 @@ func (x *SignResponse) String() string {
 func (*SignResponse) ProtoMessage() {}
 
 func (x *SignResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[17]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1330,7 +1395,7 @@ func (x *SignResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SignResponse.ProtoReflect.Descriptor instead.
 func (*SignResponse) Descriptor() ([]byte, []int) {
-	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{17}
+	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *SignResponse) GetSignature() []byte {
@@ -1359,7 +1424,7 @@ type GetPublicKeyRequest struct {
 
 func (x *GetPublicKeyRequest) Reset() {
 	*x = GetPublicKeyRequest{}
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[18]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1371,7 +1436,7 @@ func (x *GetPublicKeyRequest) String() string {
 func (*GetPublicKeyRequest) ProtoMessage() {}
 
 func (x *GetPublicKeyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[18]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1384,7 +1449,7 @@ func (x *GetPublicKeyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPublicKeyRequest.ProtoReflect.Descriptor instead.
 func (*GetPublicKeyRequest) Descriptor() ([]byte, []int) {
-	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{18}
+	return file_origincloud_kms_v1beta1_key_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GetPublicKeyRequest) GetName() string {
@@ -1409,7 +1474,7 @@ type Key_Version struct {
 
 func (x *Key_Version) Reset() {
 	*x = Key_Version{}
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[19]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1421,7 +1486,7 @@ func (x *Key_Version) String() string {
 func (*Key_Version) ProtoMessage() {}
 
 func (x *Key_Version) ProtoReflect() protoreflect.Message {
-	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[19]
+	mi := &file_origincloud_kms_v1beta1_key_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1526,7 +1591,16 @@ const file_origincloud_kms_v1beta1_key_proto_rawDesc = "" +
 	"\x1akms.origincloudapis.eu/KeyR\x04name\x12D\n" +
 	"\rdestroy_delay\x18\x02 \x01(\v2\x19.google.protobuf.DurationB\x04\xe2A\x01\x01R\fdestroyDelay\x12+\n" +
 	"\n" +
-	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"z\n" +
+	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\"\xd2\x02\n" +
+	"\x1eRetireEncryptionContextRequest\x127\n" +
+	"\x04name\x18\x01 \x01(\tB#\xe2A\x01\x02\xfaA\x1c\n" +
+	"\x1akms.origincloudapis.eu/KeyR\x04name\x12\x83\x01\n" +
+	"\x12encryption_context\x18\x02 \x03(\v2N.origincloud.kms.v1beta1.RetireEncryptionContextRequest.EncryptionContextEntryB\x04\xe2A\x01\x02R\x11encryptionContext\x12+\n" +
+	"\n" +
+	"request_id\x18\x03 \x01(\tB\f\xe2A\x01\x01\xe2\x8c\xcf\xd7\b\x02\b\x01R\trequestId\x1aD\n" +
+	"\x16EncryptionContextEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"z\n" +
 	"\x12UndeleteKeyRequest\x127\n" +
 	"\x04name\x18\x01 \x01(\tB#\xe2A\x01\x02\xfaA\x1c\n" +
 	"\x1akms.origincloudapis.eu/KeyR\x04name\x12+\n" +
@@ -1596,7 +1670,7 @@ const file_origincloud_kms_v1beta1_key_proto_rawDesc = "" +
 	"keyVersion\"T\n" +
 	"\x13GetPublicKeyRequest\x12=\n" +
 	"\x04name\x18\x01 \x01(\tB)\xe2A\x01\x02\xfaA\"\n" +
-	" kms.origincloudapis.eu/PublicKeyR\x04name2\xe6\x0f\n" +
+	" kms.origincloudapis.eu/PublicKeyR\x04name2\xc3\x11\n" +
 	"\n" +
 	"KeyService\x12\x8a\x01\n" +
 	"\x06GetKey\x12&.origincloud.kms.v1beta1.GetKeyRequest\x1a\x1c.origincloud.kms.v1beta1.Key\":\xdaA\x04name\x82\xd3\xe4\x93\x02-\x12+/v1beta1/{name=projects/*/regions/*/keys/*}\x12\x9d\x01\n" +
@@ -1606,7 +1680,8 @@ const file_origincloud_kms_v1beta1_key_proto_rawDesc = "" +
 	"\tUpdateKey\x12).origincloud.kms.v1beta1.UpdateKeyRequest\x1a\x1c.origincloud.kms.v1beta1.Key\"N\xdaA\x0fkey,update_mask\x82\xd3\xe4\x93\x026:\x03key2//v1beta1/{key.name=projects/*/regions/*/keys/*}\x12\x90\x01\n" +
 	"\tDeleteKey\x12).origincloud.kms.v1beta1.DeleteKeyRequest\x1a\x1c.origincloud.kms.v1beta1.Key\":\xdaA\x04name\x82\xd3\xe4\x93\x02-*+/v1beta1/{name=projects/*/regions/*/keys/*}\x12\xa0\x01\n" +
 	"\vUndeleteKey\x12+.origincloud.kms.v1beta1.UndeleteKeyRequest\x1a\x1c.origincloud.kms.v1beta1.Key\"F\xdaA\x04name\x82\xd3\xe4\x93\x029:\x01*\"4/v1beta1/{name=projects/*/regions/*/keys/*}:undelete\x12\x9a\x01\n" +
-	"\tRotateKey\x12).origincloud.kms.v1beta1.RotateKeyRequest\x1a\x1c.origincloud.kms.v1beta1.Key\"D\xdaA\x04name\x82\xd3\xe4\x93\x027:\x01*\"2/v1beta1/{name=projects/*/regions/*/keys/*}:rotate\x12\xad\x01\n" +
+	"\tRotateKey\x12).origincloud.kms.v1beta1.RotateKeyRequest\x1a\x1c.origincloud.kms.v1beta1.Key\"D\xdaA\x04name\x82\xd3\xe4\x93\x027:\x01*\"2/v1beta1/{name=projects/*/regions/*/keys/*}:rotate\x12\xda\x01\n" +
+	"\x17RetireEncryptionContext\x127.origincloud.kms.v1beta1.RetireEncryptionContextRequest\x1a\x1c.origincloud.kms.v1beta1.Key\"h\xdaA\x17name,encryption_context\x82\xd3\xe4\x93\x02H:\x01*\"C/v1beta1/{name=projects/*/regions/*/keys/*}:retireEncryptionContext\x12\xad\x01\n" +
 	"\aEncrypt\x12'.origincloud.kms.v1beta1.EncryptRequest\x1a(.origincloud.kms.v1beta1.EncryptResponse\"O\xdaA\x0ename,plaintext\x82\xd3\xe4\x93\x028:\x01*\"3/v1beta1/{name=projects/*/regions/*/keys/*}:encrypt\x12\xae\x01\n" +
 	"\aDecrypt\x12'.origincloud.kms.v1beta1.DecryptRequest\x1a(.origincloud.kms.v1beta1.DecryptResponse\"P\xdaA\x0fname,ciphertext\x82\xd3\xe4\x93\x028:\x01*\"3/v1beta1/{name=projects/*/regions/*/keys/*}:decrypt\x12\xc3\x01\n" +
 	"\x0fGenerateDataKey\x12/.origincloud.kms.v1beta1.GenerateDataKeyRequest\x1a0.origincloud.kms.v1beta1.GenerateDataKeyResponse\"M\xdaA\x04name\x82\xd3\xe4\x93\x02@:\x01*\";/v1beta1/{name=projects/*/regions/*/keys/*}:generateDataKey\x12\x9c\x01\n" +
@@ -1628,85 +1703,90 @@ func file_origincloud_kms_v1beta1_key_proto_rawDescGZIP() []byte {
 }
 
 var file_origincloud_kms_v1beta1_key_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_origincloud_kms_v1beta1_key_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_origincloud_kms_v1beta1_key_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_origincloud_kms_v1beta1_key_proto_goTypes = []any{
-	(Key_Purpose)(0),                // 0: origincloud.kms.v1beta1.Key.Purpose
-	(Key_State)(0),                  // 1: origincloud.kms.v1beta1.Key.State
-	(*Key)(nil),                     // 2: origincloud.kms.v1beta1.Key
-	(*PublicKey)(nil),               // 3: origincloud.kms.v1beta1.PublicKey
-	(*GetKeyRequest)(nil),           // 4: origincloud.kms.v1beta1.GetKeyRequest
-	(*ListKeysRequest)(nil),         // 5: origincloud.kms.v1beta1.ListKeysRequest
-	(*ListKeysResponse)(nil),        // 6: origincloud.kms.v1beta1.ListKeysResponse
-	(*CreateKeyRequest)(nil),        // 7: origincloud.kms.v1beta1.CreateKeyRequest
-	(*UpdateKeyRequest)(nil),        // 8: origincloud.kms.v1beta1.UpdateKeyRequest
-	(*DeleteKeyRequest)(nil),        // 9: origincloud.kms.v1beta1.DeleteKeyRequest
-	(*UndeleteKeyRequest)(nil),      // 10: origincloud.kms.v1beta1.UndeleteKeyRequest
-	(*RotateKeyRequest)(nil),        // 11: origincloud.kms.v1beta1.RotateKeyRequest
-	(*EncryptRequest)(nil),          // 12: origincloud.kms.v1beta1.EncryptRequest
-	(*EncryptResponse)(nil),         // 13: origincloud.kms.v1beta1.EncryptResponse
-	(*DecryptRequest)(nil),          // 14: origincloud.kms.v1beta1.DecryptRequest
-	(*DecryptResponse)(nil),         // 15: origincloud.kms.v1beta1.DecryptResponse
-	(*GenerateDataKeyRequest)(nil),  // 16: origincloud.kms.v1beta1.GenerateDataKeyRequest
-	(*GenerateDataKeyResponse)(nil), // 17: origincloud.kms.v1beta1.GenerateDataKeyResponse
-	(*SignRequest)(nil),             // 18: origincloud.kms.v1beta1.SignRequest
-	(*SignResponse)(nil),            // 19: origincloud.kms.v1beta1.SignResponse
-	(*GetPublicKeyRequest)(nil),     // 20: origincloud.kms.v1beta1.GetPublicKeyRequest
-	(*Key_Version)(nil),             // 21: origincloud.kms.v1beta1.Key.Version
-	nil,                             // 22: origincloud.kms.v1beta1.Key.TagsEntry
-	nil,                             // 23: origincloud.kms.v1beta1.EncryptRequest.EncryptionContextEntry
-	nil,                             // 24: origincloud.kms.v1beta1.DecryptRequest.EncryptionContextEntry
-	nil,                             // 25: origincloud.kms.v1beta1.GenerateDataKeyRequest.EncryptionContextEntry
-	(*timestamppb.Timestamp)(nil),   // 26: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),   // 27: google.protobuf.FieldMask
-	(*durationpb.Duration)(nil),     // 28: google.protobuf.Duration
+	(Key_Purpose)(0),                       // 0: origincloud.kms.v1beta1.Key.Purpose
+	(Key_State)(0),                         // 1: origincloud.kms.v1beta1.Key.State
+	(*Key)(nil),                            // 2: origincloud.kms.v1beta1.Key
+	(*PublicKey)(nil),                      // 3: origincloud.kms.v1beta1.PublicKey
+	(*GetKeyRequest)(nil),                  // 4: origincloud.kms.v1beta1.GetKeyRequest
+	(*ListKeysRequest)(nil),                // 5: origincloud.kms.v1beta1.ListKeysRequest
+	(*ListKeysResponse)(nil),               // 6: origincloud.kms.v1beta1.ListKeysResponse
+	(*CreateKeyRequest)(nil),               // 7: origincloud.kms.v1beta1.CreateKeyRequest
+	(*UpdateKeyRequest)(nil),               // 8: origincloud.kms.v1beta1.UpdateKeyRequest
+	(*DeleteKeyRequest)(nil),               // 9: origincloud.kms.v1beta1.DeleteKeyRequest
+	(*RetireEncryptionContextRequest)(nil), // 10: origincloud.kms.v1beta1.RetireEncryptionContextRequest
+	(*UndeleteKeyRequest)(nil),             // 11: origincloud.kms.v1beta1.UndeleteKeyRequest
+	(*RotateKeyRequest)(nil),               // 12: origincloud.kms.v1beta1.RotateKeyRequest
+	(*EncryptRequest)(nil),                 // 13: origincloud.kms.v1beta1.EncryptRequest
+	(*EncryptResponse)(nil),                // 14: origincloud.kms.v1beta1.EncryptResponse
+	(*DecryptRequest)(nil),                 // 15: origincloud.kms.v1beta1.DecryptRequest
+	(*DecryptResponse)(nil),                // 16: origincloud.kms.v1beta1.DecryptResponse
+	(*GenerateDataKeyRequest)(nil),         // 17: origincloud.kms.v1beta1.GenerateDataKeyRequest
+	(*GenerateDataKeyResponse)(nil),        // 18: origincloud.kms.v1beta1.GenerateDataKeyResponse
+	(*SignRequest)(nil),                    // 19: origincloud.kms.v1beta1.SignRequest
+	(*SignResponse)(nil),                   // 20: origincloud.kms.v1beta1.SignResponse
+	(*GetPublicKeyRequest)(nil),            // 21: origincloud.kms.v1beta1.GetPublicKeyRequest
+	(*Key_Version)(nil),                    // 22: origincloud.kms.v1beta1.Key.Version
+	nil,                                    // 23: origincloud.kms.v1beta1.Key.TagsEntry
+	nil,                                    // 24: origincloud.kms.v1beta1.RetireEncryptionContextRequest.EncryptionContextEntry
+	nil,                                    // 25: origincloud.kms.v1beta1.EncryptRequest.EncryptionContextEntry
+	nil,                                    // 26: origincloud.kms.v1beta1.DecryptRequest.EncryptionContextEntry
+	nil,                                    // 27: origincloud.kms.v1beta1.GenerateDataKeyRequest.EncryptionContextEntry
+	(*timestamppb.Timestamp)(nil),          // 28: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),          // 29: google.protobuf.FieldMask
+	(*durationpb.Duration)(nil),            // 30: google.protobuf.Duration
 }
 var file_origincloud_kms_v1beta1_key_proto_depIdxs = []int32{
 	0,  // 0: origincloud.kms.v1beta1.Key.purpose:type_name -> origincloud.kms.v1beta1.Key.Purpose
 	1,  // 1: origincloud.kms.v1beta1.Key.state:type_name -> origincloud.kms.v1beta1.Key.State
-	21, // 2: origincloud.kms.v1beta1.Key.versions:type_name -> origincloud.kms.v1beta1.Key.Version
-	26, // 3: origincloud.kms.v1beta1.Key.create_time:type_name -> google.protobuf.Timestamp
-	26, // 4: origincloud.kms.v1beta1.Key.update_time:type_name -> google.protobuf.Timestamp
-	26, // 5: origincloud.kms.v1beta1.Key.purge_time:type_name -> google.protobuf.Timestamp
-	22, // 6: origincloud.kms.v1beta1.Key.tags:type_name -> origincloud.kms.v1beta1.Key.TagsEntry
+	22, // 2: origincloud.kms.v1beta1.Key.versions:type_name -> origincloud.kms.v1beta1.Key.Version
+	28, // 3: origincloud.kms.v1beta1.Key.create_time:type_name -> google.protobuf.Timestamp
+	28, // 4: origincloud.kms.v1beta1.Key.update_time:type_name -> google.protobuf.Timestamp
+	28, // 5: origincloud.kms.v1beta1.Key.purge_time:type_name -> google.protobuf.Timestamp
+	23, // 6: origincloud.kms.v1beta1.Key.tags:type_name -> origincloud.kms.v1beta1.Key.TagsEntry
 	0,  // 7: origincloud.kms.v1beta1.PublicKey.algorithm:type_name -> origincloud.kms.v1beta1.Key.Purpose
 	2,  // 8: origincloud.kms.v1beta1.ListKeysResponse.keys:type_name -> origincloud.kms.v1beta1.Key
 	2,  // 9: origincloud.kms.v1beta1.CreateKeyRequest.key:type_name -> origincloud.kms.v1beta1.Key
 	2,  // 10: origincloud.kms.v1beta1.UpdateKeyRequest.key:type_name -> origincloud.kms.v1beta1.Key
-	27, // 11: origincloud.kms.v1beta1.UpdateKeyRequest.update_mask:type_name -> google.protobuf.FieldMask
-	28, // 12: origincloud.kms.v1beta1.DeleteKeyRequest.destroy_delay:type_name -> google.protobuf.Duration
-	23, // 13: origincloud.kms.v1beta1.EncryptRequest.encryption_context:type_name -> origincloud.kms.v1beta1.EncryptRequest.EncryptionContextEntry
-	24, // 14: origincloud.kms.v1beta1.DecryptRequest.encryption_context:type_name -> origincloud.kms.v1beta1.DecryptRequest.EncryptionContextEntry
-	25, // 15: origincloud.kms.v1beta1.GenerateDataKeyRequest.encryption_context:type_name -> origincloud.kms.v1beta1.GenerateDataKeyRequest.EncryptionContextEntry
-	26, // 16: origincloud.kms.v1beta1.Key.Version.create_time:type_name -> google.protobuf.Timestamp
-	4,  // 17: origincloud.kms.v1beta1.KeyService.GetKey:input_type -> origincloud.kms.v1beta1.GetKeyRequest
-	5,  // 18: origincloud.kms.v1beta1.KeyService.ListKeys:input_type -> origincloud.kms.v1beta1.ListKeysRequest
-	7,  // 19: origincloud.kms.v1beta1.KeyService.CreateKey:input_type -> origincloud.kms.v1beta1.CreateKeyRequest
-	8,  // 20: origincloud.kms.v1beta1.KeyService.UpdateKey:input_type -> origincloud.kms.v1beta1.UpdateKeyRequest
-	9,  // 21: origincloud.kms.v1beta1.KeyService.DeleteKey:input_type -> origincloud.kms.v1beta1.DeleteKeyRequest
-	10, // 22: origincloud.kms.v1beta1.KeyService.UndeleteKey:input_type -> origincloud.kms.v1beta1.UndeleteKeyRequest
-	11, // 23: origincloud.kms.v1beta1.KeyService.RotateKey:input_type -> origincloud.kms.v1beta1.RotateKeyRequest
-	12, // 24: origincloud.kms.v1beta1.KeyService.Encrypt:input_type -> origincloud.kms.v1beta1.EncryptRequest
-	14, // 25: origincloud.kms.v1beta1.KeyService.Decrypt:input_type -> origincloud.kms.v1beta1.DecryptRequest
-	16, // 26: origincloud.kms.v1beta1.KeyService.GenerateDataKey:input_type -> origincloud.kms.v1beta1.GenerateDataKeyRequest
-	18, // 27: origincloud.kms.v1beta1.KeyService.Sign:input_type -> origincloud.kms.v1beta1.SignRequest
-	20, // 28: origincloud.kms.v1beta1.KeyService.GetPublicKey:input_type -> origincloud.kms.v1beta1.GetPublicKeyRequest
-	2,  // 29: origincloud.kms.v1beta1.KeyService.GetKey:output_type -> origincloud.kms.v1beta1.Key
-	6,  // 30: origincloud.kms.v1beta1.KeyService.ListKeys:output_type -> origincloud.kms.v1beta1.ListKeysResponse
-	2,  // 31: origincloud.kms.v1beta1.KeyService.CreateKey:output_type -> origincloud.kms.v1beta1.Key
-	2,  // 32: origincloud.kms.v1beta1.KeyService.UpdateKey:output_type -> origincloud.kms.v1beta1.Key
-	2,  // 33: origincloud.kms.v1beta1.KeyService.DeleteKey:output_type -> origincloud.kms.v1beta1.Key
-	2,  // 34: origincloud.kms.v1beta1.KeyService.UndeleteKey:output_type -> origincloud.kms.v1beta1.Key
-	2,  // 35: origincloud.kms.v1beta1.KeyService.RotateKey:output_type -> origincloud.kms.v1beta1.Key
-	13, // 36: origincloud.kms.v1beta1.KeyService.Encrypt:output_type -> origincloud.kms.v1beta1.EncryptResponse
-	15, // 37: origincloud.kms.v1beta1.KeyService.Decrypt:output_type -> origincloud.kms.v1beta1.DecryptResponse
-	17, // 38: origincloud.kms.v1beta1.KeyService.GenerateDataKey:output_type -> origincloud.kms.v1beta1.GenerateDataKeyResponse
-	19, // 39: origincloud.kms.v1beta1.KeyService.Sign:output_type -> origincloud.kms.v1beta1.SignResponse
-	3,  // 40: origincloud.kms.v1beta1.KeyService.GetPublicKey:output_type -> origincloud.kms.v1beta1.PublicKey
-	29, // [29:41] is the sub-list for method output_type
-	17, // [17:29] is the sub-list for method input_type
-	17, // [17:17] is the sub-list for extension type_name
-	17, // [17:17] is the sub-list for extension extendee
-	0,  // [0:17] is the sub-list for field type_name
+	29, // 11: origincloud.kms.v1beta1.UpdateKeyRequest.update_mask:type_name -> google.protobuf.FieldMask
+	30, // 12: origincloud.kms.v1beta1.DeleteKeyRequest.destroy_delay:type_name -> google.protobuf.Duration
+	24, // 13: origincloud.kms.v1beta1.RetireEncryptionContextRequest.encryption_context:type_name -> origincloud.kms.v1beta1.RetireEncryptionContextRequest.EncryptionContextEntry
+	25, // 14: origincloud.kms.v1beta1.EncryptRequest.encryption_context:type_name -> origincloud.kms.v1beta1.EncryptRequest.EncryptionContextEntry
+	26, // 15: origincloud.kms.v1beta1.DecryptRequest.encryption_context:type_name -> origincloud.kms.v1beta1.DecryptRequest.EncryptionContextEntry
+	27, // 16: origincloud.kms.v1beta1.GenerateDataKeyRequest.encryption_context:type_name -> origincloud.kms.v1beta1.GenerateDataKeyRequest.EncryptionContextEntry
+	28, // 17: origincloud.kms.v1beta1.Key.Version.create_time:type_name -> google.protobuf.Timestamp
+	4,  // 18: origincloud.kms.v1beta1.KeyService.GetKey:input_type -> origincloud.kms.v1beta1.GetKeyRequest
+	5,  // 19: origincloud.kms.v1beta1.KeyService.ListKeys:input_type -> origincloud.kms.v1beta1.ListKeysRequest
+	7,  // 20: origincloud.kms.v1beta1.KeyService.CreateKey:input_type -> origincloud.kms.v1beta1.CreateKeyRequest
+	8,  // 21: origincloud.kms.v1beta1.KeyService.UpdateKey:input_type -> origincloud.kms.v1beta1.UpdateKeyRequest
+	9,  // 22: origincloud.kms.v1beta1.KeyService.DeleteKey:input_type -> origincloud.kms.v1beta1.DeleteKeyRequest
+	11, // 23: origincloud.kms.v1beta1.KeyService.UndeleteKey:input_type -> origincloud.kms.v1beta1.UndeleteKeyRequest
+	12, // 24: origincloud.kms.v1beta1.KeyService.RotateKey:input_type -> origincloud.kms.v1beta1.RotateKeyRequest
+	10, // 25: origincloud.kms.v1beta1.KeyService.RetireEncryptionContext:input_type -> origincloud.kms.v1beta1.RetireEncryptionContextRequest
+	13, // 26: origincloud.kms.v1beta1.KeyService.Encrypt:input_type -> origincloud.kms.v1beta1.EncryptRequest
+	15, // 27: origincloud.kms.v1beta1.KeyService.Decrypt:input_type -> origincloud.kms.v1beta1.DecryptRequest
+	17, // 28: origincloud.kms.v1beta1.KeyService.GenerateDataKey:input_type -> origincloud.kms.v1beta1.GenerateDataKeyRequest
+	19, // 29: origincloud.kms.v1beta1.KeyService.Sign:input_type -> origincloud.kms.v1beta1.SignRequest
+	21, // 30: origincloud.kms.v1beta1.KeyService.GetPublicKey:input_type -> origincloud.kms.v1beta1.GetPublicKeyRequest
+	2,  // 31: origincloud.kms.v1beta1.KeyService.GetKey:output_type -> origincloud.kms.v1beta1.Key
+	6,  // 32: origincloud.kms.v1beta1.KeyService.ListKeys:output_type -> origincloud.kms.v1beta1.ListKeysResponse
+	2,  // 33: origincloud.kms.v1beta1.KeyService.CreateKey:output_type -> origincloud.kms.v1beta1.Key
+	2,  // 34: origincloud.kms.v1beta1.KeyService.UpdateKey:output_type -> origincloud.kms.v1beta1.Key
+	2,  // 35: origincloud.kms.v1beta1.KeyService.DeleteKey:output_type -> origincloud.kms.v1beta1.Key
+	2,  // 36: origincloud.kms.v1beta1.KeyService.UndeleteKey:output_type -> origincloud.kms.v1beta1.Key
+	2,  // 37: origincloud.kms.v1beta1.KeyService.RotateKey:output_type -> origincloud.kms.v1beta1.Key
+	2,  // 38: origincloud.kms.v1beta1.KeyService.RetireEncryptionContext:output_type -> origincloud.kms.v1beta1.Key
+	14, // 39: origincloud.kms.v1beta1.KeyService.Encrypt:output_type -> origincloud.kms.v1beta1.EncryptResponse
+	16, // 40: origincloud.kms.v1beta1.KeyService.Decrypt:output_type -> origincloud.kms.v1beta1.DecryptResponse
+	18, // 41: origincloud.kms.v1beta1.KeyService.GenerateDataKey:output_type -> origincloud.kms.v1beta1.GenerateDataKeyResponse
+	20, // 42: origincloud.kms.v1beta1.KeyService.Sign:output_type -> origincloud.kms.v1beta1.SignResponse
+	3,  // 43: origincloud.kms.v1beta1.KeyService.GetPublicKey:output_type -> origincloud.kms.v1beta1.PublicKey
+	31, // [31:44] is the sub-list for method output_type
+	18, // [18:31] is the sub-list for method input_type
+	18, // [18:18] is the sub-list for extension type_name
+	18, // [18:18] is the sub-list for extension extendee
+	0,  // [0:18] is the sub-list for field type_name
 }
 
 func init() { file_origincloud_kms_v1beta1_key_proto_init() }
@@ -1720,7 +1800,7 @@ func file_origincloud_kms_v1beta1_key_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_origincloud_kms_v1beta1_key_proto_rawDesc), len(file_origincloud_kms_v1beta1_key_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   24,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

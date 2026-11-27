@@ -7,6 +7,7 @@
 package dnsv1beta1
 
 import (
+	_ "buf.build/gen/go/bufbuild/protovalidate/protocolbuffers/go/buf/validate"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -938,7 +939,7 @@ var File_origincloud_dns_v1beta1_record_set_proto protoreflect.FileDescriptor
 
 const file_origincloud_dns_v1beta1_record_set_proto_rawDesc = "" +
 	"\n" +
-	"(origincloud/dns/v1beta1/record_set.proto\x12\x17origincloud.dns.v1beta1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xcb\x05\n" +
+	"(origincloud/dns/v1beta1/record_set.proto\x12\x17origincloud.dns.v1beta1\x1a\x1bbuf/validate/validate.proto\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x1bgoogle/api/field_info.proto\x1a\x19google/api/resource.proto\x1a\x1egoogle/protobuf/duration.proto\x1a\x1bgoogle/protobuf/empty.proto\x1a google/protobuf/field_mask.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd2\x05\n" +
 	"\tRecordSet\x12\x18\n" +
 	"\x04name\x18\x01 \x01(\tB\x04\xe2A\x01\bR\x04name\x12 \n" +
 	"\bdns_name\x18\x03 \x01(\tB\x05\xe2A\x02\x02\x05R\adnsName\x12B\n" +
@@ -960,8 +961,8 @@ const file_origincloud_dns_v1beta1_record_set_proto_rawDesc = "" +
 	"\x03SRV\x10\x06\x12\a\n" +
 	"\x03CAA\x10\a:\x82\x01\xeaA\x7f\n" +
 	" dns.origincloudapis.eu/RecordSet\x12Dprojects/{project}/hostedZones/{hosted_zone}/recordSets/{record_set}*\n" +
-	"recordSets2\trecordSetB\x06\n" +
-	"\x04dataB\x06\n" +
+	"recordSets2\trecordSetB\r\n" +
+	"\x04data\x12\x05\xbaH\x02\b\x01B\x06\n" +
 	"\x04_ttl\"0\n" +
 	"\x0fBasicRecordData\x12\x1d\n" +
 	"\x06values\x18\x01 \x03(\tB\x05\xe2A\x02\x02\x06R\x06values\"b\n" +
