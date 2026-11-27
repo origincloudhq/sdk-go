@@ -15,7 +15,7 @@ const (
 )
 
 func TestTheServicesAreTheAPIsWithResources(t *testing.T) {
-	want := []string{"billing", "compute", "dns", "iam", "kms", "location", "network", "pvs", "resourcemanager", "support"}
+	want := []string{"billing", "compute", "dns", "iam", "kms", "location", "network", "pvs", "resourcemanager", "secretmanager", "support"}
 	if got := ResourceServices(); !slices.Equal(got, want) {
 		t.Errorf("ResourceServices() = %q, want %q", got, want)
 	}
